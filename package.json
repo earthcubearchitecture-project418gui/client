@@ -1,0 +1,42 @@
+{
+  "name": "jsonld-ucar-react-schema-form-2",
+  "version": "0.1.0",
+  "description": "",
+  "keywords": [],
+  "author": "ISTI inc.",
+  "license": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel src/index.html --no-autoinstall"
+  },
+  "dependencies": {
+    "ajv": "^6.7.0",
+    "core-js": "^2.5.7",
+    "lodash.topath": "^4.5.2",
+    "prop-types": "^15.5.8"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.0",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/plugin-transform-react-jsx": "^7.3.0",
+    "@babel/preset-env": "^7.4.2",
+    "codemirror": "^5.30.0",
+    "react": "^16.8.5",
+    "react-codemirror2": "^4.1.0",
+    "react-dom": "^16.8.5"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties",
+      [
+        "@babel/plugin-transform-react-jsx",
+        {
+          "pragmaFrag": "React.Fragment"
+        }
+      ]
+    ]
+  }
+}
