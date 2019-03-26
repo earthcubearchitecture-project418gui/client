@@ -15,36 +15,47 @@ const log = type => console.log.bind(console, type);
 class NavPillSelector extends Component {
   constructor(props) {
     super(props);
-    this.state = { current: "Simple" };
+    this.state = { current: props.options[0] };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     return shouldRender(this, nextProps, nextState);
   }
 
-  onLabelClick = label => {
+  onLabelClick = (label, i) => {
     return event => {
       event.preventDefault();
       this.setState({ current: label });
-      setImmediate(() => this.props.onSelected(samples[label]));
+      setImmediate(() => this.props.onSelected(label, i));
     };
   };
 
   render() {
     return (
       <ul className="nav nav-pills">
-        {Object.keys(samples).map((label, i) => {
+        { this.props.options.map((label, i) => (
+          <li
+            key={i}
+            role="presentation"
+            className={this.state.current === label ? "active" : ""}>
+            <a href="#" onClick={this.onLabelClick(label,i)} style={{ textTransform: 'capitalize' }}>
+              {label}
+            </a>
+          </li>
+        )) }        
+
+        {/* Object.keys(this.props.options).map((label, i) => {
           return (
             <li
               key={i}
               role="presentation"
               className={this.state.current === label ? "active" : ""}>
-              <a href="#" onClick={this.onLabelClick(label)}>
+              <a href="#" onClick={this.onLabelClick(label)} style={{ textTransform: 'capitalize' }}>
                 {label}
               </a>
             </li>
           );
-        })}
+        }) */}
       </ul>
     );
   }
@@ -65,11 +76,11 @@ function ThemeSelector({ theme, select }) {
   );
 }
 
-class App extends Component {
+class Condor extends Component {
   constructor(props) {
     super(props);
     // initialize state with Simple data sample
-    const { schema, uiSchema, formData, validate } = samples.Simple;
+    const { schema, uiSchema, formData, validate } = samples.dataset;
     this.state = {
       form: false,
       schema,
@@ -77,26 +88,12 @@ class App extends Component {
       formData,
       validate,
       editor: "default",
-      theme: "default",
-      liveSettings: {
-        validate: true,
-        disable: false,
-      },
-      shareURL: null,
+      // theme: "default",
     };
   }
 
   componentDidMount() {
-    // const hash = document.location.hash.match(/#(.*)/);
-    // if (hash && typeof hash[1] === "string" && hash[1].length > 0) {
-    //   try {
-    //     this.load(JSON.parse(atob(hash[1])));
-    //   } catch (err) {
-    //     alert("Unable to load form setup data.");
-    //   }
-    // } else {
-      this.load(samples.Simple);
-    // }
+    this.load(samples.dataset);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -127,63 +124,44 @@ class App extends Component {
 
   onFormDataEdited = formData => this.setState({ formData, shareURL: null });
 
-  onThemeSelected = (theme, { stylesheet, editor }) => {
-    this.setState({ theme, editor: editor ? editor : "default" });
-    setImmediate(() => {
-      // Side effect!
-      document.getElementById("theme").setAttribute("href", stylesheet);
-    });
-  };
-
-  setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
-
   onFormDataChange = ({ formData }) =>
     this.setState({ formData, shareURL: null });
+
+  // onThemeSelected = (theme, { stylesheet, editor }) => {
+  //   this.setState({ theme, editor: editor ? editor : "default" });
+  //   setImmediate(() => {
+  //     // Side effect!
+  //     document.getElementById("theme").setAttribute("href", stylesheet);
+  //   });
+  // };
+
+  // setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
 
   render() {
     const {
       schema,
       uiSchema,
       formData,
-      liveSettings,
+      // liveSettings,
       validate,
-      theme,
+      // theme,
       editor,
       ArrayFieldTemplate,
       ObjectFieldTemplate,
       transformErrors,
     } = this.state;
 
-    const liveSettingsSchema = {
-      type: "object",
-      properties: {
-        validate: { type: "boolean", title: "Live validation" },
-        disable: { type: "boolean", title: "Disable whole form" },
-      },
-    };
+    // const liveSettingsSchema = {
+    //   type: "object",
+    //   properties: {
+    //     validate: { type: "boolean", title: "Live validation" },
+    //     disable: { type: "boolean", title: "Disable whole form" },
+    //   },
+    // };
 
     return (
       <div className="container-fluid">
-        <div className="page-header">
-          <div className="row">
-            <div className="col-sm-8">
-              <NavPillSelector 
-                options={["dataset", "org"]}
-                onSelected={this.load} />
-            </div>
-            <div className="col-sm-2">
-              <Form
-                schema={liveSettingsSchema}
-                formData={liveSettings}
-                onChange={this.setLiveSettings} >
-                <div />
-              </Form>
-            </div>
-            <div className="col-sm-2">
-              <ThemeSelector theme={theme} select={this.onThemeSelected} />
-            </div>
-          </div>
-        </div>
+       
         <TriEditor 
           editor={editor}
           schema={schema}
@@ -199,8 +177,8 @@ class App extends Component {
             <Form
               ArrayFieldTemplate={ArrayFieldTemplate}
               ObjectFieldTemplate={ObjectFieldTemplate}
-              liveValidate={liveSettings.validate}
-              disabled={liveSettings.disable}
+              liveValidate={this.props.liveValidate}
+              disabled={this.props.disable}
               schema={schema}
               uiSchema={uiSchema}
               formData={formData}
@@ -227,5 +205,102 @@ class App extends Component {
     );
   }
 }
+
+class App extends Component {
+  static liveSettingsSchema = {
+    type: "object",
+    properties: {
+      validate: { type: "boolean", title: "Live validation" },
+      disable: { type: "boolean", title: "Disable whole form" },
+    },
+  };
+  
+  condor = React.createRef();
+
+  state = {
+    editor: "default",
+    theme: "default",
+
+    liveSettings: {
+      validate: true,
+      disable: false,
+    }
+  };
+
+  // load = data => {
+  //   console.log('Data:', data);
+  //   // Reset the ArrayFieldTemplate whenever you load new data
+  //   const { ArrayFieldTemplate, ObjectFieldTemplate } = data;
+  //   // uiSchema is missing on some examples. Provide a default to
+  //   // clear the field in all cases.
+  //   const { uiSchema = {} } = data;
+  //   // force resetting form component instance
+  //   this.setState({ form: false }, _ =>
+  //     this.setState({
+  //       ...data,
+  //       form: true,
+  //       ArrayFieldTemplate,
+  //       ObjectFieldTemplate,
+  //       uiSchema,
+  //     })
+  //   );
+  // };
+
+  load = data => {
+    if (this.condor && this.condor.current) {
+      this.condor.current.load(data);
+    }
+  }
+  
+  setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
+
+  onThemeSelected = (theme, { stylesheet, editor }) => {
+    this.setState({ theme, editor: editor ? editor : "default" });
+    setImmediate(() => {
+      // Side effect!
+      document.getElementById("theme").setAttribute("href", stylesheet);
+    });
+  };
+
+  render() {
+    console.log(this.condor && this.condor.current);
+
+    const { theme, liveSettings } = this.state;
+
+    return (
+      <div>
+        <div className="container-fluid">
+          <div className="page-header">
+            <div className="row">
+              <div className="col-sm-8">
+                <NavPillSelector 
+                  options={Object.keys(samples)}
+                  onSelected={(label) => this.load(samples[label])} />
+              </div>
+              <div className="col-sm-2">
+                <Form
+                  schema={App.liveSettingsSchema}
+                  formData={liveSettings}
+                  onChange={this.setLiveSettings} >
+                  <div />
+                </Form>
+              </div>
+              <div className="col-sm-2">
+                <ThemeSelector theme={theme} select={this.onThemeSelected} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Condor
+          ref={this.condor}
+          liveValidate={liveSettings.validate}
+          disable={liveSettings.disable}
+        />
+      </div>
+    );
+  }
+}
+
 
 render(<App />, document.getElementById("app"));

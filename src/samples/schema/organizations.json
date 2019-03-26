@@ -1,0 +1,544 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://earthcube.isti.com/ucar-json-ld.organization.schema.json",
+  "title": "EarthCube GeoCODES Registered Organization",
+  "description": "",
+  "type": "object",
+  "required": [
+    "@id",
+    "legalName",
+    "name",
+    "url",
+    "description",
+    "contactPoint",
+    "address",
+    "funder"
+  ],
+  "groups" : {
+    "main": [ "@id", "legalName", "name", "url", "description", "category"],
+    "contact": [ "contactPoint", "address" ],
+    "info": [ "foundingDate", "logo" ],
+    "parent Organizations": [ "parentOrganization" ] ,
+    "associations": [ "memberOf" ],
+    "funding Agencies": [ "funder" ],
+    "publishing": [ "publishingPrinciples" ]
+  },
+  "mimetypes": [
+    "text/html",
+    "text/plain",
+    "text/csv",
+    "application/rtf",
+    "application/pdf",
+    "application/postscript",
+    "application/postscript",
+    "application/msword",
+    "application/powerpoint",
+    "application/excel",
+    "image/tiff",
+    "image/png",
+    "image/jpeg",
+    "image/gif",
+    "image/svg+xml",
+    "video/x-ms-wmv",
+    "video/quicktime",
+    "video/mp4",
+    "video/x-msvideo",
+    "application/zip",
+    "application/x-gzip",
+    "application/x-gzip",
+    "application/x-hdf5",
+    "application/x-netcdf4"
+  ],
+  "properties": {
+    "@id": {
+      "type": "string",
+      "format": "uri"
+    },
+    "legalName": {
+      "type": "string",
+      "title": "Legal Name",
+      "description": "Enter the name that is legally registered to your organization.",
+      "example": "Biological and Chemical Data Management Office"
+    },
+    "name": {
+      "type": "string",
+      "title": "Common Name",
+      "description": "Enter the name commonly used to refer to your organization.",
+      "example": "BCO-DMO"
+    },
+    "url": {
+      "type": "string",
+      "title": "URL or DOI URL",
+      "description": "Enter the organization's URL or DOI URL.",
+      "example": "https://www.bco-dmo.org",
+      "format": "uri"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "description": "Describe your organization, e.g., its mission, goals, etc.",
+      "example": "The BCO-DMO resource catalog offers free and open access to publicly funded research products whose field of study are biological and chemical oceanography."
+    },
+    "category": {
+      "type": "array",
+      "title": "Field(s) of Study",
+      "description": "Enter your organization's field(s) of study.",
+      "example": "Biological Oceanography, Chemical Oceanography",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sameAs": {
+      "type": "array",
+      "title": "Social Media URLs",
+      "description": "Enter links to your organization social media pages, e.g., Facebook, LinkedIn, Twitter, etc.",
+      "example": "https://twitter.com/BCODMO, https://www.linkedin.com/company/6378439/",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "contactPoint": {
+      "type": "array",
+      "title": "Contact",
+      "description": "Provide information about the organization's contact(s), which may be an individual and/or a department within the organization.",
+      "items": {
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "name",
+          "email"
+        ],
+        "properties": {
+          "@type": {
+            "type": "string",
+            "const": "ContactPoint",
+            "default": "ContactPoint"
+          },
+          "@id": {
+            "type": "string",
+            "format": "uri"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Enter the contact name, which may be that of either an individual or a department within the organization.",
+            "example": "Customer Support"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email",
+            "description": "Provide an email address for this organizational contact.",
+            "example": "contact@bco-dmo.org",
+            "format": "email"
+          },
+          "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "Provide a URL to your organization's web pages that provide information about this contact.",
+            "example": "https://www.@bco-dmo.org/contact",
+            "format": "uri"
+          },
+          "contactType": {
+            "type": "string",
+            "title": "Contact Role",
+            "description": "Enter the role fulfilled by this contact within the organization.",
+            "example": "Customer Support, Help Line"
+          }
+        }
+      }
+    },
+    "address": {
+      "type": "array",
+      "title": "Address",
+      "description": "Enter this organization's postal address(es).",
+      "items": {
+        "type": "object",
+        "required": [
+          "@type",
+          "streetAddress",
+          "addressLocality",
+          "addressRegion",
+          "postalCode",
+          "addressCountry"
+        ],
+        "properties": {
+          "@type": {
+            "type": "string",
+            "const": "PostalAddress",
+            "default": "PostalAddress"
+          },
+          "streetAddress": {
+            "type": "string",
+            "title": "Street",
+            "description": "Enter the street address used for this organizational postal address.",
+            "example": "WHOI, MS#36, Shiverick House 11 School St."
+          },
+          "addressLocality": {
+            "type": "string",
+            "title": "City",
+            "description": "Enter the city used for this organizational postal address.",
+            "example": "Woods Hole"
+          },
+          "addressRegion": {
+            "type": "string",
+            "title": "State",
+            "description": " Enter the state used for this organizational postal address.",
+            "example": "MA"
+          },
+          "postalCode": {
+            "type": "string",
+            "title": "ZIP Code",
+            "description": "Enter the ZIP code used for this organizational postal address.",
+            "example": "02543"
+          },
+          "addressCountry": {
+            "type": "string",
+            "title": "Country",
+            "description": "Enter the country used for this organizational postal address.",
+            "example": "USA"
+          }
+        }
+      }
+    },
+    "foundingDate": {
+      "type": "string",
+      "title": "Inception Date",
+      "description": "Provide the date on which your organization was founded.",
+      "example": "2006-09-01",
+      "format": "date"
+    },
+    "logo": {
+      "type": "object",
+      "title": "Logo",
+      "description": "Logo refers to the symbol or graphical design adopted by your organization to readily identify it.",
+      "required": [
+        "@type",
+        "url"
+      ],
+      "properties": {
+        "@type": {
+          "type": "string",
+          "const": "ImageObject",
+          "default": "ImageObject"
+        },
+        "url": {
+          "type": "string",
+          "title": "Logo URL",
+          "description": "Provide a link to the image file containing your organization's logo.",
+            "example": "https://www.bco-dmo.org/files/bcodmo/images/bco-dmo-words-BLUE.jpg",
+          "format": "uri"
+        }
+      }
+    },
+    "parentOrganization": {
+      "type": "array",
+      "title": "Parent Organizations",
+      "description": "A Parent Organization is that part of an organization that coordinates, supervises, or exercises control over policy, fund-raising, and expenditures, or assists or advises one or more chapters, branches, or affiliates.",
+      "items": {
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "legalName",
+          "url"
+        ],
+        "properties": {
+          "@type": {
+            "type": "string",
+            "const": "Organization",
+            "default": "Organization"
+          },
+          "@id": {
+            "type": "string",
+    		    "format": "uri"
+          },
+          "legalName": {
+            "type": "string",
+            "title": " Legal Name",
+            "description": " Enter the name that is legally registered to this parent organization ",
+            "example": "Directorate for Geosciences"
+          },
+          "name": {
+            "type": "string",
+            "title": "Common Name",
+            "description": "Enter the name commonly used to refer to this parent organization.",
+            "example": "NSF-GEO"
+          },
+          "url": {
+            "type": "string",
+            "title": "Parent Org URL",
+            "description": "Enter a link to this parent organization's web site.",
+            "example": "http://www.nsf.gov",
+            "format": "uri"
+          },
+          "address": {
+            "type": "object",
+            "title": "Street",
+            "description": " Enter this parent organization's entire postal address.",
+            "required": [
+              "@type",
+              "streetAddress",
+              "addressLocality",
+              "addressRegion",
+              "postalCode",
+              "addressCountry"
+            ],
+            "properties": {
+              "@type": {
+                "type": "string",
+                "const": "PostalAddress",
+                "default": "PostalAddress"
+              },
+              "streetAddress": {
+                "type": "string",
+                "title": "Street",
+                "description": "Enter the street address used in this parent organization's postal address.",
+                "example": "2415 Eisenhower Ave."
+              },
+              "addressLocality": {
+                "type": "string",
+                "title": "City",
+                "description": " Enter the city used in this parent organization's postal address.",
+                "example": "Alexandria"
+              },
+              "addressRegion": {
+                "type": "string",
+                "title": "State",
+                "description": "Enter the state used in this parent organization's postal address.",
+                "example": "VA"
+              },
+              "postalCode": {
+                "type": "string",
+                "title": "ZIP Code",
+                "description": "Enter the ZIP code used in this parent organization's postal address.",
+            "example": "22314"
+              },
+              "addressCountry": {
+                "type": "string",
+                "title": "Country",
+                "description": "Enter the country used in this parent organization's postal address.",
+                "example": "USA"
+              }
+            }
+          }
+        }
+      }
+    },
+    "memberOf": {
+      "type": "array",
+      "title": "Associations",
+      "description": "Associations can be any outside partners that your organization works with, including programs with which your organization is affiliated or of which your organization is a member. ",
+      "items": {
+        "type": "object",
+        "required": [
+          "@type",
+          "programName"
+        ],
+        "properties": {
+          "@type": {
+            "type": "string",
+            "const": "ProgramMembership",
+            "default": "ProgramMembership"
+          },
+          "programName": {
+            "type": "string",
+            "title": "Name",
+            "description": "Enter the name of this association.",
+            "example": "EarthCube CDF Registry"
+          },
+          "hostingOrganization": {
+            "type": "object",
+            "title": "Hosting Organization",
+            "description": "Provide information about this association's hosting organization.",
+            "required": [
+              "@type",
+              "name",
+              "url"
+            ],
+            "properties": {
+              "@type": {
+                "type": "string",
+                "const": "Organization",
+                "default": "Organization"
+              },
+              "name": {
+                "type": "string",
+                "title": "Hosting Org Name",
+                "description": "Enter the name of this association's hosting organization.",
+                "example": "RE3Data"
+              },
+              "url": {
+                "type": "string",
+                "title": "Hosting Org URL",
+                "description": "Enter a link to this hosting organization's web site.",
+                "example": "http://www.re3data.org",
+                "format": "uri"
+              }
+            }
+          }
+        }
+      }
+    },
+    "funder": {
+      "type": "array",
+      "title": "Funding Agencies",
+      "description": "Provide information about agencies that fund your organization.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "legalName",
+          "url"
+        ],
+        "properties": {
+          "@type": {
+            "type": "string",
+            "const": "Organization",
+            "default": "Organization"
+          },
+
+          "legalName": {
+            "type": "string",
+            "title": "Legal Name",
+            "description": "Enter the name that is legally registered to this funding agency.",
+            "example": "Division of Ocean Sciences"
+          },
+          "name": {
+            "type": "string",
+            "title": "Common Name",
+            "description": "Enter the name commonly used to refer to this funding agency.",
+            "example": "OCE"
+          },
+          "url": {
+            "type": "string",
+            "title": "Funding Agency URL",
+            "description": "Enter a link to this funding agency's web site.",
+            "example": "https://www.nsf.gov/div/index.jsp?div=OCE",
+            "format": "uri"
+          },
+          "identifier": {
+            "type": "object",
+            "title": "DOI Information",
+            "required": [
+              "@type",
+              "value",
+              "url"
+            ],
+            "properties": {
+              "@type": {
+                "type": "string",
+                "const": "PropertyValue",
+                "default": "PropertyValue"
+              },
+              "value": {
+                "type": "string",
+                "title": "Funding Agency DOI",
+                "description": "Enter the Digital Object Identifier, or DOI, used by the funding agency.",
+                "example": "https://doi.org/10.13039/100000141"
+              },
+              "url": {
+                "type": "string",
+                "title": "Funding Agency DOI URL",
+                "description": "DOI URL is a DOI in URL form. Enter a link to the DOI.",
+                "example": "https://doi.org/10.13039/100000141",
+                "format": "uri"
+              }
+            }
+          }
+        }
+      }
+    },
+    "publishingPrinciples": {
+      "type": "array",
+      "title": "Publishing",
+      "description": "Provide information about the digital documents published by your organization.",
+      "items": {
+        "type": "object",
+        "required": [
+          "@type",
+          "name",
+          "url"
+        ],
+        "properties": {
+          "@type": {
+            "type": "string",
+            "const": "DigitalDocument",
+            "default": "DigitalDocument"
+          },
+          "name": {
+            "type": "string",
+            "title": "Common Name",
+            "description": "Enter the name commonly used to refer to this document.",
+            "example": "Terms of Use"
+          },
+          "url": {
+            "type": "string",
+            "title": "URL",
+            "description": "Enter a link to where this document can be found online.",
+            "example": "https://help.hydroshare.org/about-hydroshare/policies/terms-of-use/",
+            "format": "uri"
+          },
+          "fileFormat": {
+            "type": "string",
+            "title": "File Type",
+            "description": "Provide the file type for this document.",
+            "example": "text/html",
+            "format": "MimeType",
+            "enum": [
+              "text/html",
+              "text/plain",
+              "text/csv",
+              "application/rtf",
+              "application/pdf",
+              "application/postscript",
+              "application/msword",
+              "application/powerpoint",
+              "application/excel",
+              "image/tiff",
+              "image/png",
+              "image/jpeg",
+              "image/gif",
+              "image/svg+xml",
+              "video/x-ms-wmv",
+              "video/quicktime",
+              "video/mp4",
+              "video/x-msvideo",
+              "application/zip",
+              "application/x-gzip",
+              "application/x-hdf5",
+              "application/x-netcdf4"
+            ],
+            "enumNames": [
+              "HTML Document",
+              "Plain Text Document",
+              "CSV File",
+              "RTF Document",
+              "PDF Document",
+              "PostScript Document / EPS Document",
+              "Microsoft Word Document",
+              "Microsoft PowerPoint Presentation",
+              "Microsoft Excel Spreadsheet",
+              "TIFF Image",
+              "PNG Image",
+              "JPEG Image",
+              "GIF Image",
+              "SVG Image",
+              "Windows Media Video",
+              "QuickTime Movie",
+              "MPEG-4 Video",
+              "AVI Video",
+              "Zip File",
+              "Gzip Tar File",
+              "HDF5 File",
+              "NetCDF4 File"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

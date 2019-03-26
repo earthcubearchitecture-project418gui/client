@@ -21,30 +21,32 @@ import propertyDependencies from "./propertyDependencies";
 import schemaDependencies from "./schemaDependencies";
 import additionalProperties from "./additionalProperties";
 
-import datasetSchema from './schema/dataset.json';
+// import datasetSchema from './schema/dataset.json';
+import schemas from './schema/schemas.js';
 
 export const samples = {
   Simple: simple,
-  Nested: nested,
-  Arrays: arrays,
-  Numbers: numbers,
-  Widgets: widgets,
-  Ordering: ordering,
-  References: references,
-  Custom: custom,
-  Errors: errors,
-  Large: large,
-  "Date & time": date,
-  Validation: validation,
-  Files: files,
-  Single: single,
-  "Custom Array": customArray,
-  "Custom Object": customObject,
-  Alternatives: alternatives,
-  "Property dependencies": propertyDependencies,
-  "Schema dependencies": schemaDependencies,
-  "Additional Properties": additionalProperties,
-  "Any Of": anyOf,
-  "One Of": oneOf,
-  Dataset: { schema: datasetSchema }
+  // Nested: nested,
+  // Arrays: arrays,
+  // Numbers: numbers,
+  // Widgets: widgets,
+  // Ordering: ordering,
+  // References: references,
+  // Custom: custom,
+  // Errors: errors,
+  // Large: large,
+  // "Date & time": date,
+  // Validation: validation,
+  // Files: files,
+  // Single: single,
+  // "Custom Array": customArray,
+  // "Custom Object": customObject,
+  // Alternatives: alternatives,
+  // "Property dependencies": propertyDependencies,
+  // "Schema dependencies": schemaDependencies,
+  // "Additional Properties": additionalProperties,
+  // "Any Of": anyOf,
+  // "One Of": oneOf,
+
+  ...schemas
 };

@@ -1,0 +1,82 @@
+{
+  "@type": {
+    "ui:widget": "hidden"
+  },
+  "@id": {
+    "ui:widget": "hidden"
+  },
+  "description": {
+    "ui:widget": "textarea"
+  },
+  "contactPoint": {
+    "items": {
+      "@type": {
+        "ui:widget": "hidden"
+      },
+      "@id": {
+        "ui:widget": "hidden"
+      }  
+    }
+  },
+  "address": {
+    "items": {
+      "@type": {
+        "ui:widget": "hidden"
+      }
+    }
+  },
+  "logo": {
+    "@type": {
+      "ui:widget": "hidden"
+    }
+  },
+  "parentOrganization": {
+    "items": {
+      "@type": {
+        "ui:widget": "hidden"
+      },
+      "@id": {
+        "ui:widget": "hidden"
+      },
+      "address": {
+        "@type": {
+          "ui:widget": "hidden"
+        }
+      }  
+    }
+  },
+  "memberOf": {
+    "items": {
+      "@type": {
+        "ui:widget": "hidden"
+      },
+      "hostingOrganization": {
+        "@type": {
+          "ui:widget": "hidden"
+        }
+      }
+    }
+  },
+  "funder": {
+    "items": {
+      "@type": {
+        "ui:widget": "hidden"
+      },
+      "identifier": {
+        "@type": {
+          "ui:widget": "hidden"
+        }
+      }
+    }
+  },
+  "publishingPrinciples": {
+    "items": {
+      "@type": {
+        "ui:widget": "hidden"
+      },
+      "fileFormat": {
+        "ui:widget": "select"
+      }
+    }
+  }
+}
