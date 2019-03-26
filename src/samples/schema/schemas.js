@@ -2,6 +2,7 @@
 import * as R from 'ramda';
 
 import datasetSchema from './dataset.json';
+import datasetSchemaGU from './dataset-gu.js';
 import dataset_ui_schema from './dataset-ui.js';
 import datasetBCODMOexample from './bcodmo-dataset.json';
 import datasetDefault from './dataset-default.json';
@@ -28,6 +29,13 @@ if (R.hasPath(path, datasetSchema)) {
 export default {
   "dataset": {
     "schema": datasetSchemaFixed,
+    "examples": [datasetBCODMOexample],
+    "default": datasetDefault,
+    "uiSchema": dataset_ui_schema,
+    // "fields": { geo: OneOfSpliterManager }
+  },
+  "dataset-ground-up": {
+    "schema": datasetSchemaGU,
     "examples": [datasetBCODMOexample],
     "default": datasetDefault,
     "uiSchema": dataset_ui_schema,

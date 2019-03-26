@@ -32,6 +32,10 @@ module.exports = {
         title: "Telephone",
         minLength: 10,
       },
+      "url": {
+        "type": "string",
+        "format": "uri"
+      }
     },
   },
   uiSchema: {
