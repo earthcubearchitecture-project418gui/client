@@ -1,6 +1,9 @@
 import React from "react";
 import validateFormData from "./validate";
-import fill from "core-js/library/fn/array/fill";
+import fill from "core-js-pure/stable/array/fill";
+
+import { setImmediate } from 'core-js-pure';
+
 
 export const ADDITIONAL_PROPERTY_FLAG = "__additional_property";
 
@@ -73,13 +76,8 @@ export function getSchemaType(schema) {
   }
 
   if (!type && schema.enum) {
-    return "string";
+    type = "string";
   }
-
-  if (type instanceof Array && type.length === 2 && type.includes("null")) {
-    return type.find(type => type !== "null");
-  }
-
   return type;
 }
 
@@ -794,7 +792,7 @@ export function setState(instance, state, callback) {
     instance.setState(state, callback);
   } else {
     instance.setState(state);
-    setTimeout(callback, 1);
+    setImmediate(callback);
   }
 }
 

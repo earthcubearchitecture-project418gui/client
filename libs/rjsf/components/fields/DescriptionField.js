@@ -4,7 +4,8 @@ import PropTypes from "prop-types";
 function DescriptionField(props) {
   const { id, description } = props;
   if (!description) {
-    return null;
+    // See #312: Ensure compatibility with old versions of React.
+    return <div />;
   }
   if (typeof description === "string") {
     return (

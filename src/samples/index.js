@@ -20,7 +20,7 @@ import alternatives from "./alternatives";
 import propertyDependencies from "./propertyDependencies";
 import schemaDependencies from "./schemaDependencies";
 import additionalProperties from "./additionalProperties";
-import nullable from "./nullable";
+
 import datasetSchema from './schema/dataset.json';
 
 export const samples = {
@@ -46,6 +46,5 @@ export const samples = {
   "Additional Properties": additionalProperties,
   "Any Of": anyOf,
   "One Of": oneOf,
-  Nullable: nullable,
   Dataset: { schema: datasetSchema }
 };

@@ -1,7 +1,7 @@
 import AddButton from "../AddButton";
 import IconButton from "../IconButton";
 import React, { Component } from "react";
-import includes from "core-js/library/fn/array/includes";
+import includes from "core-js-pure/stable/array/includes";
 import * as types from "../../types";
 
 import UnsupportedField from "./UnsupportedField";
@@ -21,7 +21,8 @@ import {
 
 function ArrayFieldTitle({ TitleField, idSchema, title, required }) {
   if (!title) {
-    return null;
+    // See #312: Ensure compatibility with old versions of React.
+    return <div />;
   }
   const id = `${idSchema.$id}__title`;
   return <TitleField id={id} title={title} required={required} />;
@@ -29,7 +30,8 @@ function ArrayFieldTitle({ TitleField, idSchema, title, required }) {
 
 function ArrayFieldDescription({ DescriptionField, idSchema, description }) {
   if (!description) {
-    return null;
+    // See #312: Ensure compatibility with old versions of React.
+    return <div />;
   }
   const id = `${idSchema.$id}__description`;
   return <DescriptionField id={id} description={description} />;

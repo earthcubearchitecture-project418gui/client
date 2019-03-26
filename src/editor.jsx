@@ -3,12 +3,9 @@ import React, { Component } from 'react';
 import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/mode/javascript/javascript";
 
+import { setImmediate } from 'core-js-pure';
 
 import { shouldRender } from "../libs/rjsf/utils.js";
-
-function setImmediate(callback) {
-  setTimeout(callback, 1);
-}
 
 const cmOptions = {
   theme: "default",
