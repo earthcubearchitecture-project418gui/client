@@ -24,10 +24,10 @@ import additionalProperties from "./additionalProperties";
 // import datasetSchema from './schema/dataset.json';
 import schemas from './schema/schemas.js';
 
-export const samples = {
-  Simple: simple,
+export const sets = {
+  simple: simple,
   // Nested: nested,
-  // Arrays: arrays,
+  arrays: arrays,
   // Numbers: numbers,
   // Widgets: widgets,
   // Ordering: ordering,

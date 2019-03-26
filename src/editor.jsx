@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 
 import { UnControlled as CodeMirror } from "react-codemirror2";
-import "codemirror/mode/javascript/javascript";
 
 import { setImmediate } from 'core-js-pure';
 
 import { shouldRender } from "../libs/rjsf/utils.js";
+
+const fromJson = json => JSON.parse(json);
+const toJson = val => JSON.stringify(val, null, 2);
+
 
 const cmOptions = {
   theme: "default",
@@ -37,17 +40,35 @@ export default class Editor extends Component {
   }
 
   onCodeChange = (editor, metadata, code) => {
-    this.setState({ valid: true, code });
-    setImmediate(() => {
-      try {
-        this.props.onChange(fromJson(this.state.code));
-      } catch (err) {
-        this.setState({ valid: false, code });
-      }
+    let _, valid;
+    try {
+      _ = fromJson(code);
+      valid = true;
+    } catch (e) {
+      _ = code;
+      valid = false;
+    }
+
+    this.setState({ valid, code }, () => {
+      // debugger;
+      if (this.state.valid && this.props.onChange) { 
+        this.props.onChange( fromJson(this.state.code) ); 
+      } 
     });
+    
+    // setImmediate(() => {
+    //   try {
+    //     this.props.onChange(fromJson(this.state.code));
+    //   } catch (err) {
+    //     debugger;
+    //     this.setState({ valid: false, code });
+    //   }
+    // });
   };
 
   render() {
+    console.log(this.state.code);
+
     const { title, theme } = this.props;
     const icon = this.state.valid ? "ok" : "remove";
     const cls = this.state.valid ? "valid" : "invalid";

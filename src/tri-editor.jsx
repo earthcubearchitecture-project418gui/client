@@ -36,7 +36,7 @@ export default ({
             title="formData"
             theme={editor}
             code={toJson(formData)}
-            onChange={onFormDataEdited}
+            // onChange={onFormDataEdited}
           />
         </div>
       </div>

@@ -5,10 +5,14 @@ import TriEditor from './tri-editor.jsx';
 import themes from './themes.js';
 
 import { shouldRender } from "../libs/rjsf/utils.js";
-import { samples } from "./samples";
+import { sets } from "./samples";
 import Form from "../libs/rjsf";
 
 import { setImmediate } from 'core-js-pure';
+
+import 'codemirror/lib/codemirror.css'
+import "codemirror/mode/javascript/javascript";
+
 
 const log = type => console.log.bind(console, type);
 
@@ -77,10 +81,12 @@ function ThemeSelector({ theme, select }) {
 }
 
 class Condor extends Component {
+  static defaultSet() { return sets.simple; }
+
   constructor(props) {
     super(props);
     // initialize state with Simple data sample
-    const { schema, uiSchema, formData, validate } = samples.dataset;
+    const { schema, uiSchema, formData, validate } = Condor.defaultSet();
     this.state = {
       form: false,
       schema,
@@ -93,7 +99,7 @@ class Condor extends Component {
   }
 
   componentDidMount() {
-    this.load(samples.dataset);
+    this.load(Condor.defaultSet());
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -138,6 +144,8 @@ class Condor extends Component {
   // setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
 
   render() {
+    console.log('[App render()]');
+    
     const {
       schema,
       uiSchema,
@@ -158,6 +166,7 @@ class Condor extends Component {
     //     disable: { type: "boolean", title: "Disable whole form" },
     //   },
     // };
+
 
     return (
       <div className="container-fluid">
@@ -214,18 +223,25 @@ class App extends Component {
       disable: { type: "boolean", title: "Disable whole form" },
     },
   };
+
+  static defaultTheme = "paper"
   
   condor = React.createRef();
 
   state = {
     editor: "default",
-    theme: "default",
+    theme: App.defaultTheme,
 
     liveSettings: {
       validate: true,
       disable: false,
     }
   };
+
+  componentDidMount() {
+    const theme = App.defaultTheme;
+    this.onThemeSelected(theme, themes[theme]);
+  }
 
   // load = data => {
   //   console.log('Data:', data);
@@ -263,8 +279,6 @@ class App extends Component {
   };
 
   render() {
-    console.log(this.condor && this.condor.current);
-
     const { theme, liveSettings } = this.state;
 
     return (
@@ -274,8 +288,8 @@ class App extends Component {
             <div className="row">
               <div className="col-sm-8">
                 <NavPillSelector 
-                  options={Object.keys(samples)}
-                  onSelected={(label) => this.load(samples[label])} />
+                  options={Object.keys(sets)}
+                  onSelected={(label) => this.load(sets[label])} />
               </div>
               <div className="col-sm-2">
                 <Form
