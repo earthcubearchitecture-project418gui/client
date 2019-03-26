@@ -206,7 +206,7 @@ class App extends Component {
           set={this.set()}
           editorTheme={editorTheme}
           liveValidate={liveSettings.validate}
-          disable={liveSettings.disable}
+          disableForm={liveSettings.disable}
         />
       </div>
     );
@@ -217,42 +217,20 @@ class App extends Component {
 class SuperEditorForm extends Component {
   static defaultSet() { return SchemaSets.simple; }
 
-  // constructor(props) {
-  //   super(props);
-  //   initialize state with Simple data sample
-  //   const { schema, uiSchema, formData, validate } = SuperEditorForm.defaultSet();
-  //   const { schema, uiSchema, formData, validate } = props.set;
-  //   this.state = {
-  //     form: false,
-  //     schema,
-  //     uiSchema,
-  //     formData,
-  //     validate,
-  //   };
-  // }
-
   state = { form: false }
 
   componentDidMount() {
-    // this.load(SuperEditorForm.defaultSet());
     this.load(this.props.set);
   }
 
-  static getDerivedStateFromProps({ set }, state) {
+  static getDerivedStateFromProps(props, state) {
     const { schema, form } = state;
-    console.log('[SuperEditorForm derivedState()] enter');
-    // const keys = ['schema', 'uiSchema', 'formData'];
-
-    // const newItems = R.pick(keys, newSet);
-    // const oldItems = R.pick(keys, state);
-    // console.log('[SuperEditorForm derivedState()]', {newItems, oldItems});
-    // Reload ReactJSONSchemaForm if form === true AND new select props
+    const { set } = props
+    const omit = () => R.omit(['set'],props);
     if (form && !deepEquals(set.schema, schema)) {
-      console.log('[SuperEditForm derivedState()] New set...');
-      let res = { ...set, form: false };
-      return res;
+      return { ...set, ...omit(), form: false };
     }
-    return null;
+    return { ...omit() };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -261,6 +239,7 @@ class SuperEditorForm extends Component {
 
   componentDidUpdate() {
     if (this.state.form === false) {
+      // With form cleared, create new instance
       this.setState({ form: true });  
     }
   }
