@@ -67,7 +67,6 @@ export default class Editor extends Component {
   };
 
   render() {
-    console.log(this.state.code);
 
     const { title, theme } = this.props;
     const icon = this.state.valid ? "ok" : "remove";

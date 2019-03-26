@@ -1,20 +1,25 @@
-import React, { Component } from "react";
+import React, { Component } from "react";                 // External deps
 import { render } from "react-dom";
-
-import TriEditor from './tri-editor.jsx';
-import Form from "../libs/rjsf";
-import { shouldRender } from "../libs/rjsf/utils.js";
 
 import * as R from 'ramda';
 import { setImmediate } from 'core-js-pure';
 
+import TriEditor from './tri-editor.jsx';                 // Internal deps
+import Form from "../libs/rjsf";
+import { shouldRender, deepEquals } from "../libs/rjsf/utils.js";
+
+                                                          // Components
 import { NavPillSelector, ThemeSelector } from './Nav/original-nav.jsx';
 
-import BackContext from './back-context.js';
+import BackContext from './back-context.js';              // Local .js
 import themes from './themes.js';
 import { sets as SchemaSets } from "./samples";
 
-import 'codemirror/lib/codemirror.css'
+import verified_png from './images/verified.png';       // Images
+import clear_png from './images/clear.png';
+import error_png from './images/error.png';
+
+import 'codemirror/lib/codemirror.css'                    // CSS
 import "codemirror/mode/javascript/javascript";
 
 const log = type => console.log.bind(console, type);
@@ -106,17 +111,17 @@ class App extends Component {
     super(props);
     this.sets = SchemaSets;
     
-    let {schema, action} = R.mergeAll([
+    let {set, action} = R.mergeAll([
       props.retrieveStartValues(),
       {
-        "schema": Object.keys(this.sets)[0],
+        "set": Object.keys(this.sets)[0],
         "action": 'new'
       }
     ]);
 
-    if ( !Object.keys(this.sets).includes(schema) ) { schema = Object.keys(this.sets)[0]; }
+    if ( !Object.keys(this.sets).includes(set) ) { set = Object.keys(this.sets)[0]; }
     let group;
-    // if (action === 'open') { group = 'LOADJSON' } else { group = Object.keys(this.sets[schema].schema.groups)[0]}
+    // if (action === 'open') { group = 'LOADJSON' } else { group = Object.keys(this.sets[set].schema.groups)[0]}
 
     // const defaultInstance = this.sets[schema].default;
 
@@ -129,23 +134,27 @@ class App extends Component {
         disable: false,
       },
 
-      schema, 
+      set, 
       group, 
       formData: {}, 
       hasUserEdits: false
     };
   }
 
-  //TODO move mount logic in Supereditform to here...
+  set = () => this.sets[this.state.set];
+
+  //TODO maybe move mount logic in Supereditform to here...
   componentDidMount() {
     const theme = App.defaultTheme;
     this.onThemeSelected(theme, themes[theme]);
   }
 
-  load = data => {
-    if (this.superEditForm && this.superEditForm.current) {
-      this.superEditForm.current.load(data);
-    }
+  load = label => {
+    this.setState({ set: label })
+    // const set = this.sets[label];
+    // if (this.superEditForm && this.superEditForm.current) {
+    //   this.superEditForm.current.load(set);
+    // }
   }
   
   setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
@@ -159,6 +168,7 @@ class App extends Component {
   };
 
   render() {
+    console.log('[App render()]');
     const { theme, editorTheme, liveSettings } = this.state;
     const sets = this.sets;
 
@@ -170,7 +180,8 @@ class App extends Component {
               <div className="col-sm-8">
                 <NavPillSelector 
                   options={Object.keys(sets)}
-                  onSelected={(label) => this.load(sets[label])} />
+                  onSelected={this.load} 
+                />
               </div>
               <div className="col-sm-2">
                 <Form
@@ -191,7 +202,8 @@ class App extends Component {
         </div>
 
         <SuperEditorForm
-          ref={this.superEditForm}
+          // ref={this.superEditForm}
+          set={this.set()}
           editorTheme={editorTheme}
           liveValidate={liveSettings.validate}
           disable={liveSettings.disable}
@@ -205,27 +217,52 @@ class App extends Component {
 class SuperEditorForm extends Component {
   static defaultSet() { return SchemaSets.simple; }
 
-  constructor(props) {
-    super(props);
-    // initialize state with Simple data sample
-    const { schema, uiSchema, formData, validate } = SuperEditorForm.defaultSet();
-    this.state = {
-      form: false,
-      schema,
-      uiSchema,
-      formData,
-      validate,
-      // editor: "default",
-      // theme: "default",
-    };
-  }
+  // constructor(props) {
+  //   super(props);
+  //   initialize state with Simple data sample
+  //   const { schema, uiSchema, formData, validate } = SuperEditorForm.defaultSet();
+  //   const { schema, uiSchema, formData, validate } = props.set;
+  //   this.state = {
+  //     form: false,
+  //     schema,
+  //     uiSchema,
+  //     formData,
+  //     validate,
+  //   };
+  // }
+
+  state = { form: false }
 
   componentDidMount() {
-    this.load(SuperEditorForm.defaultSet());
+    // this.load(SuperEditorForm.defaultSet());
+    this.load(this.props.set);
+  }
+
+  static getDerivedStateFromProps({ set }, state) {
+    const { schema, form } = state;
+    console.log('[SuperEditorForm derivedState()] enter');
+    // const keys = ['schema', 'uiSchema', 'formData'];
+
+    // const newItems = R.pick(keys, newSet);
+    // const oldItems = R.pick(keys, state);
+    // console.log('[SuperEditorForm derivedState()]', {newItems, oldItems});
+    // Reload ReactJSONSchemaForm if form === true AND new select props
+    if (form && !deepEquals(set.schema, schema)) {
+      console.log('[SuperEditForm derivedState()] New set...');
+      let res = { ...set, form: false };
+      return res;
+    }
+    return null;
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     return shouldRender(this, nextProps, nextState);
+  }
+
+  componentDidUpdate() {
+    if (this.state.form === false) {
+      this.setState({ form: true });  
+    }
   }
 
   load = data => {
@@ -246,36 +283,21 @@ class SuperEditorForm extends Component {
     );
   };
 
-  onSchemaEdited = schema => this.setState({ schema, shareURL: null });
+  onSchemaEdited = schema => this.setState({ schema });
 
-  onUISchemaEdited = uiSchema => this.setState({ uiSchema, shareURL: null });
+  onUISchemaEdited = uiSchema => this.setState({ uiSchema });
 
-  onFormDataEdited = formData => this.setState({ formData, shareURL: null });
+  onFormDataEdited = formData => this.setState({ formData });
 
   onFormDataChange = ({ formData }) =>
-    this.setState({ formData, shareURL: null });
-
-  // onThemeSelected = (theme, { stylesheet, editor }) => {
-  //   this.setState({ theme, editor: editor ? editor : "default" });
-  //   setImmediate(() => {
-  //     // Side effect!
-  //     document.getElementById("theme").setAttribute("href", stylesheet);
-  //   });
-  // };
-
-  // setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
-
+    this.setState({ formData });
+ 
   render() {
-    console.log('[SuperEditorForm render()]');
-    
     const {
       schema,
       uiSchema,
       formData,
-      // liveSettings,
       validate,
-      // theme,
-      // editor,
       ArrayFieldTemplate,
       ObjectFieldTemplate,
       transformErrors,
@@ -286,14 +308,6 @@ class SuperEditorForm extends Component {
       disableForm,
       editorTheme
     } = this.props;
-
-    // const liveSettingsSchema = {
-    //   type: "object",
-    //   properties: {
-    //     validate: { type: "boolean", title: "Live validation" },
-    //     disable: { type: "boolean", title: "Disable whole form" },
-    //   },
-    // };
 
     return (
       <div className="container-fluid">
@@ -346,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let startupDefaults = {
     "action": params.get('action'),
-    "schema": params.get('schema')
+    "set": params.get('schema')
   };
 
   const retrieveStartValues = () => {
@@ -356,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   render(
-    <App retrieveStartValues={retrieveStartValues}/>
+    <Back retrieveStartValues={retrieveStartValues}/>
     , 
     document.getElementById("app")
   ); 
