@@ -9,7 +9,7 @@ import Form from "../libs/rjsf";
 import { shouldRender, deepEquals } from "../libs/rjsf/utils.js";
 
                                                           // Components
-import { NavPillSelector, ThemeSelector } from './Nav/original-nav.jsx';
+import { NavPillSelector, ThemeSelector } from './nav-pill.jsx';
 
 import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./samples";
@@ -124,7 +124,7 @@ class App extends Component {
     ]);
 
     if ( !Object.keys(this.sets).includes(set) ) { set = Object.keys(this.sets)[0]; }
-    let group;
+    let selectedGroup;
     // if (action === 'open') { group = 'LOADJSON' } else { group = Object.keys(this.sets[set].schema.groups)[0]}
 
     // const defaultInstance = this.sets[schema].default;
@@ -139,7 +139,7 @@ class App extends Component {
       },
 
       set, 
-      group, 
+      selectedGroup, 
       formData: {}, 
       hasUserEdits: false
     };
@@ -153,7 +153,7 @@ class App extends Component {
     this.onThemeSelected(theme, themes[theme]);
   }
 
-  load = label => {
+  loadSet = label => {
     this.setState({ set: label })
     // const set = this.sets[label];
     // if (this.superEditForm && this.superEditForm.current) {
@@ -172,8 +172,12 @@ class App extends Component {
   };
 
   updateCatagories = (catagories) => {
-
+    this.setState({catagories});
   };
+
+  changeCatagory = (selectedGroup) => {
+    this.setState({selectedGroup});
+  }
 
   render() {
     console.log('[App render()]');
@@ -182,6 +186,16 @@ class App extends Component {
     
     const set = this.set();
     const throughArgs = { editorTheme, liveValidate: liveSettings.validate, disableForm: liveSettings.disable };
+
+    const setOptions = Object.keys(this.sets).map(set => ({
+      label: set,
+      onClick: this.loadSet
+    }));
+
+    const catagoryOptions = (this.state.catagories || []).map(cat => ({
+      label: cat,
+      onClick: this.changeCatagory
+    }));
 
     return (
       <div>
@@ -193,8 +207,7 @@ class App extends Component {
               </div>
               <div className="col-sm-6">
                 <NavPillSelector 
-                  options={Object.keys(this.sets)}
-                  onSelected={this.load} 
+                  options={[ ...setOptions, ...catagoryOptions ]}
                 />
               </div>
               <div className="col-sm-2">
@@ -217,8 +230,8 @@ class App extends Component {
 
         <Catagorizor
           disableCatagorization={false}
-          reportCatagories={this.updateCatagories}
-          selectedGroup={"main"}
+          reportGroups={this.updateCatagories}
+          selectedGroup={this.state.selectedGroup}
           set={set}
           throughArgs={throughArgs}
         />
@@ -231,9 +244,26 @@ class App extends Component {
 export class Catagorizor extends Component {
   // static contextType = BackContext;
 
-  // state = {};
+  state = { previousReportedGroups: null };
 
   // SEF = React.createRef();
+
+  componentDidUpdate() {
+    if (!this.isEnabled()) {return;}
+    const { set: {schema}, reportGroups } = this.props;
+    const groupKeys = Object.keys(group(schema.properties, schema.groups));
+    if (reportGroups && !R.equals(groupKeys, this.state.previousReportedGroups)) {
+      this.setState({previousReportedGroups : groupKeys}, () =>  reportGroups(this.state.previousReportedGroups)); 
+      console.log('Reported catagories');
+    }
+  }
+
+  isEnabled = () => {
+    const { set, selectedGroup, disableCatagorization } = this.props;
+    if ( ! set.schema.groups ) { return false; }
+    if (disableCatagorization && !selectedGroup) { return false; }
+    return true;
+  }
 
   // transformedInstance = () => group(this.props.formData, this.props.schema.groups);
   // restoreInstance = transformed => ungroup(transformed, this.props.schema.groups);
@@ -316,7 +346,7 @@ export class Catagorizor extends Component {
       <p> blank </p>
       // <SuperEditorForm
       //   // ref={this.SEF}
-      //   key={''+disableCatagorization+selectedCatagory}
+      //   // key={ ''+ (disableCatagorization||false) + (selectedGroup||'') }
         
       //   schema={schema}
       //   uiSchema={uiSchema}
