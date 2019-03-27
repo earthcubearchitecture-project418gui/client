@@ -30,21 +30,21 @@ export default {
   "dataset": {
     "schema": datasetSchemaFixed,
     "examples": [datasetBCODMOexample],
-    "default": datasetDefault,
+    "formData": datasetDefault,
     "uiSchema": dataset_ui_schema,
     // "fields": { geo: OneOfSpliterManager }
   },
   "dataset-ground-up": {
     "schema": datasetSchemaGU,
     "examples": [datasetBCODMOexample],
-    "default": datasetDefault,
+    "formData": datasetDefault,
     "uiSchema": dataset_ui_schema,
     // "fields": { geo: OneOfSpliterManager }
   },
   "organizations": {
     "schema": orgSchema,
     "examples": [orgBCODMOexample],
-    "default": orgDefault,
+    "formData": orgDefault,
     "uiSchema": org_ui_schema,
     "fields": { }
   }

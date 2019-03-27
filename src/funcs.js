@@ -1,4 +1,6 @@
 
+import * as R from 'ramda';
+
 export function nameCapitalized(name) { return name.charAt(0).toUpperCase() + name.slice(1); }
 
 export function getBCODOM() {
@@ -63,9 +65,9 @@ export function mapTopPropertyToGroup(prop, groups) {
 }
 
 
-export function group( obj, catagories ) {
-  let cats = Object.keys(catagories);
-  let res = R.zipObj(cats, cats.map(c => R.pick(catagories[c], obj)));
+export function group( obj, groups ) {
+  let cats = Object.keys(groups);
+  let res = R.zipObj(cats, cats.map(c => R.pick(groups[c], obj)));
   return res;
 }
 

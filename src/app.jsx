@@ -12,12 +12,16 @@ import { shouldRender, deepEquals } from "../libs/rjsf/utils.js";
 import { NavPillSelector, ThemeSelector } from './Nav/original-nav.jsx';
 
 import BackContext from './back-context.js';              // Local .js
-import themes from './themes.js';
 import { sets as SchemaSets } from "./samples";
+import themes from './themes.js';
+import { group, ungroup, createShell } from './funcs.js';
 
 import verified_png from './images/verified.png';       // Images
 import clear_png from './images/clear.png';
 import error_png from './images/error.png';
+
+import geocodes_png from './images/geofinalLight.png';
+
 
 import 'codemirror/lib/codemirror.css'                    // CSS
 import "codemirror/mode/javascript/javascript";
@@ -167,19 +171,29 @@ class App extends Component {
     });
   };
 
+  updateCatagories = (catagories) => {
+
+  };
+
   render() {
     console.log('[App render()]');
     const { theme, editorTheme, liveSettings } = this.state;
-    const sets = this.sets;
+    // const throughArgs = R.pick(['theme', 'editorTheme', 'liveSettings'], this.state);
+    
+    const set = this.set();
+    const throughArgs = { editorTheme, liveValidate: liveSettings.validate, disableForm: liveSettings.disable };
 
     return (
       <div>
         <div className="container-fluid">
           <div className="page-header">
             <div className="row">
-              <div className="col-sm-8">
+              <div className="col-sm-2">
+                <img src={geocodes_png} style={{width: '200px' }} />
+              </div>
+              <div className="col-sm-6">
                 <NavPillSelector 
-                  options={Object.keys(sets)}
+                  options={Object.keys(this.sets)}
                   onSelected={this.load} 
                 />
               </div>
@@ -201,12 +215,12 @@ class App extends Component {
           </div>
         </div>
 
-        <SuperEditorForm
-          // ref={this.superEditForm}
-          set={this.set()}
-          editorTheme={editorTheme}
-          liveValidate={liveSettings.validate}
-          disableForm={liveSettings.disable}
+        <Catagorizor
+          disableCatagorization={false}
+          reportCatagories={this.updateCatagories}
+          selectedGroup={"main"}
+          set={set}
+          throughArgs={throughArgs}
         />
       </div>
     );
@@ -214,23 +228,121 @@ class App extends Component {
 }
 
 
+export class Catagorizor extends Component {
+  // static contextType = BackContext;
+
+  // state = {};
+
+  // SEF = React.createRef();
+
+  // transformedInstance = () => group(this.props.formData, this.props.schema.groups);
+  // restoreInstance = transformed => ungroup(transformed, this.props.schema.groups);
+  
+  // currentGroups = () => group(this.props.schema.properties, this.props.schema.groups);
+  // currentProperties = () => this.currentGroups()[this.props.selectedGroup];
+  // currentFormData = () => this.transformedInstance()[this.props.selectedGroup];
+
+  // propperties = (groups, selectedGroup)
+
+  // subSchema = (schema, selectedGroup) => {
+  //   // const { schema } = this.props;
+  //   const groups = group(schema.properties, schema.groups);
+  //   const shell = createShell(schema);
+  //   shell.properties = groups[selectedGroup];
+  //   return shell;
+  // }
+
+  // subFormData = (schema, selectedGroup, formData) => {
+  //   const groups = group(schema.properties, schema.groups);    
+  //   const keys = Object.keys(groups[selectedGroup]);
+  //   return R.pick(keys, formData);
+  // }
+
+ 
+  // ui_sub_schema = (schema, selectedGroup, uiSchema) => {
+  //   const groups = group(schema.properties, schema.groups);
+  //   const selectedGroupKeys = Object.keys(groups[selectedGroup]);
+  //   return R.pick(selectedGroupKeys, uiSchema);
+  // };
+
+  /// Copied behaviour from library example
+  /// Reset <Form /> on each update
+  // setStateResetForm = ( obj ) => this.setState({ form: false }, _ => this.setState({...obj, form: true}) );
+
+  // onFormDataChange = subData => {
+  //   let next = this.transformedInstance();
+  //   next[this.props.selectedGroup] = subData.formData;
+  //   this.props.onChange(this.restoreInstance(next));
+  // };
+
+  render() {
+
+    const subSchema = (schema, selectedGroup) => {
+      // const { schema } = this.props;
+      const groups = group(schema.properties, schema.groups);
+      const shell = createShell(schema);
+      shell.properties = groups[selectedGroup];
+      return shell;
+    }
+  
+    const subFormData = (schema, selectedGroup, formData) => {
+      const groups = group(schema.properties, schema.groups);    
+      const keys = Object.keys(groups[selectedGroup]);
+      return R.pick(keys, formData);
+    }
+   
+    const ui_sub_schema = (schema, selectedGroup, uiSchema) => {
+      const groups = group(schema.properties, schema.groups);
+      const selectedGroupKeys = Object.keys(groups[selectedGroup]);
+      return R.pick(selectedGroupKeys, uiSchema);
+    };
+
+    let { set, selectedGroup, disableCatagorization } = this.props;
+    let { schema, uiSchema, formData } = set;
+
+    if ( ! set.schema.groups ) { disableCatagorization = true; }
+
+    if (!disableCatagorization && selectedGroup) {
+      schema = subSchema(set.schema, selectedGroup);
+      formData = subFormData(set.schema, selectedGroup, set.formData);
+      uiSchema = ui_sub_schema(set.schema, selectedGroup, set.uiSchema);
+      console.log('[Catagorizor render()] | Subsections :', {schema, formData, uiSchema});
+    } else {
+      if (disableCatagorization) { console.log('[Catagorizor render()] | Disabled'); }
+      if (!selectedGroup) { console.log('[Catagorizor render()] | No Selected Catagory'); }
+    }
+
+    return (
+      <p> blank </p>
+      // <SuperEditorForm
+      //   // ref={this.SEF}
+      //   key={''+disableCatagorization+selectedCatagory}
+        
+      //   schema={schema}
+      //   uiSchema={uiSchema}
+      //   formData={formData}
+      //   {...this.props.throughArgs}
+      // />
+    );
+
+  }
+}
+
 class SuperEditorForm extends Component {
-  static defaultSet() { return SchemaSets.simple; }
+  // static defaultSet() { return SchemaSets.simple; }
 
   state = { form: false }
 
   componentDidMount() {
-    this.load(this.props.set);
+    this.load(this.props);
   }
 
   static getDerivedStateFromProps(props, state) {
     const { schema, form } = state;
-    const { set } = props
-    const omit = () => R.omit(['set'],props);
-    if (form && !deepEquals(set.schema, schema)) {
-      return { ...set, ...omit(), form: false };
+    if (form && !deepEquals(props.schema, schema)) {
+      return { ...props, form: false };
     }
-    return { ...omit() };
+    return null;
   }
 
   shouldComponentUpdate(nextProps, nextState) {
