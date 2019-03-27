@@ -68,16 +68,16 @@ export class StartPage extends Component {
 
   clearModal = () => this.setState({modalDisplaying: false});
 
-  upload = () => this.props.loadFormData(this.state.loadedData);
+  upload = () => this.props.onLoadFormData(this.state.loadedData);
 
-  render(props) {
+  render() {
     const files = R.path(['fileInputRef','current','files'], this);
     let fileName;
     if (files && files.length > 0) { fileName = files[0].name; }
 
     return (
       <div>
-        {/* <Modal show={this.state.modalDisplaying}>
+        {/* <Modal show={this.state.modalDisplaying} >
           <VerifyUserAction 
             onAccept={() => {console.log('accepted'); this.clearModal(); this.state.modalAccepted();}} 
             onCancel={() => {console.log('cancelled'); this.clearModal(); } } 
@@ -118,10 +118,9 @@ export class StartPage extends Component {
           </div>
           <div className="row">
             <div className="col-xs-12">
-              <textarea readOnly className="w-100 monospace" rows="30" value={ 
-                JSON.stringify(this.state.loadedData, undefined, 2)
-              }>
-              </textarea>
+              <pre>
+                { JSON.stringify(this.state.loadedData, undefined, 2) }
+              </pre>
             </div>
           </div>
           

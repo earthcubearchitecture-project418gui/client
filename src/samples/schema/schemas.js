@@ -3,6 +3,8 @@ import * as R from 'ramda';
 
 import datasetSchema from './dataset.json';
 import datasetSchemaGU from './dataset-gu.js';
+import datasetSchemaGroupMain from './dataset-group-main.js';
+
 import dataset_ui_schema from './dataset-ui.js';
 import datasetBCODMOexample from './bcodmo-dataset.json';
 import datasetDefault from './dataset-default.json';
@@ -37,7 +39,14 @@ export default {
   "dataset-ground-up": {
     "schema": datasetSchemaGU,
     "examples": [datasetBCODMOexample],
-    "formData": datasetDefault,
+    "formData": {},
+    "uiSchema": dataset_ui_schema,
+    // "fields": { geo: OneOfSpliterManager }
+  },
+  "dataset-group-main": {
+    "schema": datasetSchemaGroupMain,
+    "examples": [datasetBCODMOexample],
+    "formData": {},
     "uiSchema": dataset_ui_schema,
     // "fields": { geo: OneOfSpliterManager }
   },

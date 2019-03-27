@@ -21,7 +21,7 @@ export function MakeJSONPage(props) {
       </div>
       
       <pre> 
-        { JSON.stringify(props.fixedJSON, undefined, 2) }
+        { JSON.stringify(props.json, undefined, 2) }
       </pre>
 
       <div className="row margin-top-sm">

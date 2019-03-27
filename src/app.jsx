@@ -100,7 +100,7 @@ class Back extends Component {
 
 
 class App extends Component {
-  static contextType = BackContext;
+  // static contextType = BackContext;
   static defaultTheme = "paper";
 
   static liveSettingsSchema = {
@@ -111,8 +111,6 @@ class App extends Component {
     },
   };
   
-  superEditForm = React.createRef();
-
   constructor(props) {
     super(props);
     this.sets = SchemaSets;
@@ -129,8 +127,6 @@ class App extends Component {
     let selectedGroup;
     // if (action === 'open') { group = 'LOADJSON' } else { group = Object.keys(this.sets[set].schema.groups)[0]}
 
-    // const defaultInstance = this.sets[schema].default;
-
     this.state = { 
       editorTheme: "default",
       theme: App.defaultTheme,
@@ -142,12 +138,10 @@ class App extends Component {
 
       set, 
       selectedGroup, 
-      formData: {}, 
+      formData: null, 
       hasUserEdits: false
     };
   }
-
-  set = () => this.sets[this.state.set];
 
   //TODO maybe move mount logic in Supereditform to here...
   componentDidMount() {
@@ -155,15 +149,6 @@ class App extends Component {
     this.onThemeSelected(theme, themes[theme]);
   }
 
-  loadSet = label => {
-    this.setState({ set: label, selectedGroup: null })
-    // const set = this.sets[label];
-    // if (this.superEditForm && this.superEditForm.current) {
-    //   this.superEditForm.current.load(set);
-    // }
-  }
-  
-  setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
 
   onThemeSelected = (theme, { stylesheet, editor }) => {
     this.setState({ theme, editorTheme: editor ? editor : "default" });
@@ -173,49 +158,54 @@ class App extends Component {
     });
   };
 
-  updateCatagories = (catagories) => {
-    this.setState({catagories});
-  };
+  loadSet = label => this.setState({ set: label, selectedGroup: null });  
 
-  changeCatagory = (selectedGroup) => {
-    this.setState({selectedGroup});
-  }
+  setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
+
+  updateGroups = groups => this.setState({groups});
+  changeGroup = selectedGroup => this.setState({selectedGroup});
+
+  loadExternalFormData = externalFormData => this.setState({formData : externalFormData});
 
   render() {
     console.log('[App render()]');
     const { theme, editorTheme, liveSettings } = this.state;
     
-    const set = this.set();
-    const throughArgs = { editorTheme, liveValidate: liveSettings.validate, disableForm: liveSettings.disable };
+    const set = { ...this.sets[this.state.set] };
+    //Replace default formData with user formData
+    set.formData = this.state.formData || set.formData;
 
     const setOptions = Object.keys(this.sets).map(set => ({
       label: set,
       onClick: this.loadSet
     }));
 
-    const catagoryOptions = (this.state.catagories || []).map(cat => ({
+    const groupOptions = (this.state.groups || []).map(cat => ({
       label: cat,
-      onClick: this.changeCatagory
+      onClick: this.changeGroup
     }));
 
     const navOptions = [
-      { label: 'LOADJSON', onClick: () => this.changeCatagory('LOADJSON') },
+      { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON') },
+      { label: 'Sets >>>', onClick: () => {} },
       ...setOptions,
-      ...catagoryOptions,
-      { label: 'MAKEJSON', onClick: () => this.changeCatagory('MAKEJSON') }
+      { label: 'Groups >>>', onClick: () => {} },
+      ...groupOptions,
+      { label: 'Make JSON', onClick: () => this.changeGroup('MAKEJSON') }
     ];
 
     let main;
 
     if (this.state.selectedGroup === "LOADJSON") {
       main = ( <StartPage 
-        // loadFormData={this.changeFormData} shouldChallenge={this.state.hasUserEdits}
+        shouldChallenge={this.state.hasUserEdits}
+        onLoadFormData={this.loadExternalFormData} 
       /> );
     } else if (this.state.selectedGroup === "MAKEJSON") {
       main = (
         <MakeJSONPage 
-          // generatedJSON={this.state.formData} 
-          // fixedJSON={fillInMissingIDs(this.sets[this.state.selectedSchema].schema, R.clone(this.state.formData))}
+          json={this.state.formData} 
+          // josn={fillInMissingIDs(this.sets[this.state.selectedSchema].schema, R.clone(this.state.formData))}
           // onSave={this.saveFile}
           // onValidateClick={this.remoteValidation}
         /> 
@@ -226,14 +216,13 @@ class App extends Component {
           // ref={this.SEF}
           // key={ ''+ (disableCatagorization||false) + (selectedGroup||'') }
           disableCatagorization={false}
-          reportGroups={this.updateCatagories}
+          reportGroups={this.updateGroups}
           selectedGroup={this.state.selectedGroup}
           set={set}
-          throughArgs={throughArgs}
+          throughArgs={{ editorTheme, onFormDataChange: this.onFormDataChange, liveValidate: liveSettings.validate, disableForm: liveSettings.disable }}
         />
       );
     }
-
 
     return (
       <div>
@@ -286,7 +275,7 @@ export class Catagorizor extends Component {
     const groupKeys = Object.keys(group(schema.properties, schema.groups));
     if (reportGroups && !R.equals(groupKeys, this.state.previousReportedGroups)) {
       this.setState({previousReportedGroups : groupKeys}, () =>  reportGroups(this.state.previousReportedGroups)); 
-      console.log('Reported catagories');
+      console.log('Reported groups');
     }
   }
 
@@ -335,16 +324,16 @@ export class Catagorizor extends Component {
     }
 
     return (
-      <p> blank </p>
-      // <SuperEditorForm
-      //   // ref={this.SEF}
-      //   // key={ ''+ (disableCatagorization||false) + (selectedGroup||'') }
+      // <p> blank </p>
+      <SuperEditorForm
+        // ref={this.SEF}
+        // key={ ''+ (disableCatagorization||false) + (selectedGroup||'') }
         
-      //   schema={schema}
-      //   uiSchema={uiSchema}
-      //   formData={formData}
-      //   {...this.props.throughArgs}
-      // />
+        schema={schema}
+        uiSchema={uiSchema}
+        formData={formData}
+        {...this.props.throughArgs}
+      />
     );
 
   }
