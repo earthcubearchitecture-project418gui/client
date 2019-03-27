@@ -13,6 +13,7 @@ function createAjvInstance() {
     allErrors: true,
     multipleOfPrecision: 8,
     schemaId: "auto",
+    unknownFormats: "ignore"
   });
 
   // add custom formats
@@ -183,6 +184,7 @@ export default function validateFormData(
   try {
     ajv.validate(schema, formData);
   } catch (err) {
+    console.error("CLIENT-SIDE VALIDATION FAILED : ",err);
     validationError = err;
   }
 
@@ -249,6 +251,7 @@ export function isValid(schema, data) {
   try {
     return ajv.validate(schema, data);
   } catch (e) {
+    console.error("CLIENT-SIDE VALIDATION FAILED : ", e);
     return false;
   }
 }
