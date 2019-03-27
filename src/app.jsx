@@ -10,6 +10,8 @@ import { shouldRender, deepEquals } from "../libs/rjsf/utils.js";
 
                                                           // Components
 import { NavPillSelector, ThemeSelector } from './nav-pill.jsx';
+import { StartPage } from './start-page.jsx';
+import { MakeJSONPage } from './make-json-page.jsx';
 
 import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./samples";
@@ -154,7 +156,7 @@ class App extends Component {
   }
 
   loadSet = label => {
-    this.setState({ set: label })
+    this.setState({ set: label, selectedGroup: null })
     // const set = this.sets[label];
     // if (this.superEditForm && this.superEditForm.current) {
     //   this.superEditForm.current.load(set);
@@ -182,7 +184,6 @@ class App extends Component {
   render() {
     console.log('[App render()]');
     const { theme, editorTheme, liveSettings } = this.state;
-    // const throughArgs = R.pick(['theme', 'editorTheme', 'liveSettings'], this.state);
     
     const set = this.set();
     const throughArgs = { editorTheme, liveValidate: liveSettings.validate, disableForm: liveSettings.disable };
@@ -197,6 +198,43 @@ class App extends Component {
       onClick: this.changeCatagory
     }));
 
+    const navOptions = [
+      { label: 'LOADJSON', onClick: () => this.changeCatagory('LOADJSON') },
+      ...setOptions,
+      ...catagoryOptions,
+      { label: 'MAKEJSON', onClick: () => this.changeCatagory('MAKEJSON') }
+    ];
+
+    let main;
+
+    if (this.state.selectedGroup === "LOADJSON") {
+      main = ( <StartPage 
+        // loadFormData={this.changeFormData} shouldChallenge={this.state.hasUserEdits}
+      /> );
+    } else if (this.state.selectedGroup === "MAKEJSON") {
+      main = (
+        <MakeJSONPage 
+          // generatedJSON={this.state.formData} 
+          // fixedJSON={fillInMissingIDs(this.sets[this.state.selectedSchema].schema, R.clone(this.state.formData))}
+          // onSave={this.saveFile}
+          // onValidateClick={this.remoteValidation}
+        /> 
+      );
+    } else {
+      main = (
+        <Catagorizor
+          // ref={this.SEF}
+          // key={ ''+ (disableCatagorization||false) + (selectedGroup||'') }
+          disableCatagorization={false}
+          reportGroups={this.updateCatagories}
+          selectedGroup={this.state.selectedGroup}
+          set={set}
+          throughArgs={throughArgs}
+        />
+      );
+    }
+
+
     return (
       <div>
         <div className="container-fluid">
@@ -207,7 +245,7 @@ class App extends Component {
               </div>
               <div className="col-sm-6">
                 <NavPillSelector 
-                  options={[ ...setOptions, ...catagoryOptions ]}
+                  options={navOptions}
                 />
               </div>
               <div className="col-sm-2">
@@ -228,13 +266,7 @@ class App extends Component {
           </div>
         </div>
 
-        <Catagorizor
-          disableCatagorization={false}
-          reportGroups={this.updateCatagories}
-          selectedGroup={this.state.selectedGroup}
-          set={set}
-          throughArgs={throughArgs}
-        />
+        { main }
       </div>
     );
   }
@@ -264,46 +296,6 @@ export class Catagorizor extends Component {
     if (disableCatagorization && !selectedGroup) { return false; }
     return true;
   }
-
-  // transformedInstance = () => group(this.props.formData, this.props.schema.groups);
-  // restoreInstance = transformed => ungroup(transformed, this.props.schema.groups);
-  
-  // currentGroups = () => group(this.props.schema.properties, this.props.schema.groups);
-  // currentProperties = () => this.currentGroups()[this.props.selectedGroup];
-  // currentFormData = () => this.transformedInstance()[this.props.selectedGroup];
-
-  // propperties = (groups, selectedGroup)
-
-  // subSchema = (schema, selectedGroup) => {
-  //   // const { schema } = this.props;
-  //   const groups = group(schema.properties, schema.groups);
-  //   const shell = createShell(schema);
-  //   shell.properties = groups[selectedGroup];
-  //   return shell;
-  // }
-
-  // subFormData = (schema, selectedGroup, formData) => {
-  //   const groups = group(schema.properties, schema.groups);    
-  //   const keys = Object.keys(groups[selectedGroup]);
-  //   return R.pick(keys, formData);
-  // }
-
- 
-  // ui_sub_schema = (schema, selectedGroup, uiSchema) => {
-  //   const groups = group(schema.properties, schema.groups);
-  //   const selectedGroupKeys = Object.keys(groups[selectedGroup]);
-  //   return R.pick(selectedGroupKeys, uiSchema);
-  // };
-
-  /// Copied behaviour from library example
-  /// Reset <Form /> on each update
-  // setStateResetForm = ( obj ) => this.setState({ form: false }, _ => this.setState({...obj, form: true}) );
-
-  // onFormDataChange = subData => {
-  //   let next = this.transformedInstance();
-  //   next[this.props.selectedGroup] = subData.formData;
-  //   this.props.onChange(this.restoreInstance(next));
-  // };
 
   render() {
 
