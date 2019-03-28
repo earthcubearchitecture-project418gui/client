@@ -161,12 +161,16 @@ class App extends Component {
 
   setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
   
-  changeSet = selectedSet => this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined });  
+  changeSet = selectedSet => {
+    if (selectedSet === this.state.selectedSet) { return; }
+    this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined });  
+  };
 
   updateGroups = groups => this.setState({groups});
   changeGroup = selectedGroup => this.setState({selectedGroup});
 
-  loadExternalFormData = externalFormData => this.setState({formData : externalFormData});
+  loadExternalFormData = formData => this.setState({formData, hasUserEdits: false});
+  userEditedFormData = formData => this.setState({formData, hasUserEdits: true});
 
   render() {
     const { theme, editorTheme, liveSettings } = this.state;
@@ -287,7 +291,6 @@ export class Catagorizor extends Component {
     reportGroups(groupKeys);
     console.log('Reported groups');
   }
-
 
   isEnabled = () => {
     const { set, selectedGroup, disableCatagorization } = this.props;
@@ -441,7 +444,7 @@ class SuperEditorForm extends Component {
             onFormDataEdited={this.onFormDataEdited}
           /> 
         )}
-        <div className="col-sm-5">
+        <div className={ this.props.disableTripleEdit ? "col-sm-12" : "col-sm-5" }>
           {this.state.form && (
             <Form
               ArrayFieldTemplate={ArrayFieldTemplate}

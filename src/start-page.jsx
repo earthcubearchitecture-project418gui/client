@@ -15,6 +15,8 @@ export class StartPage extends Component {
     this.state = { loadedData: undefined, modalDisplaying: false };
   }
 
+  upload = () => this.props.onLoadFormData(this.state.loadedData);
+
   handleFetchJSON = () => this.challengeUser({modalAccepted: () => this.fetchJSON(this.upload)});
   fetchJSON = (callback = nop) => {
     // fetch('https://earthcube.isti.com/test_file.html')
@@ -32,6 +34,23 @@ export class StartPage extends Component {
       .catch(err => console.error(err));
   }
   
+  
+  handleLoadFile = () => this.challengeUser({modalAccepted: () => this.handleAcceptedLoadFile(this.upload) });
+  handleAcceptedLoadFile = (callback) => {
+    const file = this.retrieveSelectedFileName();
+    if (!file) { return; }
+    this.loadFile(file, callback);
+  }
+
+  retrieveSelectedFileName = () => {
+    let files = this.fileInputRef.current.files;
+    if (files.length !== 0) {
+      let currentFile = files[0];
+      return currentFile;
+    }
+    return;
+  }
+
   loadFile = (file, callback = nop) => {
     const fr = new FileReader();
     fr.onload = () => {
@@ -41,34 +60,15 @@ export class StartPage extends Component {
     fr.readAsText(file);
   }
 
-  handleLoadFile = () => this.challengeUser({modalAccepted: () => this.handleAcceptedLoadFile(this.upload) });
-  handleAcceptedLoadFile = (callback) => {
-    const file = this.retrieveFile();
-    if (!file) { return; }
-    this.loadFile(file, callback);
-  }
-
-  retrieveFile = () => {
-    let files = this.fileInputRef.current.files;
-    if (files.length !== 0) {
-      let currentFile = files[0];
-      return currentFile;
-    }
-    return;
-  }
 
   challengeUser = (state) => {
     if (! this.props.shouldChallenge) { 
       if (state.modalAccepted) { state.modalAccepted(); }
       return;
     }
-
     this.setState({modalAccepted: this.clearModal, ...state, modalDisplaying: true});
   }
-
   clearModal = () => this.setState({modalDisplaying: false});
-
-  upload = () => this.props.onLoadFormData(this.state.loadedData);
 
   render() {
     const files = R.path(['fileInputRef','current','files'], this);
