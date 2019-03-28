@@ -4,6 +4,8 @@ import { render } from "react-dom";
 import * as R from 'ramda';
 import { setImmediate } from 'core-js-pure';
 
+import * as FileSaver from 'file-saver';
+
 import TriEditor from './tri-editor.jsx';                 // Internal deps
 import Form from "../libs/rjsf";
 import { shouldRender, deepEquals } from "../libs/rjsf/utils.js";
@@ -16,7 +18,7 @@ import { MakeJSONPage } from './make-json-page.jsx';
 import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
 import themes from './themes.js';
-import { group, ungroup, createShell } from './funcs.js';
+import { group, ungroup, createShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
 
 import verified_png from './images/verified.png';       // Images
 import clear_png from './images/clear.png';
@@ -62,17 +64,17 @@ class Back extends Component {
     }
   }
 
-  registerOnRemoteValidation = (callback) => {
-    const callbacks = this.state.callbacks.slice();
-    callbacks.push(callback);
-    this.setState({ callbacks });
-    return () => {
-      const i = this.state.callbacks.indexOf(callback);
-      const callbacks = this.state.callbacks.slice().splice(i, 1);
-      this.setState({ callbacks })
-    };
-  }
-  executeOnRemoteValidation = () => this.state.callbacks.map(c => c());
+  // registerOnRemoteValidation = (callback) => {
+  //   const callbacks = this.state.callbacks.slice();
+  //   callbacks.push(callback);
+  //   this.setState({ callbacks });
+  //   return () => {
+  //     const i = this.state.callbacks.indexOf(callback);
+  //     const callbacks = this.state.callbacks.slice().splice(i, 1);
+  //     this.setState({ callbacks })
+  //   };
+  // }
+  // executeOnRemoteValidation = () => this.state.callbacks.map(c => c());
 
   verificationImage = (status) => {
     const backStatus = status || this.backStatus();
@@ -99,7 +101,8 @@ class Back extends Component {
 
 
 class App extends Component {
-  // static contextType = BackContext;
+  static contextType = BackContext;
+
   static defaultTheme = "paper";
 
   static liveSettingsSchema = {
@@ -141,11 +144,9 @@ class App extends Component {
       groups: undefined,
       selectedGroup, 
       formData: undefined, 
-      // hasUserEdits: false
     };
   }
 
-  //TODO maybe move mount logic in Supereditform to here...
   componentDidMount() {
     const theme = App.defaultTheme;
     this.onThemeSelected(theme, themes[theme]);
@@ -158,7 +159,14 @@ class App extends Component {
       this.setState({ selectedGroup: groups[0] });
     }
   }
-
+  
+  // For NavPill
+  setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
+  changeSet = selectedSet => {
+    if (selectedSet === this.state.selectedSet) { this.setState({ selectedGroup: undefined }); }
+    else { this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined, formData: undefined }); }
+  };
+  changeGroup = selectedGroup => this.setState({selectedGroup});
   onThemeSelected = (theme, { stylesheet, editor }) => {
     this.setState({ theme, editorTheme: editor ? editor : "default" });
     setImmediate(() => {
@@ -167,26 +175,36 @@ class App extends Component {
     });
   };
 
-  setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
+  // For Catagorizor
+  updateGroups = groups => this.setState({groups});
+  userEditedFormData = formData => this.setState({formData});
   
-  changeSet = selectedSet => {
-    if (selectedSet === this.state.selectedSet) { this.setState({ selectedGroup: undefined }); }
-    else { this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined, formData: undefined }); }
+  // For StartPage
+  loadExternalFormData = formData => this.setState({formData});
+  
+  // For MakeJSONPage
+  saveFile = () => {
+    var blob = new Blob([JSON.stringify(this.state.formData, undefined, 2)], {type: "text/plain;charset=utf-8"});
+    FileSaver.saveAs(blob, "ucar-json-instance.json");
+  }
+  
+  remoteValidation = () => {
+    console.log('[App remoteValidation()]');
+    this.context.validate({
+      schema: this.state.selectedSet,
+      doc: this.state.formData
+    });
   };
 
-  updateGroups = groups => this.setState({groups});
-  changeGroup = selectedGroup => this.setState({selectedGroup});
-
-  loadExternalFormData = formData => this.setState({formData /* , hasUserEdits: false */});
-  userEditedFormData = formData => this.setState({formData /* , hasUserEdits: true */});
-
   render() {
-    const {  selectedSet, selectedGroup, theme, editorTheme, liveSettings } = this.state;
+    const { selectedSet, selectedGroup, theme, editorTheme, liveSettings } = this.state;
     
     const set = { ...this.sets[this.state.selectedSet] };
     //Replace default formData with user formData
     set.formData = this.state.formData || set.formData;
 
+    const invalidTopProperties = stripToTopProperty(R.pathOr([], ['context','response','errors'], this));
+    
     const setOptions = Object.keys(this.sets).map(set => ({
       label: set,
       onClick: this.changeSet,
@@ -196,7 +214,10 @@ class App extends Component {
     const groupOptions = (this.state.groups || []).map(group => ({
       label: group,
       onClick: this.changeGroup,
-      active: selectedGroup === group
+      active: selectedGroup === group,
+      icon: this.context.status === 'clear' 
+        ? undefined 
+        : R.any(v => v === true, invalidTopProperties.map(top => group === mapTopPropertyToGroup(top, set.schema.groups))) ? '🛑' : '✅'
     }));
 
     const navOptions = [
@@ -220,14 +241,13 @@ class App extends Component {
         <MakeJSONPage 
           json={this.state.formData} 
           // josn={fillInMissingIDs(this.sets[this.state.selectedSchema].schema, R.clone(this.state.formData))}
-          // onSave={this.saveFile}
-          // onValidateClick={this.remoteValidation}
+          onValidateClick={this.remoteValidation}
+          onSave={this.saveFile}
         /> 
       );
     } else {
       main = (
         <Catagorizor
-          // ref={this.SEF}
           key={ selectedSet }
           disableCatagorization={false}
           set={set}
@@ -368,7 +388,7 @@ export class Catagorizor extends Component {
 
 class SuperEditorForm extends Component {
 
-  state = { form: false, suppressNextPropagation: true }
+  state = { form: false /* , suppressNextPropagation: true  */}
 
   componentDidMount() {
     this.load(this.props);
@@ -396,7 +416,7 @@ class SuperEditorForm extends Component {
   static getDerivedStateFromProps(props, state) {
     const { schema, form } = state;
     if (form && !deepEquals(props.schema, schema)) {
-      return { ...props, form: false, suppressNextPropagation: true };
+      return { ...props, form: false /* , suppressNextPropagation: true  */};
     }
     return null;
   }
@@ -407,13 +427,12 @@ class SuperEditorForm extends Component {
   }
 
   componentDidUpdate() {
+    // console.log('[SuperEditorForm compDidUpdate()]');
     if (this.state.form === false) {
       // With form cleared, create new instance
       this.setState({ form: true });  
     }
   }
-
-  
 
   onSchemaEdited = schema => this.setState({ schema });
 
@@ -423,8 +442,14 @@ class SuperEditorForm extends Component {
 
   onFormDataChange = ({ formData }) => {
     this.setState({ formData }, () => {
-      if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
-      else { this.props.onFormDataChange(this.state.formData); }
+      // if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
+      // else { this.props.onFormDataChange(this.state.formData); }
+
+      // Potential Performance Hit
+      if (!R.equals(this.state.formData, this.props.formData)) { 
+        // console.log('[SuperEditorForm] formData send up');
+        this.props.onFormDataChange(this.state.formData); 
+      }
     });
   };
  

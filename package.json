@@ -50,6 +50,9 @@
   "postcss": {
     "modules": true,
     "plugins": {
+      "postcss-modules": {
+        "globalModulePaths": [".global."]
+      },
       "autoprefixer": {
         "grid": true
       }

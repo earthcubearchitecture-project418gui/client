@@ -9,8 +9,8 @@ export function MakeJSONPage(props) {
 
       <div className="row margin-y-sm">
         <div className="col-xs-2">
-          <button type="button" className="btn btn-info margin-left-xs" onClick={props.onValidateClick} > Validate </button>
-          <button type="button" className="btn btn-info" onClick={props.onSave}>Save</button>
+          <button type="button" className="btn btn-info" onClick={props.onValidateClick} > Validate </button>
+          <button type="button" className="btn btn-info margin-left-xs" onClick={props.onSave}>Save</button>
         </div>
         <div className="col-xs-8">
             <p className="padding-x-lg padding-y-xs"><b>Validate</b> your JSON.
@@ -28,8 +28,8 @@ export function MakeJSONPage(props) {
 
       <div className="row margin-top-sm">
         <div className="col-xs-12">
-          <button type="button" className="btn btn-info margin-left-xs" onClick={props.onValidateClick} > Validate </button>
-          <button type="button" className="btn btn-info" onClick={props.onSave}>Save</button>
+          <button type="button" className="btn btn-info" onClick={props.onValidateClick} > Validate </button>
+          <button type="button" className="btn btn-info margin-left-xs" onClick={props.onSave}>Save</button>
         </div>
       </div>
 

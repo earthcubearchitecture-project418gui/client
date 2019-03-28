@@ -43,6 +43,12 @@ export function retrieveErrors(errorList, dataPath) {
 
 export function morphDataPath(path) { return '/' + path.slice(5).replace(/_/g, '/'); }
 
+
+
+/**
+ * Returns top property identified in data path, for each string
+ * @param {Array.<string>} errors 
+ */
 export function stripToTopProperty(errors) {
   return errors.map(e => {
     const noSlash = e.dataPath.slice(1);

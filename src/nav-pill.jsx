@@ -46,7 +46,7 @@ export function NavPillSelector({ options }) {
                 role="presentation"
                 className={ option.active ? "active" : ""}>
                 <a href="#" onClick={onLabelClick(option.label, option.onClick)} style={{ textTransform: 'capitalize' }}>
-                  {option.label}
+                  {option.icon} {'  ' + option.label}
                 </a>
               </li>
             );
