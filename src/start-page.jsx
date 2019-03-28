@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import * as R from 'ramda';
 
-// import Modal from './modal/modal.jsx';
+import { Modal } from './modal.jsx';
 
 const nop = () => {};
 
@@ -62,6 +62,7 @@ export class StartPage extends Component {
 
 
   challengeUser = (state) => {
+    console.log('[StartPage challengeUser()]');
     if (! this.props.shouldChallenge) { 
       if (state.modalAccepted) { state.modalAccepted(); }
       return;
@@ -77,12 +78,12 @@ export class StartPage extends Component {
 
     return (
       <div>
-        {/* <Modal show={this.state.modalDisplaying} >
+        <Modal show={this.state.modalDisplaying} >
           <VerifyUserAction 
             onAccept={() => {console.log('accepted'); this.clearModal(); this.state.modalAccepted();}} 
             onCancel={() => {console.log('cancelled'); this.clearModal(); } } 
           />
-        </Modal> */}
+        </Modal>
 
         <div className="container-fluid">
           

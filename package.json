@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "ajv": "^6.7.0",
+    "autoprefixer": "^9.5.0",
     "codemirror": "^5.45.0",
     "core-js-pure": "^3.0.0",
     "file-saver": "^2.0.1",
@@ -29,7 +30,8 @@
     "@babel/core": "^7.4.0",
     "@babel/plugin-proposal-class-properties": "^7.4.0",
     "@babel/plugin-transform-react-jsx": "^7.3.0",
-    "@babel/preset-env": "^7.4.2"
+    "@babel/preset-env": "^7.4.2",
+    "postcss-modules": "^1.4.1"
   },
   "babel": {
     "presets": [
@@ -44,5 +46,13 @@
         }
       ]
     ]
+  },
+  "postcss": {
+    "modules": true,
+    "plugins": {
+      "autoprefixer": {
+        "grid": true
+      }
+    }
   }
 }
