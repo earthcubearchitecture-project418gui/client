@@ -36,6 +36,8 @@ export default {
             "title": "File Type",
             "description": "Select the type of file you are making available.",
             "example": "application/zip, text/csv",
+            "format": "MimeType",
+
             "enum": [
               "text/html",
               "text/plain",

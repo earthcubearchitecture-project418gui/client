@@ -14,7 +14,7 @@ import { StartPage } from './start-page.jsx';
 import { MakeJSONPage } from './make-json-page.jsx';
 
 import BackContext from './back-context.js';              // Local .js
-import { sets as SchemaSets } from "./samples";
+import { sets as SchemaSets } from "./sets/sets.js";
 import themes from './themes.js';
 import { group, ungroup, createShell } from './funcs.js';
 
@@ -23,7 +23,6 @@ import clear_png from './images/clear.png';
 import error_png from './images/error.png';
 
 import geocodes_png from './images/geofinalLight.png';
-
 
 import 'codemirror/lib/codemirror.css'                    // CSS
 import "codemirror/mode/javascript/javascript";
@@ -116,7 +115,7 @@ class App extends Component {
     super(props);
     this.sets = SchemaSets;
     
-    let {set, action} = R.mergeAll([
+    let {selectedSet, action} = R.mergeAll([
       props.retrieveStartValues(),
       {
         "set": Object.keys(this.sets)[0],
@@ -124,7 +123,7 @@ class App extends Component {
       }
     ]);
 
-    if ( !Object.keys(this.sets).includes(set) ) { set = Object.keys(this.sets)[0]; }
+    if ( !Object.keys(this.sets).includes(selectedSet) ) { selectedSet = Object.keys(this.sets)[0]; }
     let selectedGroup;
     // if (action === 'open') { group = 'LOADJSON' } else { group = Object.keys(this.sets[set].schema.groups)[0]}
 
@@ -138,7 +137,7 @@ class App extends Component {
         disableTripleEdit: false
       },
 
-      set, 
+      selectedSet, 
       groups: undefined,
       selectedGroup, 
       formData: undefined, 
@@ -152,7 +151,6 @@ class App extends Component {
     this.onThemeSelected(theme, themes[theme]);
   }
 
-
   onThemeSelected = (theme, { stylesheet, editor }) => {
     this.setState({ theme, editorTheme: editor ? editor : "default" });
     setImmediate(() => {
@@ -163,20 +161,17 @@ class App extends Component {
 
   setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
   
-  changeSet = selectedSet => this.setState({ set: selectedSet, selectedGroup: undefined, groups: undefined });  
+  changeSet = selectedSet => this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined });  
 
   updateGroups = groups => this.setState({groups});
   changeGroup = selectedGroup => this.setState({selectedGroup});
 
-  loadExternalFormData = externalFormData => { 
-    console.log('[App] Loaded External Form Data!!!');
-    this.setState({formData : externalFormData});
-  }
+  loadExternalFormData = externalFormData => this.setState({formData : externalFormData});
 
   render() {
     const { theme, editorTheme, liveSettings } = this.state;
     
-    const set = { ...this.sets[this.state.set] };
+    const set = { ...this.sets[this.state.selectedSet] };
     //Replace default formData with user formData
     set.formData = this.state.formData || set.formData;
 
@@ -192,12 +187,12 @@ class App extends Component {
 
     const navOptions = [
       { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON') },
-      { label: 'Sets >>>', onClick: () => {} },
+      { label: 'Sets >>>',  onClick: () => {} },
       ...setOptions,
       { label: ' <<< Sets | Groups >>>', onClick: () => {} },
       ...groupOptions,
       { label: '<<< Groups', onClick: () => {} },
-      { label: 'Make JSON', onClick: () => this.changeGroup('MAKEJSON') }
+      { label: 'Make JSON',  onClick: () => this.changeGroup('MAKEJSON') }
     ];
 
     let main;
@@ -220,7 +215,7 @@ class App extends Component {
       main = (
         <Catagorizor
           // ref={this.SEF}
-          // key={ ''+ (disableCatagorization||false) + (selectedGroup||'') }
+          key={ this.state.selectedSet }
           disableCatagorization={false}
           set={set}
           selectedGroup={this.state.selectedGroup}
@@ -245,7 +240,7 @@ class App extends Component {
               <div className="col-sm-2">
                 <img src={geocodes_png} style={{width: '200px' }} />
               </div>
-              <div className="col-sm-6">
+              <div className="col-sm-8">
                 <NavPillSelector 
                   options={navOptions}
                 />
@@ -258,12 +253,12 @@ class App extends Component {
                   <div />
                 </Form>
               </div>
-              <div className="col-sm-2">
+              {/* <div className="col-sm-2">
                 <ThemeSelector 
                   themes={themes}
                   theme={theme} 
                   select={this.onThemeSelected} />
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -277,22 +272,22 @@ class App extends Component {
 
 export class Catagorizor extends Component {
   // static contextType = BackContext;
-
+  constructor(props) {
+    super(props);
+    console.log('[Catagorizor constructor()]');
+  }
   state = { previousReportedGroups: null };
 
-  // SEF = React.createRef();
+  componentDidMount() {
+    const { set: { schema }, reportGroups } = this.props;
 
-  // Component reports to parent, the groups of the current parent
-  componentDidUpdate() {
-    console.log('[Catagorizer componentDidUpdate()]');
-    if (!this.props.set.schema.groups) {return;}
-    const { set: {schema}, reportGroups } = this.props;
+    if (!this.props.set.schema.groups) { console.log('[Catagorizer] no schema.groups'); return; }
+
     const groupKeys = Object.keys(group(schema.properties, schema.groups));
-    if (reportGroups && !R.equals(groupKeys, this.state.previousReportedGroups)) {
-      this.setState({previousReportedGroups : groupKeys}, () => reportGroups(this.state.previousReportedGroups)); 
-      console.log('Reported groups');
-    }
+    reportGroups(groupKeys);
+    console.log('Reported groups');
   }
+
 
   isEnabled = () => {
     const { set, selectedGroup, disableCatagorization } = this.props;
@@ -348,11 +343,7 @@ export class Catagorizor extends Component {
     }
 
     return (
-      // <p> blank </p>
       <SuperEditorForm
-        // ref={this.SEF}
-        // key={ ''+ (disableCatagorization||false) + (selectedGroup||'') }
-        
         schema={schema}
         uiSchema={uiSchema}
         formData={formData}
@@ -360,12 +351,10 @@ export class Catagorizor extends Component {
         {...this.props.throughArgs}
       />
     );
-
   }
 }
 
 class SuperEditorForm extends Component {
-  // static defaultSet() { return SchemaSets.simple; }
 
   state = { form: false }
 
@@ -392,13 +381,6 @@ class SuperEditorForm extends Component {
       this.setState({ form: true });  
     }
   }
-
-  // time to save this shit
-  // componentWillUnmount() {
-  //   console.log('[SuperEditorForm componentWillUnmount()]');
-  //   const formData = R.clone(this.state.formData);
-  //   this.props.onFormDataChange(formData);
-  // }
 
   load = data => {
     // Reset the ArrayFieldTemplate whenever you load new data

@@ -1,0 +1,161 @@
+{
+
+ 	"@context": {
+        "@vocab": "http://schema.org/",
+        "gdx": "https://geodex.org/voc/",
+        "datacite": "http://purl.org/spar/datacite/",
+        "geolink": "http://schema.geolink.org/1.0/base/main#",
+        "re3data": "http://example.org/re3data/0.1/",
+        "ecrwg": "http://example.org/ecrwg/0.1/"
+    },
+
+	"@type": ["Service", "Organization", "WebSite", "WebPage"],
+	"@id": "https://doi.org/10.17616/R37P4C",
+	
+	"legalName": "Biological and Chemical Data Management Office",
+    "name": "BCO-DMO",
+    "url": "https://www.bco-dmo.org",
+	"description": "The BCO-DMO resource catalog offers free and open access to publicly funded research products whose field of study are biological and chemical oceanography.",
+	"category": ["Biological Oceanography", "Chemical Oceanography"],
+
+	"sameAs": [
+        "https://twitter.com/BCODMO",
+        "https://www.linkedin.com/company/6378439/"
+    	],
+
+	"contactPoint": [{
+        "@type": "ContactPoint",
+        "@id": "https://www.bco-dmo.org/about-us",
+        "name": "Support",
+        "email": "info@bco-dmo.org",
+        "url": "https:/www.bco-dmo.org/about-us",
+        "contactType": "Customer Support"
+    },
+    {
+        "@type": "ContactPoint",
+        "@id": "https://www.bco-dmo.org/contact",
+        "name": "Help Line",
+        "email": "contact@bco-dmo.org",
+        "url": "https:/www.bco-dmo.org/contact",
+        "contactType": "Help Line"
+    }
+    ],
+    
+    "address": [{
+      	"@type": "PostalAddress",
+      	"streetAddress": "WHOI, MS#36, Shiverick House 11 School St.",
+        "addressLocality": "Woods Hole",
+        "addressRegion": "MA",
+        "postalCode": "02543",
+        "addressCountry": "USA"
+    },
+    {
+      	"@type": "PostalAddress",
+      	"streetAddress": "1077 Laramie Blvd",
+        "addressLocality": "Boulder",
+        "addressRegion": "CO",
+        "postalCode": "80304",
+        "addressCountry": "USA"
+    }],
+    
+    "foundingDate": "2006-09-01",
+    
+    "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.bco-dmo.org/files/bcodmo/images/bco-dmo-words-BLUE.jpg"
+     },
+
+	"parentOrganization": [{
+        "@type": "Organization",
+        "@id": "http://www.nsf.gov",
+        "legalName": "Directorate for Geosciences",
+        "name": "NSF-GEO",
+        "url": "http://www.nsf.gov",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "266 Woods Hole Road",
+            "addressLocality": "Woods Hole",
+            "addressRegion": "MA",
+            "postalCode": "02543",
+            "addressCountry": "USA"
+        }
+    	 }, {
+        "@type": "Organization",
+        "@id": "http://pandiasoftware.com",
+        "legalName": "Pandia Software, LLC",
+        "name": "Pandia",
+        "url": "http://pandiasoftware.com",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "1077 Laramie Blvd",
+            "addressLocality": "Boulder",
+            "addressRegion": "CO",
+            "postalCode": "80304",
+            "addressCountry": "USA"
+            }
+        }],
+    
+     "memberOf": [{
+        "@type": "ProgramMembership",
+        "programName": "EarthCube CDF Registry",
+        "hostingOrganization": {
+            "@type": "Organization",
+            "name": "RE3Data",
+            "url": "http://www.re3data.org"
+        }
+   	 }, 
+   	 {
+        "@type": "ProgramMembership",
+        "programName": "Association of Scientists",
+        "hostingOrganization": {
+            "@type": "Organization",
+            "name": "AOS",
+            "url": "http://www.aos.org"
+        }
+   	 }
+   	 ],
+     "funder": [{
+        "@type": "Organization",
+        "@id": "https://www.nsf.gov/div/index.jsp?div=OCE",
+        "legalName": "Division of Ocean Sciences",
+        "name": "OCE",
+        "url": "https://www.nsf.gov/div/index.jsp?div=OCE",
+        "identifier": {
+            "@type": "PropertyValue",
+            "propertyID": "http://purl.org/spar/datacite/doi",
+            "value": "10.13039/100000141",
+            "url": "https://doi.org/10.13039/100000141"
+        }}, {
+        "@type": "Organization",
+        "@id": "https://www.doe.gov",
+        "legalName": "Department of Energy",
+        "name": "DOE",
+        "url": "https://www.doe.gov",
+        "identifier": {
+            "@type": "PropertyValue",
+            "propertyID": "http://purl.org/spar/datacite/doi",
+            "value": "10.5125/100002150",
+            "url": "https://doi.org/10.5125/100002150"
+        		}
+        }
+        
+        ],
+    
+     "publishingPrinciples": [
+        {
+            "@type": "DigitalDocument",
+            "additionalType": "https://geodex.org/voc/Protocol-TermsOfUse",
+            "name": "Terms of Use",
+            "url": "https://help.hydroshare.org/about-hydroshare/policies/terms-of-use/",
+            "fileFormat": "text/html"
+        },
+        {
+            "@type": "DigitalDocument",
+            "additionalType": "https://geodex.org/voc/Protocol-ResourceSubmissionPolicy",
+            "name": "HydroShare Publication Agreement",
+            "url": "https://help.hydroshare.org/about-hydroshare/policies/hydroshare-publication-agreement/",
+            "fileFormat": "text/html"
+        }
+    ] 
+    
+}
