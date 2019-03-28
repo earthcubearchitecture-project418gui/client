@@ -7,36 +7,45 @@ import { setImmediate } from 'core-js-pure';
 
 import themes from './themes.js';
 
-export class NavPillSelector extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { current: props.options[0].label };
-  }
+export function NavPillSelector({ options }) {
+  // constructor(props) {
+  //   super(props);
+  //   this.state = { current: props.options[0].label };
+  // }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return shouldRender(this, nextProps, nextState);
-  }
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   return shouldRender(this, nextProps, nextState);
+  // }
 
-  onLabelClick = (label, onClick) => {
-    return event => {
-      event.preventDefault();
-      this.setState({ current: label });
-      setImmediate(() => onClick(label));
+  // onLabelClick = (label, onClick) => {
+  //   return event => {
+  //     event.preventDefault();
+  //     this.setState({ current: label });
+  //     setImmediate(() => onClick(label));
+  //   };
+  // };
+
+  // render() {
+    
+    const onLabelClick = (label, onClick) => {
+      return event => {
+        event.preventDefault();
+        // this.setState({ current: label });
+        onClick(label);
+      };
     };
-  };
 
-  render() {
     // console.log('[NavPill render()]', this.props.options);
     return (
       <ul className="nav nav-pills">
         {
-          this.props.options.map((option, i) => {
+          options.map((option, i) => {
             return (
               <li
                 key={i}
                 role="presentation"
-                className={this.state.current === option.label ? "active" : ""}>
-                <a href="#" onClick={this.onLabelClick(option.label, option.onClick)} style={{ textTransform: 'capitalize' }}>
+                className={ option.active ? "active" : ""}>
+                <a href="#" onClick={onLabelClick(option.label, option.onClick)} style={{ textTransform: 'capitalize' }}>
                   {option.label}
                 </a>
               </li>
@@ -45,7 +54,7 @@ export class NavPillSelector extends Component {
         }
       </ul>
     );
-  }
+  // }
 }
 
 export function ThemeSelector({ theme, select }) {

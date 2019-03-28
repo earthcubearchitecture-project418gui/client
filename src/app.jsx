@@ -151,6 +151,14 @@ class App extends Component {
     this.onThemeSelected(theme, themes[theme]);
   }
 
+  componentDidUpdate() { 
+    const { groups, selectedGroup } = this.state;
+    if (!groups) { return; }
+    if ( !this.state.selectedGroup ) {
+      this.setState({ selectedGroup: groups[0] });
+    }
+  }
+
   onThemeSelected = (theme, { stylesheet, editor }) => {
     this.setState({ theme, editorTheme: editor ? editor : "default" });
     setImmediate(() => {
@@ -173,7 +181,7 @@ class App extends Component {
   userEditedFormData = formData => this.setState({formData, hasUserEdits: true});
 
   render() {
-    const { theme, editorTheme, liveSettings } = this.state;
+    const {  selectedSet, selectedGroup, theme, editorTheme, liveSettings } = this.state;
     
     const set = { ...this.sets[this.state.selectedSet] };
     //Replace default formData with user formData
@@ -181,32 +189,34 @@ class App extends Component {
 
     const setOptions = Object.keys(this.sets).map(set => ({
       label: set,
-      onClick: this.changeSet
+      onClick: this.changeSet,
+      active: selectedSet === set
     }));
 
-    const groupOptions = (this.state.groups || []).map(cat => ({
-      label: cat,
-      onClick: this.changeGroup
+    const groupOptions = (this.state.groups || []).map(group => ({
+      label: group,
+      onClick: this.changeGroup,
+      active: selectedGroup === group
     }));
 
     const navOptions = [
-      { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON') },
+      { label: 'Load JSON', onClick: () => this.changeSet('LOADJSON'), active: selectedSet === 'LOADJSON' },
       { label: 'Sets >>>',  onClick: () => {} },
       ...setOptions,
       { label: ' <<< Sets | Groups >>>', onClick: () => {} },
       ...groupOptions,
       { label: '<<< Groups', onClick: () => {} },
-      { label: 'Make JSON',  onClick: () => this.changeGroup('MAKEJSON') }
+      { label: 'Make JSON',  onClick: () => this.changeSet('MAKEJSON'), active: selectedSet === 'MAKEJSON' }
     ];
 
     let main;
 
-    if (this.state.selectedGroup === "LOADJSON") {
+    if (this.state.selectedSet === "LOADJSON") {
       main = ( <StartPage 
         shouldChallenge={this.state.hasUserEdits}
         onLoadFormData={this.loadExternalFormData} 
       /> );
-    } else if (this.state.selectedGroup === "MAKEJSON") {
+    } else if (this.state.selectedSet === "MAKEJSON") {
       main = (
         <MakeJSONPage 
           json={this.state.formData} 
@@ -219,10 +229,10 @@ class App extends Component {
       main = (
         <Catagorizor
           // ref={this.SEF}
-          key={ this.state.selectedSet }
+          key={ selectedSet }
           disableCatagorization={false}
           set={set}
-          selectedGroup={this.state.selectedGroup}
+          selectedGroup={selectedGroup}
           reportGroups={this.updateGroups}
           onFormDataChange={this.loadExternalFormData}
 
