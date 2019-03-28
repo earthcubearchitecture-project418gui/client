@@ -14,7 +14,7 @@ import org_ui_schema from './organizations-ui.json';
 import orgBCODMOexample from './bcodmo-org.json';
 import orgDefault from './org-default.json';
 
-// import { GeoComponent, OneOfSpliter, OneOfSpliterManager } from './components/geo-component.jsx';
+import { GeoComponent, OneOfSpliter, OneOfSpliterManager } from './schema-components/geo-component.jsx';
 
 /// IMPORTANT FIX 
 // Remove spatialCoverage.geo from schema, brakes react-jsonschema-form
@@ -34,7 +34,7 @@ export default {
     "examples": [datasetBCODMOexample],
     "formData": datasetDefault,
     "uiSchema": dataset_ui_schema,
-    // "fields": { geo: OneOfSpliterManager }
+    "fields": { geo: OneOfSpliterManager }
   },
   "dataset-ground-up": {
     "schema": datasetSchemaGU,

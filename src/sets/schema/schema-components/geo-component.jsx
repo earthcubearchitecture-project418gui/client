@@ -14,18 +14,17 @@ import {
   Rectangle,
   TileLayer,
 } from 'react-leaflet';
+
 // import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 // delete L.Icon.Default.prototype._getIconUrl;
 
-import BackContext from '../../back-context.js';
+import BackContext from '../../../back-context.js';
 
-import { morphDataPath } from '../../funcs.js';
+import { morphDataPath } from '../../../funcs.js';
 
-import * as validator from '../../validation/validators.js';
-
-const { clone, filter, propEq, map, addIndex } = R;
+import * as validator from '../../../validators.js';
 
 class LatLon extends React.Component {
   static contextType = BackContext;
@@ -45,7 +44,7 @@ class LatLon extends React.Component {
       this.setState({ [name]: event.target.value }, () => {
         const value = outboundTransform(this.state[name]);
         if (!value) { return; }
-        const latlon = clone(this.props.formData);
+        const latlon = R.clone(this.props.formData);
         latlon[name] = value;
         this.props.onChange(latlon);
         
@@ -135,7 +134,7 @@ class Shape extends React.Component {
 
   onChange(name) {
     return event => {
-      const shape = clone(this.props.formData);
+      const shape = R.clone(this.props.formData);
       shape[name] = event.target.value;
       this.props.onChange(shape);
     }
@@ -262,6 +261,7 @@ Shape.propTypes = {
 
 export class OneOfSpliterManager extends React.Component {
   render() {
+    console.log('[OneOfSplitterManager]');
     const dataPath = this.props.idSchema['$id'];
 
     const re = /spatialCoverage_(?<index>\d+)_geo/;
@@ -305,7 +305,7 @@ export class OneOfSpliter extends React.Component {
 
   formDataChange = (type, index) => {
     return (potential) => {
-      const next = clone(this.state.formData);
+      const next = R.clone(this.state.formData);
       next[type] = potential;
       this.setStateOnChange({formData:next});
     };

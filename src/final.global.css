@@ -1,4 +1,10 @@
 
+.leaflet-container {
+  height: 400px;
+  width: 100%;
+  /* margin: 0 auto; */
+}
+
 .monospace { font-family: 'Courier New', Courier, monospace }
 
 .w-100 { width: 100%; }

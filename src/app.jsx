@@ -137,10 +137,10 @@ class App extends Component {
       liveSettings: {
         validate: true,
         disable: false,
-        disableTripleEdit: false
+        disableTripleEdit: true
       },
 
-      selectedSet, 
+      selectedSet: "dataset", 
       groups: undefined,
       selectedGroup, 
       formData: undefined, 
@@ -221,9 +221,9 @@ class App extends Component {
     }));
 
     const navOptions = [
-      { label: ' | Sets | >>>',  onClick: () => {} },
-      ...setOptions,
-      { label: ' | Groups | >>> ', onClick: () => {} },
+      // { label: ' | Sets | >>>',  onClick: () => {} },
+      // ...setOptions,
+      // { label: ' | Groups | >>> ', onClick: () => {} },
       { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
       { label: 'Make JSON',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
@@ -278,20 +278,20 @@ class App extends Component {
                   options={navOptions}
                 />
               </div>
-              <div className="col-sm-2">
+              {/* <div className="col-sm-2">
                 <Form
                   schema={App.liveSettingsSchema}
                   formData={liveSettings}
                   onChange={this.setLiveSettings} >
                   <div />
                 </Form>
-              </div>
-              {/* <div className="col-sm-2">
+              </div> */}
+              <div className="col-sm-2">
                 <ThemeSelector 
                   themes={themes}
                   theme={theme} 
                   select={this.onThemeSelected} />
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
@@ -362,7 +362,7 @@ export class Catagorizor extends Component {
     };
 
     let { set, selectedGroup } = this.props;
-    let { schema, uiSchema, formData } = set;
+    let { schema, uiSchema, formData, fields } = set;
 
     if (this.isEnabled()) {
       schema = subSchema(set.schema, selectedGroup);
@@ -379,6 +379,7 @@ export class Catagorizor extends Component {
         schema={schema}
         uiSchema={uiSchema}
         formData={formData}
+        fields={fields}
         onFormDataChange={this.onFormDataChange}
         {...this.props.throughArgs}
       />
@@ -416,7 +417,7 @@ class SuperEditorForm extends Component {
   static getDerivedStateFromProps(props, state) {
     const { schema, form } = state;
     if (form && !deepEquals(props.schema, schema)) {
-      return { ...props, form: false /* , suppressNextPropagation: true  */};
+      return { ...props, form: false /* , suppressNextPropagation: true  */ };
     }
     return null;
   }
@@ -458,6 +459,7 @@ class SuperEditorForm extends Component {
       schema,
       uiSchema,
       formData,
+      fields,
       validate,
       ArrayFieldTemplate,
       ObjectFieldTemplate,
@@ -499,7 +501,7 @@ class SuperEditorForm extends Component {
                 console.log("submitted formData", formData);
                 console.log("submit event", e);
               }}
-              // fields={{ geo: GeoPosition }}
+              fields={fields}
               validate={validate}
               // onBlur={(id, value) =>
               //   console.log(`Touched ${id} with value ${value}`)

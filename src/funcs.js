@@ -70,7 +70,6 @@ export function mapTopPropertyToGroup(prop, groups) {
   return false;
 }
 
-
 export function group( obj, groups ) {
   let cats = Object.keys(groups);
   let res = R.zipObj(cats, cats.map(c => R.pick(groups[c], obj)));

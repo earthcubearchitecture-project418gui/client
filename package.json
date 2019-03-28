@@ -7,7 +7,8 @@
   "license": "",
   "main": "index.js",
   "scripts": {
-    "start": "parcel src/index.html --no-autoinstall"
+    "start": "parcel src/index.html --no-autoinstall",
+    "build": "parcel build src/index.html --public-url . "
   },
   "dependencies": {
     "ajv": "^6.7.0",
@@ -31,6 +32,7 @@
     "@babel/plugin-proposal-class-properties": "^7.4.0",
     "@babel/plugin-transform-react-jsx": "^7.3.0",
     "@babel/preset-env": "^7.4.2",
+    "cssnano": "^4.1.10",
     "postcss-modules": "^1.4.1"
   },
   "babel": {
@@ -51,7 +53,9 @@
     "modules": true,
     "plugins": {
       "postcss-modules": {
-        "globalModulePaths": [".global."]
+        "globalModulePaths": [
+          ".global."
+        ]
       },
       "autoprefixer": {
         "grid": true
