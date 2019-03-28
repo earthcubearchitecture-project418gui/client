@@ -141,7 +141,7 @@ class App extends Component {
       groups: undefined,
       selectedGroup, 
       formData: undefined, 
-      hasUserEdits: false
+      // hasUserEdits: false
     };
   }
 
@@ -170,15 +170,15 @@ class App extends Component {
   setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
   
   changeSet = selectedSet => {
-    if (selectedSet === this.state.selectedSet) { return; }
-    this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined });  
+    if (selectedSet === this.state.selectedSet) { this.setState({ selectedGroup: undefined }); }
+    else { this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined, formData: undefined }); }
   };
 
   updateGroups = groups => this.setState({groups});
   changeGroup = selectedGroup => this.setState({selectedGroup});
 
-  loadExternalFormData = formData => this.setState({formData, hasUserEdits: false});
-  userEditedFormData = formData => this.setState({formData, hasUserEdits: true});
+  loadExternalFormData = formData => this.setState({formData /* , hasUserEdits: false */});
+  userEditedFormData = formData => this.setState({formData /* , hasUserEdits: true */});
 
   render() {
     const {  selectedSet, selectedGroup, theme, editorTheme, liveSettings } = this.state;
@@ -200,23 +200,22 @@ class App extends Component {
     }));
 
     const navOptions = [
-      { label: 'Load JSON', onClick: () => this.changeSet('LOADJSON'), active: selectedSet === 'LOADJSON' },
-      { label: 'Sets >>>',  onClick: () => {} },
+      { label: ' | Sets | >>>',  onClick: () => {} },
       ...setOptions,
-      { label: ' <<< Sets | Groups >>>', onClick: () => {} },
+      { label: ' | Groups | >>> ', onClick: () => {} },
+      { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
-      { label: '<<< Groups', onClick: () => {} },
-      { label: 'Make JSON',  onClick: () => this.changeSet('MAKEJSON'), active: selectedSet === 'MAKEJSON' }
+      { label: 'Make JSON',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
     ];
 
     let main;
 
-    if (this.state.selectedSet === "LOADJSON") {
+    if (this.state.selectedGroup === "LOADJSON") {
       main = ( <StartPage 
-        shouldChallenge={this.state.hasUserEdits}
+        shouldChallenge={!! this.state.formData}
         onLoadFormData={this.loadExternalFormData} 
       /> );
-    } else if (this.state.selectedSet === "MAKEJSON") {
+    } else if (this.state.selectedGroup === "MAKEJSON") {
       main = (
         <MakeJSONPage 
           json={this.state.formData} 
@@ -234,7 +233,7 @@ class App extends Component {
           set={set}
           selectedGroup={selectedGroup}
           reportGroups={this.updateGroups}
-          onFormDataChange={this.loadExternalFormData}
+          onFormDataChange={this.userEditedFormData}
 
           throughArgs={{ 
             editorTheme, 
@@ -369,32 +368,13 @@ export class Catagorizor extends Component {
 
 class SuperEditorForm extends Component {
 
-  state = { form: false }
+  state = { form: false, suppressNextPropagation: true }
 
   componentDidMount() {
     this.load(this.props);
   }
 
-  static getDerivedStateFromProps(props, state) {
-    const { schema, form } = state;
-    if (form && !deepEquals(props.schema, schema)) {
-      return { ...props, form: false };
-    }
-    return null;
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextState.form === false) { return true; }
-    return shouldRender(this, nextProps, nextState);
-  }
-
-  componentDidUpdate() {
-    if (this.state.form === false) {
-      // With form cleared, create new instance
-      this.setState({ form: true });  
-    }
-  }
-
+  // From original playground, could likely be reduced/removed
   load = data => {
     // Reset the ArrayFieldTemplate whenever you load new data
     const { ArrayFieldTemplate, ObjectFieldTemplate } = data;
@@ -413,15 +393,40 @@ class SuperEditorForm extends Component {
     );
   };
 
+  static getDerivedStateFromProps(props, state) {
+    const { schema, form } = state;
+    if (form && !deepEquals(props.schema, schema)) {
+      return { ...props, form: false, suppressNextPropagation: true };
+    }
+    return null;
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextState.form === false) { return true; }
+    return shouldRender(this, nextProps, nextState);
+  }
+
+  componentDidUpdate() {
+    if (this.state.form === false) {
+      // With form cleared, create new instance
+      this.setState({ form: true });  
+    }
+  }
+
+  
+
   onSchemaEdited = schema => this.setState({ schema });
 
   onUISchemaEdited = uiSchema => this.setState({ uiSchema });
 
   onFormDataEdited = formData => this.setState({ formData });
 
-  onFormDataChange = ({ formData }) =>
-    this.setState({ formData }, () => 
-      this.props.onFormDataChange(this.state.formData));
+  onFormDataChange = ({ formData }) => {
+    this.setState({ formData }, () => {
+      if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
+      else { this.props.onFormDataChange(this.state.formData); }
+    });
+  };
  
   render() {
     const {
