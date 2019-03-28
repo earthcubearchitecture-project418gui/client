@@ -24,7 +24,7 @@ let datasetSchemaFixed = datasetSchema;
 const path = ['properties', 'spatialCoverage', 'items', 'properties', 'geo'];
 if (R.hasPath(path, datasetSchema)) {
   const geo = R.omit(['oneOf'], R.path(path, datasetSchema));
-  console.log('geo changed:', geo);
+  // console.log('geo changed:', geo);
   datasetSchemaFixed = R.assocPath(path, geo, datasetSchema);
 }
 

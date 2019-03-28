@@ -73,4 +73,4 @@ export function group( obj, groups ) {
 
 export function ungroup(obj) { return R.mergeAll(Object.values(obj)); }
 
-export function createShell(schema) { return  R.pick(["$schema", "$id", "title", "description", "type"], schema) }
+export function createShell(schema) { return  R.pick(["$schema", "title", "description", "type"], schema) }

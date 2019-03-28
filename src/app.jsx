@@ -108,6 +108,7 @@ class App extends Component {
     properties: {
       validate: { type: "boolean", title: "Live validation" },
       disable: { type: "boolean", title: "Disable whole form" },
+      disableTripleEdit: { type: "boolean", title: "Disable Tri-Edit" }
     },
   };
   
@@ -134,11 +135,13 @@ class App extends Component {
       liveSettings: {
         validate: true,
         disable: false,
+        disableTripleEdit: false
       },
 
       set, 
+      groups: undefined,
       selectedGroup, 
-      formData: null, 
+      formData: undefined, 
       hasUserEdits: false
     };
   }
@@ -158,17 +161,19 @@ class App extends Component {
     });
   };
 
-  loadSet = label => this.setState({ set: label, selectedGroup: null });  
-
   setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
+  
+  changeSet = selectedSet => this.setState({ set: selectedSet, selectedGroup: undefined, groups: undefined });  
 
   updateGroups = groups => this.setState({groups});
   changeGroup = selectedGroup => this.setState({selectedGroup});
 
-  loadExternalFormData = externalFormData => this.setState({formData : externalFormData});
+  loadExternalFormData = externalFormData => { 
+    console.log('[App] Loaded External Form Data!!!');
+    this.setState({formData : externalFormData});
+  }
 
   render() {
-    console.log('[App render()]');
     const { theme, editorTheme, liveSettings } = this.state;
     
     const set = { ...this.sets[this.state.set] };
@@ -177,7 +182,7 @@ class App extends Component {
 
     const setOptions = Object.keys(this.sets).map(set => ({
       label: set,
-      onClick: this.loadSet
+      onClick: this.changeSet
     }));
 
     const groupOptions = (this.state.groups || []).map(cat => ({
@@ -189,8 +194,9 @@ class App extends Component {
       { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON') },
       { label: 'Sets >>>', onClick: () => {} },
       ...setOptions,
-      { label: 'Groups >>>', onClick: () => {} },
+      { label: ' <<< Sets | Groups >>>', onClick: () => {} },
       ...groupOptions,
+      { label: '<<< Groups', onClick: () => {} },
       { label: 'Make JSON', onClick: () => this.changeGroup('MAKEJSON') }
     ];
 
@@ -216,10 +222,17 @@ class App extends Component {
           // ref={this.SEF}
           // key={ ''+ (disableCatagorization||false) + (selectedGroup||'') }
           disableCatagorization={false}
-          reportGroups={this.updateGroups}
-          selectedGroup={this.state.selectedGroup}
           set={set}
-          throughArgs={{ editorTheme, onFormDataChange: this.onFormDataChange, liveValidate: liveSettings.validate, disableForm: liveSettings.disable }}
+          selectedGroup={this.state.selectedGroup}
+          reportGroups={this.updateGroups}
+          onFormDataChange={this.loadExternalFormData}
+
+          throughArgs={{ 
+            editorTheme, 
+            liveValidate: liveSettings.validate, 
+            disableForm: liveSettings.disable, 
+            disableTripleEdit: liveSettings.disableTripleEdit
+          }}
         />
       );
     }
@@ -269,22 +282,35 @@ export class Catagorizor extends Component {
 
   // SEF = React.createRef();
 
+  // Component reports to parent, the groups of the current parent
   componentDidUpdate() {
-    if (!this.isEnabled()) {return;}
+    console.log('[Catagorizer componentDidUpdate()]');
+    if (!this.props.set.schema.groups) {return;}
     const { set: {schema}, reportGroups } = this.props;
     const groupKeys = Object.keys(group(schema.properties, schema.groups));
     if (reportGroups && !R.equals(groupKeys, this.state.previousReportedGroups)) {
-      this.setState({previousReportedGroups : groupKeys}, () =>  reportGroups(this.state.previousReportedGroups)); 
+      this.setState({previousReportedGroups : groupKeys}, () => reportGroups(this.state.previousReportedGroups)); 
       console.log('Reported groups');
     }
   }
 
   isEnabled = () => {
     const { set, selectedGroup, disableCatagorization } = this.props;
-    if ( ! set.schema.groups ) { return false; }
-    if (disableCatagorization && !selectedGroup) { return false; }
-    return true;
+    return  !disableCatagorization && selectedGroup && set.schema.groups; 
   }
+
+  transformedFormData = () => group(this.props.set.formData, this.props.set.schema.groups);
+  restoreInstance = transformed => ungroup(transformed, this.props.set.schema.groups);
+
+  onFormDataChange = formData => {
+    if (this.isEnabled()) {
+      let next = this.transformedFormData();
+      next[this.props.selectedGroup] = formData;
+      this.props.onFormDataChange(this.restoreInstance(next));
+    } else {
+      this.props.onFormDataChange(formData);
+    }
+  };
 
   render() {
 
@@ -308,19 +334,17 @@ export class Catagorizor extends Component {
       return R.pick(selectedGroupKeys, uiSchema);
     };
 
-    let { set, selectedGroup, disableCatagorization } = this.props;
+    let { set, selectedGroup } = this.props;
     let { schema, uiSchema, formData } = set;
 
-    if ( ! set.schema.groups ) { disableCatagorization = true; }
-
-    if (!disableCatagorization && selectedGroup) {
+    if (this.isEnabled()) {
       schema = subSchema(set.schema, selectedGroup);
       formData = subFormData(set.schema, selectedGroup, set.formData);
       uiSchema = ui_sub_schema(set.schema, selectedGroup, set.uiSchema);
-      console.log('[Catagorizor render()] | Subsections :', {schema, formData, uiSchema});
+      // console.log('[Catagorizor render()] | Subsections :', {schema, formData, uiSchema});
     } else {
-      if (disableCatagorization) { console.log('[Catagorizor render()] | Disabled'); }
-      if (!selectedGroup) { console.log('[Catagorizor render()] | No Selected Catagory'); }
+      // if (disableCatagorization) { console.log('[Catagorizor render()] | Disabled'); }
+      // if (!selectedGroup) { console.log('[Catagorizor render()] | No Selected Catagory'); }
     }
 
     return (
@@ -332,6 +356,7 @@ export class Catagorizor extends Component {
         schema={schema}
         uiSchema={uiSchema}
         formData={formData}
+        onFormDataChange={this.onFormDataChange}
         {...this.props.throughArgs}
       />
     );
@@ -357,6 +382,7 @@ class SuperEditorForm extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    if (nextState.form === false) { return true; }
     return shouldRender(this, nextProps, nextState);
   }
 
@@ -366,6 +392,13 @@ class SuperEditorForm extends Component {
       this.setState({ form: true });  
     }
   }
+
+  // time to save this shit
+  // componentWillUnmount() {
+  //   console.log('[SuperEditorForm componentWillUnmount()]');
+  //   const formData = R.clone(this.state.formData);
+  //   this.props.onFormDataChange(formData);
+  // }
 
   load = data => {
     // Reset the ArrayFieldTemplate whenever you load new data
@@ -392,7 +425,8 @@ class SuperEditorForm extends Component {
   onFormDataEdited = formData => this.setState({ formData });
 
   onFormDataChange = ({ formData }) =>
-    this.setState({ formData });
+    this.setState({ formData }, () => 
+      this.props.onFormDataChange(this.state.formData));
  
   render() {
     const {
@@ -413,16 +447,18 @@ class SuperEditorForm extends Component {
 
     return (
       <div className="container-fluid">
-        <TriEditor 
-          editor={editorTheme}
-          schema={schema}
-          uiSchema={uiSchema}
-          formData={formData}
+        { !this.props.disableTripleEdit && (
+          <TriEditor 
+            editor={editorTheme}
+            schema={schema}
+            uiSchema={uiSchema}
+            formData={formData}
 
-          onSchemaEdited={this.onSchemaEdited}
-          onUISchemaEdited={this.onUISchemaEdited}
-          onFormDataEdited={this.onFormDataEdited}
-        />
+            onSchemaEdited={this.onSchemaEdited}
+            onUISchemaEdited={this.onUISchemaEdited}
+            onFormDataEdited={this.onFormDataEdited}
+          /> 
+        )}
         <div className="col-sm-5">
           {this.state.form && (
             <Form
@@ -440,12 +476,12 @@ class SuperEditorForm extends Component {
               }}
               // fields={{ geo: GeoPosition }}
               validate={validate}
-              onBlur={(id, value) =>
-                console.log(`Touched ${id} with value ${value}`)
-              }
-              onFocus={(id, value) =>
-                console.log(`Focused ${id} with value ${value}`)
-              }
+              // onBlur={(id, value) =>
+              //   console.log(`Touched ${id} with value ${value}`)
+              // }
+              // onFocus={(id, value) =>
+              //   console.log(`Focused ${id} with value ${value}`)
+              // }
               transformErrors={transformErrors}
               onError={log("errors")}>
               

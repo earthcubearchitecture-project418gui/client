@@ -17,14 +17,6 @@ export class NavPillSelector extends Component {
     return shouldRender(this, nextProps, nextState);
   }
 
-  // onLabelClick = (label, i) => {
-  //   return event => {
-  //     event.preventDefault();
-  //     this.setState({ current: label });
-  //     setImmediate(() => this.props.onSelected(label, i));
-  //   };
-  // };
-
   onLabelClick = (label, onClick) => {
     return event => {
       event.preventDefault();
@@ -34,7 +26,7 @@ export class NavPillSelector extends Component {
   };
 
   render() {
-    console.log('[NavPill render()]', this.props.options);
+    // console.log('[NavPill render()]', this.props.options);
     return (
       <ul className="nav nav-pills">
         {
@@ -51,30 +43,6 @@ export class NavPillSelector extends Component {
             );
           })
         }
-
-        {/* this.props.options.map((label, i) => (
-          <li
-            key={i}
-            role="presentation"
-            className={this.state.current === label ? "active" : ""}>
-            <a href="#" onClick={this.onLabelClick(label,i)} style={{ textTransform: 'capitalize' }}>
-              {label}
-            </a>
-          </li>
-        )) */}        
-
-        {/* Object.keys(this.props.options).map((label, i) => {
-          return (
-            <li
-              key={i}
-              role="presentation"
-              className={this.state.current === label ? "active" : ""}>
-              <a href="#" onClick={this.onLabelClick(label)} style={{ textTransform: 'capitalize' }}>
-                {label}
-              </a>
-            </li>
-          );
-        }) */}
       </ul>
     );
   }

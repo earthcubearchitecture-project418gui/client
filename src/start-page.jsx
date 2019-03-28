@@ -118,9 +118,11 @@ export class StartPage extends Component {
           </div>
           <div className="row">
             <div className="col-xs-12">
-              <pre>
-                { JSON.stringify(this.state.loadedData, undefined, 2) }
-              </pre>
+              { this.state.loadedData && (
+                <pre>
+                  { JSON.stringify(this.state.loadedData, undefined, 2) }
+                </pre>
+              )}
             </div>
           </div>
           

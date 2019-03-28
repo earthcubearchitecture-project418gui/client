@@ -20,9 +20,11 @@ export function MakeJSONPage(props) {
         <div className="col-xs-2"></div>
       </div>
       
-      <pre> 
-        { JSON.stringify(props.json, undefined, 2) }
-      </pre>
+      { props.json && (
+        <pre> 
+          { JSON.stringify(props.json, undefined, 2) }
+        </pre> 
+      )}
 
       <div className="row margin-top-sm">
         <div className="col-xs-12">

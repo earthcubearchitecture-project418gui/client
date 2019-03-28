@@ -169,6 +169,7 @@ export default function validateFormData(
   transformErrors,
   additionalMetaSchemas = []
 ) {
+  let ajv = createAjvInstance();
   // add more schemas to validate against
   if (
     additionalMetaSchemas &&
