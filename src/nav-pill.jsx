@@ -31,7 +31,7 @@ export function NavPillSelector({ options }) {
       return event => {
         event.preventDefault();
         // this.setState({ current: label });
-        onClick(label);
+        if (onClick) { onClick(label); }
       };
     };
 

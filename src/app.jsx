@@ -104,8 +104,10 @@ class Back extends Component {
 class App extends Component {
   static contextType = BackContext;
 
-  static defaultTheme = "paper";
-  static defaultSet = "dataset";
+  static defaults = {
+    theme: "paper",
+    set: "dataset"
+  };
 
   static liveSettingsSchema = {
     type: "object",
@@ -121,21 +123,23 @@ class App extends Component {
     this.sets = SchemaSets;
     const setKeys = Object.keys(this.sets);
 
-    let {set: selectedSet, action} = R.mergeAll([
-      {
-        "set": setKeys.includes(App.defaultSet) ? App.defaultSet : setKeys[0],
-        "action": 'new'
-      },
-      props.retrieveStartValues()
-    ]);
+    // let {set: selectedSet, action} = R.mergeAll([
+    //   {
+    //     "set": setKeys.includes(App.defaults.set) ? App.defaults.set : setKeys[0],
+    //     "action": 'new'
+    //   },
+    //   props.retrieveStartValues()
+    // ]);
+    const start = props.retrieveStartValues();
+    const selectedSet = setKeys.includes(start.set) ? start.set : App.defaults.set;
 
-    console.log('[App constructor()] selectedSet: ', selectedSet);
-    let selectedGroup;
-    if (action === 'open') { selectedGroup = 'LOADJSON' } else { selectedGroup = Object.keys(this.sets[set].schema.groups)[0]}
+    const selectedGroup = start.action === 'load' ? 'LOADJSON' : Object.keys(this.sets[selectedSet].schema.groups)[0];
+
+    console.log('[App constructor()] selectedGroup: ', { selectedSet, selectedGroup });
 
     this.state = { 
       editorTheme: "default",
-      theme: App.defaultTheme,
+      theme: App.defaults.theme,
 
       liveSettings: {
         validate: true,
@@ -143,7 +147,7 @@ class App extends Component {
         disableTripleEdit: true
       },
 
-      selectedSet: "dataset", 
+      selectedSet, 
       groups: undefined,
       selectedGroup, 
       formData: undefined, 
@@ -151,7 +155,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const theme = App.defaultTheme;
+    const theme = App.defaults.theme;
     this.onThemeSelected(theme, themes[theme]);
   }
 
@@ -177,6 +181,7 @@ class App extends Component {
       document.getElementById("theme").setAttribute("href", stylesheet);
     });
   };
+  
 
   // For Catagorizor
   updateGroups = groups => this.setState({groups});
@@ -208,13 +213,16 @@ class App extends Component {
 
     const invalidTopProperties = stripToTopProperty(R.pathOr([], ['context','response','errors'], this));
     
-    const setOptions = Object.keys(this.sets).map(set => ({
-      label: set,
-      onClick: this.changeSet,
-      active: selectedSet === set
-    }));
+    // const setOptions = Object.keys(this.sets).map(set => ({
+    //   label: set,
+    //   onClick: this.changeSet,
+    //   active: selectedSet === set
+    // }));
 
-    const groupOptions = (this.state.groups || []).map(group => ({
+    let groupKeys;
+    if (set.schema.groups) { groupKeys = Object.keys(group(set.schema.properties, set.schema.groups)); }
+
+    const groupOptions = (groupKeys || []).map(group => ({
       label: group,
       onClick: this.changeGroup,
       active: selectedGroup === group,
@@ -224,16 +232,17 @@ class App extends Component {
     }));
 
     const navOptions = [
-      // { label: ' | Sets | >>>',  onClick: () => {} },
+      // { label: ' | Sets | >>>' },
       // ...setOptions,
-      // { label: ' | Groups | >>> ', onClick: () => {} },
+      // { label: ' | Groups | >>> ' },
       { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
       { label: 'Make JSON',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
     ];
 
-    let main;
+    if (!groupKeys) { navOptions.unshift({ label: 'Group information not found in schema.' }); }
 
+    let main;
     if (this.state.selectedGroup === "LOADJSON") {
       main = ( <StartPage 
         shouldChallenge={!! this.state.formData}
@@ -269,9 +278,9 @@ class App extends Component {
     }
 
     return (
-      <div>
-        <div className="container-fluid">
-          <div className="page-header">
+      <>
+        <div className="fixed">
+          <div className="container-fluid">
             <div className="row">
               <div className="col-sm-2">
                 <img src={geocodes_png} style={{width: '200px' }} />
@@ -299,8 +308,10 @@ class App extends Component {
           </div>
         </div>
 
-        { main }
-      </div>
+        <div className="main">
+          { main }
+        </div>
+      </>
     );
   }
 }

@@ -22,7 +22,7 @@ import { removeIDs } from '../../json-schema-visitors.js';
 // Remove spatialCoverage.geo from schema, brakes react-jsonschema-form
 // Uses custom component for rendering instead
 
-let datasetSchemaFixed = R.clone(datasetSchema);
+const datasetSchemaFixed = R.clone(datasetSchema);
 const path = ['properties', 'spatialCoverage', 'items', 'properties', 'geo'];
 if (R.hasPath(path, datasetSchemaFixed)) {
   const geo = R.omit(['oneOf'], R.path(path, datasetSchemaFixed));
@@ -31,6 +31,10 @@ if (R.hasPath(path, datasetSchemaFixed)) {
 }
 
 removeIDs(datasetSchemaFixed);
+
+const orgSchemaFixed = R.clone(orgSchema);
+removeIDs(orgSchemaFixed);
+
 
 export default {
   "dataset": {
@@ -56,7 +60,7 @@ export default {
     // "fields": { geo: OneOfSpliterManager }
   },
   "organizations": {
-    "schema": orgSchema,
+    "schema": orgSchemaFixed,
     "examples": [orgBCODMOexample],
     "formData": orgDefault,
     "uiSchema": org_ui_schema,
