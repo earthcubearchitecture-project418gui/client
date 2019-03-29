@@ -2,7 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 
 function TextareaWidget(props) {
-  const {
+  let {
+    schema, // ISTI
     id,
     options,
     placeholder,
@@ -15,6 +16,9 @@ function TextareaWidget(props) {
     onBlur,
     onFocus,
   } = props;
+
+  if (!placeholder && schema.example) { placeholder = 'Example:   ' + schema.example; } // ISTI
+
   const _onChange = ({ target: { value } }) => {
     return onChange(value === "" ? options.emptyValue : value);
   };

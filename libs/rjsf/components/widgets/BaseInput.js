@@ -53,6 +53,8 @@ function BaseInput(props) {
     return props.onChange(value === "" ? options.emptyValue : value);
   };
 
+  //ISTI inc.
+  if (schema.example) { inputProps.placeholder = 'Example:   ' + schema.example; }
   return (
     <input
       className="form-control"
