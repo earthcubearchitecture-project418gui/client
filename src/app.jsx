@@ -105,7 +105,7 @@ class App extends Component {
   static contextType = BackContext;
 
   static defaults = {
-    theme: "paper",
+    theme: "superhero",
     set: "dataset"
   };
 
@@ -184,7 +184,7 @@ class App extends Component {
   
 
   // For Catagorizor
-  updateGroups = groups => this.setState({groups});
+  // updateGroups = groups => this.setState({groups});
   userEditedFormData = formData => this.setState({formData});
   
   // For StartPage
@@ -252,7 +252,7 @@ class App extends Component {
       main = (
         <MakeJSONPage 
           // json={this.state.formData} 
-          josn={fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' })}
+          json={fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' })}
           onValidateClick={this.remoteValidation}
           onSave={this.saveFile}
         /> 
@@ -264,7 +264,7 @@ class App extends Component {
           disableCatagorization={false}
           set={set}
           selectedGroup={selectedGroup}
-          reportGroups={this.updateGroups}
+          // reportGroups={this.updateGroups}
           onFormDataChange={this.userEditedFormData}
 
           throughArgs={{ 
@@ -279,36 +279,69 @@ class App extends Component {
 
     return (
       <>
-        <div className="fixed">
+        <div className="navbar navbar-default navbar-fixed-top container-fluid">
           <div className="container-fluid">
-            <div className="row">
-              <div className="col-sm-2">
-                <img src={geocodes_png} style={{width: '200px' }} />
-              </div>
-              <div className="col-sm-8">
-                <NavPillSelector 
-                  options={navOptions}
-                />
-              </div>
-              {/* <div className="col-sm-2">
-                <Form
-                  schema={App.liveSettingsSchema}
-                  formData={liveSettings}
-                  onChange={this.setLiveSettings} >
-                  <div />
-                </Form>
-              </div> */}
-              <div className="col-sm-2">
-                <ThemeSelector 
-                  themes={themes}
-                  theme={theme} 
-                  select={this.onThemeSelected} />
-              </div>
+            <div className="navbar-header">
+              
+              <a className="navbar-brand" href="#">
+                <img src={geocodes_png} />
+              </a>
+              <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false" style={{marginTop: '2rem'}}>
+                <span className="sr-only">Toggle navigation</span>
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+              </button>
+            </div>
+            <div className="collapse navbar-collapse" id="navbar-collapse-1">
+              <NavPillSelector  options={navOptions} />        
+              {/* <ul className="nav navbar-nav navbar-right">
+                <li><a href="#">Link</a></li>
+                <li className="dropdown">
+                  <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span className="caret"></span></a>
+                  <ul className="dropdown-menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li role="separator" className="divider"></li>
+                    <li><a href="#">Separated link</a></li>
+                  </ul>
+                </li>
+              </ul> */}
             </div>
           </div>
         </div>
 
         <div className="main">
+          {/*         
+            <div className="container-fluid">
+              <div className="row">
+                <div className="col-sm-2">
+                  <img src={geocodes_png} style={{width: '200px' }} />
+                </div>
+                <div className="col-sm-8">
+                  <NavPillSelector 
+                    options={navOptions}
+                  />
+                </div>
+                <div className="col-sm-2">
+                  <Form
+                    schema={App.liveSettingsSchema}
+                    formData={liveSettings}
+                    onChange={this.setLiveSettings} >
+                    <div />
+                  </Form>
+                </div> 
+                <div className="col-sm-2">
+                  <ThemeSelector 
+                    themes={themes}
+                    theme={theme} 
+                    select={this.onThemeSelected} />
+                </div>
+              </div>
+            </div> 
+          */}
+
           { main }
         </div>
       </>
@@ -322,15 +355,15 @@ export class Catagorizor extends Component {
  
   state = { previousReportedGroups: null };
 
-  componentDidMount() {
-    const { set: { schema }, reportGroups } = this.props;
+  // componentDidMount() {
+  //   const { set: { schema }, reportGroups } = this.props;
 
-    if (!this.props.set.schema.groups) { console.log('[Catagorizer] no schema.groups'); return; }
+  //   if (!this.props.set.schema.groups) { console.log('[Catagorizer] no schema.groups'); return; }
 
-    const groupKeys = Object.keys(group(schema.properties, schema.groups));
-    reportGroups(groupKeys);
-    console.log('Reported groups');
-  }
+  //   const groupKeys = Object.keys(group(schema.properties, schema.groups));
+  //   reportGroups(groupKeys);
+  //   console.log('Reported groups');
+  // }
 
   isEnabled = () => {
     const { set, selectedGroup, disableCatagorization } = this.props;

@@ -1,9 +1,47 @@
 
-.fixed {
-  position: fixed;
-  padding: 1rem;
-  background-color: #F3F3F3;
-  z-index: 100;
+.navbar.navbar-default {
+  min-height: 8rem;
+}
+
+@media (min-width: 768px) {
+  .navbar.navbar-default {
+    padding-left: 3rem;
+  }
+}
+
+.navbar-brand {
+  margin-top: 1.3rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+
+  height: 5.25rem;
+  
+  background-color: coral;
+  border: 1px solid black;
+  border-radius: 15px 50px;
+}
+
+.navbar-brand:hover {
+  background-color: coral !important;
+}
+
+.navbar-brand  img {
+  /* width: 100%; */
+  position: relative;
+  top: -0.65rem;
+  max-height: 4.5rem;
+  object-fit: contain;
+
+  /* padding-top: px; */
+  /* padding-bottom: 5px; */
+
+  padding-left: 10px;
+  padding-right: 0px;
+
+}
+
+.nav.nav-pills {
+  padding-top: 1.5rem;
 }
 
 .main {
