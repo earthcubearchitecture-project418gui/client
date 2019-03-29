@@ -16,17 +16,21 @@ import orgDefault from './org-default.json';
 
 import { GeoComponent, OneOfSpliter, OneOfSpliterManager } from './schema-components/geo-component.jsx';
 
+import { removeIDs } from '../../json-schema-visitors.js';
+
 /// IMPORTANT FIX 
 // Remove spatialCoverage.geo from schema, brakes react-jsonschema-form
 // Uses custom component for rendering instead
 
-let datasetSchemaFixed = datasetSchema;
+let datasetSchemaFixed = R.clone(datasetSchema);
 const path = ['properties', 'spatialCoverage', 'items', 'properties', 'geo'];
-if (R.hasPath(path, datasetSchema)) {
-  const geo = R.omit(['oneOf'], R.path(path, datasetSchema));
+if (R.hasPath(path, datasetSchemaFixed)) {
+  const geo = R.omit(['oneOf'], R.path(path, datasetSchemaFixed));
   // console.log('geo changed:', geo);
-  datasetSchemaFixed = R.assocPath(path, geo, datasetSchema);
+  R.assocPath(path, geo, datasetSchemaFixed);
 }
+
+removeIDs(datasetSchemaFixed);
 
 export default {
   "dataset": {
@@ -34,7 +38,8 @@ export default {
     "examples": [datasetBCODMOexample],
     "formData": datasetDefault,
     "uiSchema": dataset_ui_schema,
-    "fields": { geo: OneOfSpliterManager }
+    "fields": { geo: OneOfSpliterManager },
+    "perform_id_removal": true
   },
   "dataset-ground-up": {
     "schema": datasetSchemaGU,
@@ -55,6 +60,7 @@ export default {
     "examples": [orgBCODMOexample],
     "formData": orgDefault,
     "uiSchema": org_ui_schema,
-    "fields": { }
+    "fields": { },
+    "perform_id_removal": true
   }
 };

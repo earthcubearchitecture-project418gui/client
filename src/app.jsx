@@ -19,6 +19,7 @@ import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
 import themes from './themes.js';
 import { group, ungroup, createShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
+import { fillInMissingIDs } from './json-schema-visitors.js';
 
 import verified_png from './images/verified.png';       // Images
 import clear_png from './images/clear.png';
@@ -104,6 +105,7 @@ class App extends Component {
   static contextType = BackContext;
 
   static defaultTheme = "paper";
+  static defaultSet = "dataset";
 
   static liveSettingsSchema = {
     type: "object",
@@ -117,18 +119,19 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.sets = SchemaSets;
-    
-    let {selectedSet, action} = R.mergeAll([
-      props.retrieveStartValues(),
+    const setKeys = Object.keys(this.sets);
+
+    let {set: selectedSet, action} = R.mergeAll([
       {
-        "set": Object.keys(this.sets)[0],
+        "set": setKeys.includes(App.defaultSet) ? App.defaultSet : setKeys[0],
         "action": 'new'
-      }
+      },
+      props.retrieveStartValues()
     ]);
 
-    if ( !Object.keys(this.sets).includes(selectedSet) ) { selectedSet = Object.keys(this.sets)[0]; }
+    console.log('[App constructor()] selectedSet: ', selectedSet);
     let selectedGroup;
-    // if (action === 'open') { group = 'LOADJSON' } else { group = Object.keys(this.sets[set].schema.groups)[0]}
+    if (action === 'open') { selectedGroup = 'LOADJSON' } else { selectedGroup = Object.keys(this.sets[set].schema.groups)[0]}
 
     this.state = { 
       editorTheme: "default",
@@ -239,8 +242,8 @@ class App extends Component {
     } else if (this.state.selectedGroup === "MAKEJSON") {
       main = (
         <MakeJSONPage 
-          json={this.state.formData} 
-          // josn={fillInMissingIDs(this.sets[this.state.selectedSchema].schema, R.clone(this.state.formData))}
+          // json={this.state.formData} 
+          josn={fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' })}
           onValidateClick={this.remoteValidation}
           onSave={this.saveFile}
         /> 
@@ -305,10 +308,7 @@ class App extends Component {
 
 export class Catagorizor extends Component {
   // static contextType = BackContext;
-  constructor(props) {
-    super(props);
-    console.log('[Catagorizor constructor()]');
-  }
+ 
   state = { previousReportedGroups: null };
 
   componentDidMount() {
@@ -525,8 +525,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let startupDefaults = {
     "action": params.get('action'),
-    "set": params.get('schema')
+    "set": params.get('set')
   };
+
+  console.log({startupDefaults});
 
   const retrieveStartValues = () => {
     const temp = startupDefaults;
