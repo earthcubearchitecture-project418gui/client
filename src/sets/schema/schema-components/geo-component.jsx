@@ -30,7 +30,6 @@ class LatLon extends React.Component {
   static contextType = BackContext;
 
   constructor(props) {
-    console.log('LatLong [constructor()]');
     super(props);
     let { latitude = '', longitude = '' } = props.formData;
     if (latitude === 0) { latitude = ''; }
@@ -40,7 +39,6 @@ class LatLon extends React.Component {
 
   onChange(name) {
     return event => {
-      console.log(name,' : ', event.target.value);
       this.setState({ [name]: event.target.value }, () => {
         const value = outboundTransform(this.state[name]);
         if (!value) { return; }
@@ -175,7 +173,6 @@ class Shape extends React.Component {
   }
 
   render() {
-    console.log(this.fg);
 
     const backErrors = R.pathOr([], ['context', 'response', 'errors'], this);
     const dataPath = morphDataPath(this.props.dataPath);
@@ -261,7 +258,6 @@ Shape.propTypes = {
 
 export class OneOfSpliterManager extends React.Component {
   render() {
-    console.log('[OneOfSplitterManager]');
     const dataPath = this.props.idSchema['$id'];
 
     const re = /spatialCoverage_(?<index>\d+)_geo/;
@@ -369,26 +365,25 @@ export class OneOfSpliter extends React.Component {
   }
 }
 
-export function average(arr) {
-  const sum = arr.reduce((acc, v) => acc + v);
-  return sum / arr.length;
-}
+// export function average(arr) {
+//   const sum = arr.reduce((acc, v) => acc + v);
+//   return sum / arr.length;
+// }
 
-export function validate(formData, errors) {
-  console.log('[validate]', formData);
+// export function validate(formData, errors) {
   
-  if (formData.spatialCoverage) {
-    formData.spatialCoverage.forEach((spatial, m) => {
-      spatial.geo.forEach((geo, n) => {
-        const [res, errors] = validator.isValidGeo(geo);
-        console.error(geo, 'error:', res, errors);
-        formData.spatialCoverage[m].geo[n].errors = errors;
-      });
-    });
-  }
+//   if (formData.spatialCoverage) {
+//     formData.spatialCoverage.forEach((spatial, m) => {
+//       spatial.geo.forEach((geo, n) => {
+//         const [res, errors] = validator.isValidGeo(geo);
+//         console.error(geo, 'error:', res, errors);
+//         formData.spatialCoverage[m].geo[n].errors = errors;
+//       });
+//     });
+//   }
 
-  return errors;
-}
+//   return errors;
+// }
 
 function filterErrors(backErrors, dataPath) {
   const msgs = backErrors.filter(err => err.dataPath === dataPath).map(err => err.message);

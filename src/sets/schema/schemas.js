@@ -22,12 +22,14 @@ import { removeIDs } from '../../json-schema-visitors.js';
 // Remove spatialCoverage.geo from schema, brakes react-jsonschema-form
 // Uses custom component for rendering instead
 
-const datasetSchemaFixed = R.clone(datasetSchema);
+let datasetSchemaFixed = R.clone(datasetSchema);
 const path = ['properties', 'spatialCoverage', 'items', 'properties', 'geo'];
 if (R.hasPath(path, datasetSchemaFixed)) {
   const geo = R.omit(['oneOf'], R.path(path, datasetSchemaFixed));
-  // console.log('geo changed:', geo);
-  R.assocPath(path, geo, datasetSchemaFixed);
+  console.log('geo changed:', geo);
+  datasetSchemaFixed = R.assocPath(path, geo, datasetSchemaFixed);
+} else {
+  console.log('Geo not found!!!');
 }
 
 removeIDs(datasetSchemaFixed);
