@@ -85,7 +85,8 @@
       "description": "Enter your organization's field(s) of study.",
       "example": "Biological Oceanography, Chemical Oceanography",
       "items": {
-        "type": "string"
+        "type": "string",
+        "default": ""
       }
     },
     "sameAs": {

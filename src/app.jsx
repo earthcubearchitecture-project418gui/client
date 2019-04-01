@@ -226,7 +226,7 @@ class App extends Component {
       label: group,
       onClick: this.changeGroup,
       active: selectedGroup === group,
-      icon: this.context.status !== 'clear' 
+      icon: this.context.status === 'clear' 
         ? undefined 
         : R.any(v => v === true, invalidTopProperties.map(top => group === mapTopPropertyToGroup(top, set.schema.groups))) ? '🛑' : '✅'
     }));
