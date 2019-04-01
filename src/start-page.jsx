@@ -12,33 +12,41 @@ export class StartPage extends Component {
     console.log('[StartPage] | shouldChallenge : ', props.shouldChallenge);
     this.fileInputRef = React.createRef();
     this.urlInputRef = React.createRef();
-    this.state = { loadedData: undefined, modalDisplaying: false };
+    this.state = { 
+      loadedData: undefined, 
+      challengeModal: false,
+      modalAccepted: undefined,
+      
+      errorModal: false,
+      errorMessage: ''
+    
+    };
   }
 
   upload = () => this.props.onLoadFormData(this.state.loadedData);
 
   handleFetchJSON = () => this.challengeUser({modalAccepted: () => this.fetchJSON(this.upload)});
-  fetchJSON = (callback = nop) => {
-    // fetch('https://earthcube.isti.com/test_file.html')
-    // fetch('https://earthcube.isti.com/test_file_json.html')
-    
-    if (! this.urlInputRef) { return; }
+  fetchJSON = (onVerified) => {
+    const self = this;
 
+    if (! this.urlInputRef) { return; }
     const url = this.urlInputRef.current.value;
+
     fetch(url)
       .then(res => res.json())
-      .then(obj => {
-        this.setState({ loadedData: obj }, callback);
-      })
-      .catch(err => console.error(err));
+      .then(obj => self.verifyInput(obj, onVerified) )
+      .catch(err => {
+        console.error(err)
+        this.setState({ errorModal: true, errorMessage: `Error : Remote data is not valid JSON.`});
+      });
   }
-  
+ 
   
   handleLoadFile = () => this.challengeUser({modalAccepted: () => this.handleAcceptedLoadFile(this.upload) });
-  handleAcceptedLoadFile = (callback) => {
+  handleAcceptedLoadFile = (onVerified) => {
     const file = this.retrieveSelectedFileName();
     if (!file) { return; }
-    this.loadFile(file, callback);
+    this.loadFile(file, onVerified);
   }
 
   retrieveSelectedFileName = () => {
@@ -50,25 +58,60 @@ export class StartPage extends Component {
     return;
   }
 
-  loadFile = (file, callback = nop) => {
+  loadFile = (file, onVerified) => {
     const fr = new FileReader();
     fr.onload = () => {
-      const instance = JSON.parse(fr.result, undefined, 2);
-      this.setState({loadedData: instance}, callback);
+      try {
+        const instance = JSON.parse(fr.result, undefined, 2);
+        this.verifyInput(instance, onVerified);
+      } catch(error) {
+        this.setState({ errorModal: true, errorMessage: `Error : Remote data is not valid JSON.`});
+      }
     };
     fr.readAsText(file);
   }
 
+  verifyInput = (instance, onVerified = nop) => {
+    // inspect for conflicting dataset
+    // console.log('[verifyInput] instance: ', instance.hasOwnProperty('@type') );
 
+    const instanceType = instance['@type'];
+
+    //No check if not object or missing @type
+    if (
+      !R.is(Object, instance) 
+      ||   
+      ( R.is(Object, instance) && !instance.hasOwnProperty('@type'))
+    ) { 
+      console.log('No @type, bypass check');
+      this.setState({ loadedData: instance }, onVerified);
+      return; 
+    }
+
+    // console.log('Checking for @type === ', this.props.checkType);
+    // console.log('Checking for typeof instanceType ', typeof instanceType);
+
+    if (
+      (R.is(String, instanceType) && instanceType.toLowerCase() === this.props.checkType) 
+      ||
+      (R.is(Array, instanceType) && !!instanceType.find(v => v.toLowerCase() === this.props.checkType))
+    ) {
+      this.setState({ loadedData: instance }, onVerified);
+    } else {
+      console.error('Remote JSON contains invalid @type value : ', instanceType);
+      this.setState({ errorModal: true, errorMessage: `Error : Loaded data contains invalid <code>"@type"</code>.`});
+    }
+  };
+  
   challengeUser = (state) => {
     console.log('[StartPage challengeUser()]');
     if (! this.props.shouldChallenge) { 
       if (state.modalAccepted) { state.modalAccepted(); }
       return;
     }
-    this.setState({modalAccepted: this.clearModal, ...state, modalDisplaying: true});
+    this.setState({modalAccepted: this.clearModal, ...state, challengeModal: true});
   }
-  clearModal = () => this.setState({modalDisplaying: false});
+  clearModal = () => this.setState({challengeModal: false, errorModal: false});
 
   render() {
     const files = R.path(['fileInputRef','current','files'], this);
@@ -77,9 +120,16 @@ export class StartPage extends Component {
 
     return (
       <div>
-        <Modal show={this.state.modalDisplaying} >
+        <Modal show={this.state.challengeModal} >
           <VerifyUserAction 
             onAccept={() => {console.log('accepted'); this.clearModal(); this.state.modalAccepted();}} 
+            onCancel={() => {console.log('cancelled'); this.clearModal(); } } 
+          />
+        </Modal>
+
+        <Modal show={this.state.errorModal} >
+          <ErrorModal
+            message={this.state.errorMessage}
             onCancel={() => {console.log('cancelled'); this.clearModal(); } } 
           />
         </Modal>
@@ -143,6 +193,23 @@ function VerifyUserAction(props) {
       <div className="pull-right">
         <button type="button" className="btn-sm btn-default" onClick={onCancel}>Cancel</button>
         <button type="button" className="btn-sm btn-danger margin-left-xs" onClick={onAccept}>Accept</button>
+      </div>
+    </>
+  );
+}
+
+function ErrorModal(props) {
+  const msg = props.message || 'An error has occurred while loading this file';
+  return (
+    <>
+      <div className="bg-danger " style={{color: '#111'}}>
+        <p className=" padding-sm" >
+          {msg}
+        </p>
+      </div>
+
+      <div className="pull-right">
+        <button type="button" className="btn-sm btn-default" onClick={props.onCancel}>Cancel</button>
       </div>
     </>
   );

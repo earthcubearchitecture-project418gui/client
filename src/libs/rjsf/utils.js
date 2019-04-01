@@ -2,9 +2,10 @@ import React from "react";
 import validateFormData from "./validate";
 
 import { setImmediate } from 'core-js-pure';
-import fill from 'core-js/stable/array/fill';
+// import fill from 'core-js/stable/array/fill';  
 
-console.log({fill});  //KEEP HERE
+// console.log({fill});  //KEEP HERE
+// console.log(Array.prototype.fill);
 
 export const ADDITIONAL_PROPERTY_FLAG = "__additional_property";
 
@@ -170,8 +171,7 @@ function computeDefaults(schema, parentDefaults, definitions = {}) {
             const fillerSchema = Array.isArray(schema.items)
               ? schema.additionalItems
               : schema.items;
-            const fillerEntries = fill(
-              new Array(schema.minItems - defaultsLength),
+            const fillerEntries = (new Array(schema.minItems - defaultsLength)).fill(
               computeDefaults(fillerSchema, fillerSchema.defaults, definitions)
             );
             // then fill up the rest with either the item default or empty, up to minItems

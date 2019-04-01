@@ -246,6 +246,7 @@ class App extends Component {
     if (this.state.selectedGroup === "LOADJSON") {
       main = ( <StartPage 
         shouldChallenge={!! this.state.formData}
+        checkType={selectedSet}
         onLoadFormData={this.loadExternalFormData} 
       /> );
     } else if (this.state.selectedGroup === "MAKEJSON") {
@@ -313,35 +314,6 @@ class App extends Component {
         </div>
 
         <div className="main">
-          {/*         
-            <div className="container-fluid">
-              <div className="row">
-                <div className="col-sm-2">
-                  <img src={geocodes_png} style={{width: '200px' }} />
-                </div>
-                <div className="col-sm-8">
-                  <NavPillSelector 
-                    options={navOptions}
-                  />
-                </div>
-                <div className="col-sm-2">
-                  <Form
-                    schema={App.liveSettingsSchema}
-                    formData={liveSettings}
-                    onChange={this.setLiveSettings} >
-                    <div />
-                  </Form>
-                </div> 
-                <div className="col-sm-2">
-                  <ThemeSelector 
-                    themes={themes}
-                    theme={theme} 
-                    select={this.onThemeSelected} />
-                </div>
-              </div>
-            </div> 
-          */}
-
           { main }
         </div>
       </>
