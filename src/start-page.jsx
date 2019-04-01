@@ -9,7 +9,6 @@ const nop = () => {};
 export class StartPage extends Component {
   constructor(props) {
     super(props);
-    console.log('[StartPage] | shouldChallenge : ', props.shouldChallenge);
     this.fileInputRef = React.createRef();
     this.urlInputRef = React.createRef();
     this.state = { 
@@ -104,7 +103,6 @@ export class StartPage extends Component {
   };
   
   challengeUser = (state) => {
-    console.log('[StartPage challengeUser()]');
     if (! this.props.shouldChallenge) { 
       if (state.modalAccepted) { state.modalAccepted(); }
       return;

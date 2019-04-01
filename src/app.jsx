@@ -91,7 +91,7 @@ class Back extends Component {
         validate: this.remoteValidation, 
         invalidate: this.invalidate, 
         status: this.backStatus(), 
-        icon: this.verificationImage(),
+        validationImage: this.verificationImage(),
         // registerOnRemoteValidation: this.registerOnRemoteValidation 
       }} >
         <App retrieveStartValues={this.props.retrieveStartValues}/>
@@ -226,7 +226,7 @@ class App extends Component {
       label: group,
       onClick: this.changeGroup,
       active: selectedGroup === group,
-      icon: this.context.status === 'clear' 
+      icon: this.context.status !== 'clear' 
         ? undefined 
         : R.any(v => v === true, invalidTopProperties.map(top => group === mapTopPropertyToGroup(top, set.schema.groups))) ? '🛑' : '✅'
     }));
@@ -254,6 +254,8 @@ class App extends Component {
         <MakeJSONPage 
           // json={this.state.formData} 
           json={fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' })}
+          remoteResponse={this.context.response}
+          validationImage={this.context.validationImage}
           onValidateClick={this.remoteValidation}
           onSave={this.saveFile}
         /> 
