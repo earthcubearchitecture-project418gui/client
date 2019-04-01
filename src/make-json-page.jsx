@@ -7,8 +7,6 @@ import * as R from 'ramda';
 export function MakeJSONPage({json, remoteResponse = {}, validationImage, onValidateClick, onSave}) {
   json = JSON.stringify(json || {}, undefined, 2);
 
-  console.log('[MakeJSONPage] : ', remoteResponse);
-
   let errorList;
   if (remoteResponse.valid === false) {
     const transformed = remoteResponse.errors.map(err => ({ stack: err.message }) );

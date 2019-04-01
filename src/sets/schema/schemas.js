@@ -26,10 +26,10 @@ let datasetSchemaFixed = R.clone(datasetSchema);
 const path = ['properties', 'spatialCoverage', 'items', 'properties', 'geo'];
 if (R.hasPath(path, datasetSchemaFixed)) {
   const geo = R.omit(['oneOf'], R.path(path, datasetSchemaFixed));
-  console.log('geo changed:', geo);
+  // console.log('geo changed:', geo);
   datasetSchemaFixed = R.assocPath(path, geo, datasetSchemaFixed);
 } else {
-  console.log('Geo not found!!!');
+  console.error('Geo not found!!!');
 }
 
 removeIDs(datasetSchemaFixed);

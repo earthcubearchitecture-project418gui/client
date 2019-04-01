@@ -51,7 +51,28 @@ class Back extends Component {
       .catch(err => console.error(err));  
   }
 
-  invalidate = () => this.setState({ back: undefined });
+  /** 
+   * Scans current backend errorlist, removes items that belong to group 
+   * Passed groups to prevent major refactor
+   * */
+  invalidate = (group, groups) => {
+    console.log('[invalidate] : ', {group, self: this});
+    // if (!group) { this.setState({ back: undefined }); }
+
+    const errorList = R.path(['back','errors'], this.state);
+    if (! errorList) { return; }
+    console.log({errorList});
+
+    const invalidTopProperties = stripToTopProperty(errorList);
+    console.log(invalidTopProperties);
+
+    const shouldRemove = invalidTopProperties.map(top => group === mapTopPropertyToGroup(top, groups));
+
+    const newErrorList = errorList.filter((v,i) => !shouldRemove[i]);
+    console.log({shouldRemove, newErrorList});
+
+    this.setState(prevState => ({...prevState, back: {...prevState.back, errors: newErrorList}}));
+  };
 
   backStatus = () => {
     if (this.state.back) {
@@ -135,7 +156,7 @@ class App extends Component {
 
     const selectedGroup = start.action === 'load' ? 'LOADJSON' : Object.keys(this.sets[selectedSet].schema.groups)[0];
 
-    console.log('[App constructor()] selectedGroup: ', { selectedSet, selectedGroup });
+    // console.log('[App constructor()] selectedGroup: ', { selectedSet, selectedGroup });
 
     this.state = { 
       editorTheme: "default",
@@ -182,10 +203,10 @@ class App extends Component {
     });
   };
   
-
   // For Catagorizor
   // updateGroups = groups => this.setState({groups});
-  userEditedFormData = formData => this.setState({formData});
+  userEditedFormData = formData => this.setState({formData}, () => 
+    this.context.invalidate(this.state.selectedGroup, this.sets[this.state.selectedSet].schema.groups) );
   
   // For StartPage
   loadExternalFormData = formData => this.setState({formData});
@@ -546,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
     "set": params.get('set')
   };
 
-  console.log({startupDefaults});
+  // console.log({startupDefaults});
 
   const retrieveStartValues = () => {
     const temp = startupDefaults;

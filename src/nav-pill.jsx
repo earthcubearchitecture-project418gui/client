@@ -8,53 +8,36 @@ import { setImmediate } from 'core-js-pure';
 import themes from './themes.js';
 
 export function NavPillSelector({ options }) {
-  // constructor(props) {
-  //   super(props);
-  //   this.state = { current: props.options[0].label };
-  // }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   return shouldRender(this, nextProps, nextState);
-  // }
 
-  // onLabelClick = (label, onClick) => {
-  //   return event => {
-  //     event.preventDefault();
-  //     this.setState({ current: label });
-  //     setImmediate(() => onClick(label));
-  //   };
-  // };
+  console.log('[NavPillSelector] render()');
 
-  // render() {
-    
-    const onLabelClick = (label, onClick) => {
-      return event => {
-        event.preventDefault();
-        // this.setState({ current: label });
-        if (onClick) { onClick(label); }
-      };
+  const onLabelClick = (label, onClick) => {
+    return event => {
+      event.preventDefault();
+      // this.setState({ current: label });
+      if (onClick) { onClick(label); }
     };
+  };
 
-    // console.log('[NavPill render()]', this.props.options);
-    return (
-      <ul className="nav nav-pills">
-        {
-          options.map((option, i) => {
-            return (
-              <li
-                key={i}
-                role="presentation"
-                className={ option.active ? "active" : ""}>
-                <a href="#" onClick={onLabelClick(option.label, option.onClick)} style={{ textTransform: 'capitalize' }}>
-                  {option.icon} {'  ' + option.label}
-                </a>
-              </li>
-            );
-          })
-        }
-      </ul>
-    );
-  // }
+  return (
+    <ul className="nav nav-pills">
+      {
+        options.map((option, i) => {
+          return (
+            <li
+              key={i}
+              role="presentation"
+              className={option.active ? "active" : ""}>
+              <a href="#" onClick={onLabelClick(option.label, option.onClick)} style={{ textTransform: 'capitalize' }}>
+                {option.icon} {'  ' + option.label}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  );
 }
 
 export function ThemeSelector({ theme, select }) {
