@@ -19,7 +19,7 @@ import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
 import themes from './themes.js';
 import { group, ungroup, createShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
-import { fillInMissingIDs } from './json-schema-visitors.js';
+import { fillInMissingIDs, removeIDs } from './json-schema-visitors.js';
 
 import verified_png from './images/verified.png';       // Images
 import clear_png from './images/clear.png';
@@ -273,6 +273,7 @@ class App extends Component {
     var blob = new Blob([JSON.stringify(this.state.formData, undefined, 2)], {type: "text/plain;charset=utf-8"});
     FileSaver.saveAs(blob, "ucar-json-instance.json");
   }
+  fillInMissingIDs = () => fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' });
   
   // For Back context
   remoteValidation = () => {
@@ -280,7 +281,7 @@ class App extends Component {
     this.setState({ errorList: undefined, validGroups: undefined, errorGroups: undefined}, () => 
       this.context.validate({
         schema: this.state.selectedSet,
-        doc: this.state.formData
+        doc: this.fillInMissingIDs()
       })
     );
   };
@@ -337,7 +338,7 @@ class App extends Component {
       main = (
         <MakeJSONPage 
           // json={this.state.formData} 
-          json={fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' })}
+          json={this.fillInMissingIDs()}
           remoteResponse={this.context.response}
           validationImage={this.context.validationImage}
           onValidateClick={this.remoteValidation}
@@ -349,7 +350,7 @@ class App extends Component {
         <Catagorizor
           key={ selectedSet }
           disableCatagorization={false}
-          set={set}
+          set={{...set, schema: removeIDs(R.clone(set.schema))}}
           selectedGroup={selectedGroup}
           // reportGroups={this.updateGroups}
           onFormDataChange={this.userEditedFormData}

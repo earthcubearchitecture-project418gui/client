@@ -32,10 +32,10 @@ if (R.hasPath(path, datasetSchemaFixed)) {
   console.error('Geo not found!!!');
 }
 
-removeIDs(datasetSchemaFixed);
+// removeIDs(datasetSchemaFixed);
 
-const orgSchemaFixed = R.clone(orgSchema);
-removeIDs(orgSchemaFixed);
+// const orgSchemaFixed = R.clone(orgSchema);
+// removeIDs(orgSchemaFixed);
 
 
 export default {
@@ -62,7 +62,7 @@ export default {
     // "fields": { geo: OneOfSpliterManager }
   },
   "organizations": {
-    "schema": orgSchemaFixed,
+    "schema": orgSchema,
     "examples": [orgBCODMOexample],
     "formData": orgDefault,
     "uiSchema": org_ui_schema,
