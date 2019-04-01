@@ -35,7 +35,7 @@ const log = type => console.log.bind(console, type);
 class Back extends Component {
   constructor(props) {
     super(props);
-    this.state = {back: undefined, callbacks: []};
+    this.state = { back: undefined, callbacks: []};
   }
 
   remoteValidation = (body) => {
@@ -55,24 +55,42 @@ class Back extends Component {
    * Scans current backend errorlist, removes items that belong to group 
    * Passed groups to prevent major refactor
    * */
-  invalidate = (group, groups) => {
-    console.log('[invalidate] : ', {group, self: this});
-    // if (!group) { this.setState({ back: undefined }); }
+  // invalidate = (group, groups) => {
+  //   console.log('[invalidate] : ', {group, self: this});
+  //   // if (!group) { this.setState({ back: undefined }); }
 
-    const errorList = R.path(['back','errors'], this.state);
-    if (! errorList) { return; }
-    console.log({errorList});
+  //   const errorList = R.path(['back','errors'], this.state);
+  //   if (! errorList) { return; }
+  //   console.log({errorList});
 
-    const invalidTopProperties = stripToTopProperty(errorList);
-    console.log(invalidTopProperties);
+  //   const invalidTopProperties = stripToTopProperty(errorList);
+  //   console.log(invalidTopProperties);
 
-    const shouldRemove = invalidTopProperties.map(top => group === mapTopPropertyToGroup(top, groups));
+  //   const shouldRemove = invalidTopProperties.map(top => group === mapTopPropertyToGroup(top, groups));
 
-    const newErrorList = errorList.filter((v,i) => !shouldRemove[i]);
-    console.log({shouldRemove, newErrorList});
+  //   const newErrorList = errorList.filter((v,i) => !shouldRemove[i]);
+  //   console.log({shouldRemove, newErrorList});
 
-    this.setState(prevState => ({...prevState, back: {...prevState.back, errors: newErrorList}}));
-  };
+  //   this.setState(prevState => ({...prevState, back: {...prevState.back, errors: newErrorList}}));
+  // };
+
+  // errorGroups = (groups) => {
+    
+  //   const errorList = R.path(['back','errors'], this.state);
+  //   if (! errorList) { return []; }
+  //   console.log({errorList});
+
+  //   const invalidTopProperties = stripToTopProperty(errorList);
+
+  //   const errorGroups = [];
+  //   invalidTopProperties.forEach(top => {
+  //     const group = mapTopPropertyToGroup(top, groups);
+  //     if (!errorGroups.includes(group)) { errorGroups.push(group); }
+  //   });
+    
+  //   console.log({errorGroups});
+  //   return errorGroups;
+  // }
 
   backStatus = () => {
     if (this.state.back) {
@@ -115,7 +133,10 @@ class Back extends Component {
         validationImage: this.verificationImage(),
         // registerOnRemoteValidation: this.registerOnRemoteValidation 
       }} >
-        <App retrieveStartValues={this.props.retrieveStartValues}/>
+        <App 
+          retrieveStartValues={this.props.retrieveStartValues}
+          errorList={R.path(['back','errors'], this.state)}
+          />
       </BackContext.Provider>
     );
   }
@@ -141,7 +162,7 @@ class App extends Component {
   
   constructor(props) {
     super(props);
-    this.sets = SchemaSets;
+    this.sets = SchemaSets; // TODO: change to App.sets
     const setKeys = Object.keys(this.sets);
 
     // let {set: selectedSet, action} = R.mergeAll([
@@ -151,8 +172,11 @@ class App extends Component {
     //   },
     //   props.retrieveStartValues()
     // ]);
+
     const start = props.retrieveStartValues();
-    const selectedSet = setKeys.includes(start.set) ? start.set : App.defaults.set;
+    const selectedSet = (start.set && setKeys.includes(start.set))
+      ? start.set 
+      : App.defaults.set;
 
     const selectedGroup = start.action === 'load' ? 'LOADJSON' : Object.keys(this.sets[selectedSet].schema.groups)[0];
 
@@ -175,6 +199,41 @@ class App extends Component {
     };
   }
 
+  static getDerivedStateFromProps(props, state) {
+    if (!props.errorList) { return { errorList: undefined, validGroups: undefined, errorGroups: undefined }; }
+
+    if (!deepEquals(props.errorList, state.errorList)) {
+      const errorList = props.errorList;
+      const errorGroups = [];
+      //TODO: SchemaSets -> App.sets
+      const groups = SchemaSets[state.selectedSet].schema.groups;
+
+      const invalidTopProperties = stripToTopProperty(errorList);
+
+      invalidTopProperties.forEach((top, i) => {
+        debugger;
+        const group = mapTopPropertyToGroup(top, groups);
+        if (group === false) { 
+          console.error('[App getDerivedState()] an error reported by the backend could not be matched to a group.', invalidTopProperties[i]); 
+          return;
+        }
+        if (!errorGroups.includes(group)) { errorGroups.push(group); }
+      });
+
+      // Now filter for those groups that are valid
+      const validGroups = Object.keys(groups).filter(g => !errorGroups.includes(g));
+      return { errorList: props.errorList, validGroups, errorGroups };
+    }
+    return null;
+  }
+
+  invalidate = (group = '') => this.setState( ({validGroups, errorGroups}) => {
+    if (validGroups) { validGroups = R.reject(v => v === group, validGroups); }
+    if (errorGroups) { errorGroups = R.reject(v => v === group, errorGroups); }
+
+    return { validGroups, errorGroups };
+  });
+
   componentDidMount() {
     const theme = App.defaults.theme;
     this.onThemeSelected(theme, themes[theme]);
@@ -187,7 +246,7 @@ class App extends Component {
       this.setState({ selectedGroup: groups[0] });
     }
   }
-  
+
   // For NavPill
   setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
   changeSet = selectedSet => {
@@ -205,8 +264,7 @@ class App extends Component {
   
   // For Catagorizor
   // updateGroups = groups => this.setState({groups});
-  userEditedFormData = formData => this.setState({formData}, () => 
-    this.context.invalidate(this.state.selectedGroup, this.sets[this.state.selectedSet].schema.groups) );
+  userEditedFormData = formData => this.setState({formData}, () => this.invalidate(this.state.selectedGroup));
   
   // For StartPage
   loadExternalFormData = formData => this.setState({formData});
@@ -217,6 +275,7 @@ class App extends Component {
     FileSaver.saveAs(blob, "ucar-json-instance.json");
   }
   
+  // For Back context
   remoteValidation = () => {
     console.log('[App remoteValidation()]');
     this.context.validate({
@@ -226,7 +285,11 @@ class App extends Component {
   };
 
   render() {
-    const { selectedSet, selectedGroup, theme, editorTheme, liveSettings } = this.state;
+    const { 
+      selectedSet, selectedGroup, 
+      theme, editorTheme, liveSettings,
+      validGroups = [], errorGroups = []
+    } = this.state;
     
     const set = { ...this.sets[this.state.selectedSet] };
     //Replace default formData with user formData
@@ -243,13 +306,12 @@ class App extends Component {
     let groupKeys;
     if (set.schema.groups) { groupKeys = Object.keys(group(set.schema.properties, set.schema.groups)); }
 
-    const groupOptions = (groupKeys || []).map(group => ({
+    // const errorGroups = this.context.errorGroups(set.schema.groups);
+    const groupOptions = groupKeys.map(group => ({
       label: group,
       onClick: this.changeGroup,
       active: selectedGroup === group,
-      icon: this.context.status === 'clear' 
-        ? undefined 
-        : R.any(v => v === true, invalidTopProperties.map(top => group === mapTopPropertyToGroup(top, set.schema.groups))) ? '🛑' : '✅'
+      icon: '' + (errorGroups.includes(group) ? '🛑' : '') + (validGroups.includes(group) ? '✅' : '')
     }));
 
     const navOptions = [
@@ -487,7 +549,6 @@ class SuperEditorForm extends Component {
 
       // Potential Performance Hit
       if (!R.equals(this.state.formData, this.props.formData)) { 
-        // console.log('[SuperEditorForm] formData send up');
         this.props.onFormDataChange(this.state.formData); 
       }
     });
@@ -570,8 +631,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // console.log({startupDefaults});
 
   const retrieveStartValues = () => {
+    console.log('[retrieveStartValues] HIT');
     const temp = startupDefaults;
-    startupDefaults = undefined;
+    startupDefaults = {};
     return temp;
   }
 

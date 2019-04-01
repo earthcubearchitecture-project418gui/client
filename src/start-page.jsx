@@ -98,7 +98,7 @@ export class StartPage extends Component {
       this.setState({ loadedData: instance }, onVerified);
     } else {
       console.error('Remote JSON contains invalid @type value : ', instanceType);
-      this.setState({ errorModal: true, errorMessage: `Error : Loaded data contains invalid <code>"@type"</code>.`});
+      this.setState({ errorModal: true, errorMessage: `Error : Loaded data contains invalid "@type".`});
     }
   };
   
