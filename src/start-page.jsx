@@ -25,7 +25,6 @@ export class StartPage extends Component {
     if (! this.urlInputRef) { return; }
 
     const url = this.urlInputRef.current.value;
-    console.log('input is : ', url);
     fetch(url)
       .then(res => res.json())
       .then(obj => {

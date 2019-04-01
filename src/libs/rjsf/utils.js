@@ -1,9 +1,10 @@
 import React from "react";
 import validateFormData from "./validate";
-import fill from "core-js-pure/stable/array/fill";
 
 import { setImmediate } from 'core-js-pure';
+import fill from 'core-js/stable/array/fill';
 
+console.log({fill});  //KEEP HERE
 
 export const ADDITIONAL_PROPERTY_FLAG = "__additional_property";
 
@@ -190,7 +191,7 @@ export function getDefaultFormState(_schema, formData, definitions = {}) {
     throw new Error("Invalid schema: " + _schema);
   }
   const schema = retrieveSchema(_schema, definitions, formData);
-  const defaults = computeDefaults(schema, _schema.default, definitions);
+  const defaults = computeDefaults(_schema, _schema.default, definitions);   //ISTI
   if (typeof formData === "undefined") {
     // No form data? Use schema defaults.
     return defaults;

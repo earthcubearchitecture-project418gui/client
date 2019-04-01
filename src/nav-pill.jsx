@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-import Form from "../libs/rjsf";
-import { shouldRender } from "../libs/rjsf/utils.js";
+import Form from "./libs/rjsf";
+import { shouldRender } from "./libs/rjsf/utils.js";
 
 import { setImmediate } from 'core-js-pure';
 

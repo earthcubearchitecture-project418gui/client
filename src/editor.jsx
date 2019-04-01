@@ -4,7 +4,7 @@ import { UnControlled as CodeMirror } from "react-codemirror2";
 
 import { setImmediate } from 'core-js-pure';
 
-import { shouldRender } from "../libs/rjsf/utils.js";
+import { shouldRender } from "./libs/rjsf/utils.js";
 
 const fromJson = json => JSON.parse(json);
 const toJson = val => JSON.stringify(val, null, 2);

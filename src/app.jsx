@@ -7,8 +7,8 @@ import { setImmediate } from 'core-js-pure';
 import * as FileSaver from 'file-saver';
 
 import TriEditor from './tri-editor.jsx';                 // Internal deps
-import Form from "../libs/rjsf";
-import { shouldRender, deepEquals } from "../libs/rjsf/utils.js";
+import Form from "./libs/rjsf";
+import { shouldRender, deepEquals } from "./libs/rjsf/utils.js";
 
                                                           // Components
 import { NavPillSelector, ThemeSelector } from './nav-pill.jsx';
