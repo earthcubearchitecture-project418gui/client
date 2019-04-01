@@ -211,7 +211,6 @@ class App extends Component {
       const invalidTopProperties = stripToTopProperty(errorList);
 
       invalidTopProperties.forEach((top, i) => {
-        debugger;
         const group = mapTopPropertyToGroup(top, groups);
         if (group === false) { 
           console.error('[App getDerivedState()] an error reported by the backend could not be matched to a group.', invalidTopProperties[i]); 
@@ -278,10 +277,12 @@ class App extends Component {
   // For Back context
   remoteValidation = () => {
     console.log('[App remoteValidation()]');
-    this.context.validate({
-      schema: this.state.selectedSet,
-      doc: this.state.formData
-    });
+    this.setState({ errorList: undefined, validGroups: undefined, errorGroups: undefined}, () => 
+      this.context.validate({
+        schema: this.state.selectedSet,
+        doc: this.state.formData
+      })
+    );
   };
 
   render() {
