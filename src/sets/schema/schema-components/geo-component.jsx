@@ -86,13 +86,13 @@ class LatLon extends React.Component {
           <div className="row margin-md">
             <div className="col-sm-6">
               <span>Latitude:</span>
-              <input className="margin-md" type="text" value={latitude} onChange={this.onChange("latitude")} pattern="[+-]?\d+"/>
+              <input className="margin-md" type="text" value={latitude} onChange={this.onChange("latitude")} pattern="[+-]?\d+(\.\d+)?"/>
               <div>{errors.latitude}</div>
               <div>{backErrorsLatitude}</div>
             </div>
             <div className="col-sm-6">
               <span>Longitude:</span>
-              <input className="margin-md" type="text" value={longitude} onChange={this.onChange("longitude")} pattern="[+-]?\d+" />
+              <input className="margin-md" type="text" value={longitude} onChange={this.onChange("longitude")} pattern="[+-]?\d+(\.\d+)?" />
               <div>{errors.longitude}</div>
               <div>{backErrorsLongitude}</div>
             </div>

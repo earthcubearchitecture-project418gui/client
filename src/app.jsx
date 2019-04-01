@@ -193,10 +193,23 @@ class App extends Component {
       },
 
       selectedSet, 
-      groups: undefined,
       selectedGroup, 
       formData: undefined, 
     };
+  }
+  
+  componentDidMount() {
+    const theme = App.defaults.theme;
+    this.onThemeSelected(theme, themes[theme]);
+  }
+
+  componentDidUpdate() { 
+    const { groups, selectedGroup } = this.state;
+    if (!groups) { return; }
+    if ( !this.state.selectedGroup ) {
+      debugger;
+      this.setState({ selectedGroup: groups[0] });
+    }
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -225,26 +238,12 @@ class App extends Component {
     }
     return null;
   }
-
   invalidate = (group = '') => this.setState( ({validGroups, errorGroups}) => {
     if (validGroups) { validGroups = R.reject(v => v === group, validGroups); }
     if (errorGroups) { errorGroups = R.reject(v => v === group, errorGroups); }
 
     return { validGroups, errorGroups };
   });
-
-  componentDidMount() {
-    const theme = App.defaults.theme;
-    this.onThemeSelected(theme, themes[theme]);
-  }
-
-  componentDidUpdate() { 
-    const { groups, selectedGroup } = this.state;
-    if (!groups) { return; }
-    if ( !this.state.selectedGroup ) {
-      this.setState({ selectedGroup: groups[0] });
-    }
-  }
 
   // For NavPill
   setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
@@ -264,7 +263,16 @@ class App extends Component {
   // For Catagorizor
   // updateGroups = groups => this.setState({groups});
   userEditedFormData = formData => this.setState({formData}, () => this.invalidate(this.state.selectedGroup));
-  
+  onSubmit = () => {
+    const set = this.sets[this.state.selectedSet];
+    const groupKeys = Object.keys(group(set.schema.properties, set.schema.groups)); 
+    // const groups  = Object.keys(this.state.groups);
+    const index = groupKeys.indexOf(this.state.selectedGroup);
+    if (index + 1 < groupKeys.length) {
+      this.setState({selectedGroup: groupKeys[index + 1]})
+    }
+  };
+
   // For StartPage
   loadExternalFormData = formData => this.setState({formData});
   
@@ -359,7 +367,8 @@ class App extends Component {
             editorTheme, 
             liveValidate: liveSettings.validate, 
             disableForm: liveSettings.disable, 
-            disableTripleEdit: liveSettings.disableTripleEdit
+            disableTripleEdit: liveSettings.disableTripleEdit,
+            onSubmit: this.onSubmit
           }}
         />
       );
@@ -602,6 +611,7 @@ class SuperEditorForm extends Component {
               onSubmit={({ formData }, e) => {
                 console.log("submitted formData", formData);
                 console.log("submit event", e);
+                this.props.onSubmit();
               }}
               fields={fields}
               validate={validate}
