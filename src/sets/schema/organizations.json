@@ -511,7 +511,8 @@
               "application/zip",
               "application/x-gzip",
               "application/x-hdf5",
-              "application/x-netcdf4"
+              "application/x-netcdf4",
+              " "
             ],
             "enumNames": [
               "HTML Document",
@@ -535,7 +536,8 @@
               "Zip File",
               "Gzip Tar File",
               "HDF5 File",
-              "NetCDF4 File"
+              "NetCDF4 File",
+              "Other"
             ]
           }
         }

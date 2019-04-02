@@ -40,6 +40,15 @@
 
 }
 
+.verification-img img {
+  height: 4rem;
+  padding: 0.5rem;
+  background-color: lightgray;
+  object-fit: contain;
+
+  border-radius: 10%;
+}
+
 .nav.nav-pills {
   padding-top: 1.5rem;
 }

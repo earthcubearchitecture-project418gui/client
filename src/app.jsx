@@ -163,24 +163,13 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.sets = SchemaSets; // TODO: change to App.sets
-    const setKeys = Object.keys(this.sets);
-
-    // let {set: selectedSet, action} = R.mergeAll([
-    //   {
-    //     "set": setKeys.includes(App.defaults.set) ? App.defaults.set : setKeys[0],
-    //     "action": 'new'
-    //   },
-    //   props.retrieveStartValues()
-    // ]);
 
     const start = props.retrieveStartValues();
-    const selectedSet = (start.set && setKeys.includes(start.set))
+    const selectedSet = (start.set && Object.keys(this.sets).includes(start.set))
       ? start.set 
       : App.defaults.set;
 
     const selectedGroup = start.action === 'load' ? 'LOADJSON' : Object.keys(this.sets[selectedSet].schema.groups)[0];
-
-    // console.log('[App constructor()] selectedGroup: ', { selectedSet, selectedGroup });
 
     this.state = { 
       editorTheme: "default",
@@ -203,6 +192,7 @@ class App extends Component {
     this.onThemeSelected(theme, themes[theme]);
   }
 
+  //TODO: check that this is dead code
   componentDidUpdate() { 
     const { groups, selectedGroup } = this.state;
     if (!groups) { return; }
@@ -269,7 +259,7 @@ class App extends Component {
     // const groups  = Object.keys(this.state.groups);
     const index = groupKeys.indexOf(this.state.selectedGroup);
     if (index + 1 < groupKeys.length) {
-      this.setState({selectedGroup: groupKeys[index + 1]})
+      this.setState({selectedGroup: groupKeys[index + 1]}, () => window.scrollTo(0, 0));
     }
   };
 

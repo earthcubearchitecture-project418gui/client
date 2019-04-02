@@ -22,13 +22,10 @@ export function MakeJSONPage({json, remoteResponse = {}, validationImage, onVali
       </div>
       <div className="row margin-y-sm">
         <div className="col-xs-2">
-          <button type="button" className="btn btn-info" onClick={onValidateClick} > Validate </button>
-          <button type="button" className="btn btn-info margin-left-xs" onClick={onSave}>Save</button>
-          <span className="padding-sm">
-            <img className="verification-img" src={validationImage} style={{
-               height: '2rem',
-               maxHeight: '100%'
-            }} />
+          <button type="button" className="btn btn-info margin-xs" onClick={onValidateClick} > Validate </button>
+          <button type="button" className="btn btn-info margin-xs" onClick={onSave}>Save</button>
+          <span className="verification-img margin-sm" >
+            <img src={validationImage} />
           </span>
    
         </div>
@@ -50,8 +47,8 @@ export function MakeJSONPage({json, remoteResponse = {}, validationImage, onVali
 
       <div className="row margin-top-sm">
         <div className="col-xs-12">
-          <button type="button" className="btn btn-info" onClick={onValidateClick} > Validate </button>
-          <button type="button" className="btn btn-info margin-left-xs" onClick={onSave}>Save</button>
+        <button type="button" className="btn btn-info margin-xs" onClick={onValidateClick} > Validate </button>
+          <button type="button" className="btn btn-info margin-xs" onClick={onSave}>Save</button>
         </div>
       </div>
 
