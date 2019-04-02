@@ -47,50 +47,9 @@ class Back extends Component {
       body: JSON.stringify(body)
     })
       .then(res => res.json())
-      .then(json => this.setState({ back:json } , () => { console.log(this.state.back); return; this.executeOnRemoteValidation(); } ) )
+      .then(json => this.setState({ back:json } , () => { console.log(this.state.back); return; } ) )
       .catch(err => console.error(err));  
   }
-
-  /** 
-   * Scans current backend errorlist, removes items that belong to group 
-   * Passed groups to prevent major refactor
-   * */
-  // invalidate = (group, groups) => {
-  //   console.log('[invalidate] : ', {group, self: this});
-  //   // if (!group) { this.setState({ back: undefined }); }
-
-  //   const errorList = R.path(['back','errors'], this.state);
-  //   if (! errorList) { return; }
-  //   console.log({errorList});
-
-  //   const invalidTopProperties = stripToTopProperty(errorList);
-  //   console.log(invalidTopProperties);
-
-  //   const shouldRemove = invalidTopProperties.map(top => group === mapTopPropertyToGroup(top, groups));
-
-  //   const newErrorList = errorList.filter((v,i) => !shouldRemove[i]);
-  //   console.log({shouldRemove, newErrorList});
-
-  //   this.setState(prevState => ({...prevState, back: {...prevState.back, errors: newErrorList}}));
-  // };
-
-  // errorGroups = (groups) => {
-    
-  //   const errorList = R.path(['back','errors'], this.state);
-  //   if (! errorList) { return []; }
-  //   console.log({errorList});
-
-  //   const invalidTopProperties = stripToTopProperty(errorList);
-
-  //   const errorGroups = [];
-  //   invalidTopProperties.forEach(top => {
-  //     const group = mapTopPropertyToGroup(top, groups);
-  //     if (!errorGroups.includes(group)) { errorGroups.push(group); }
-  //   });
-    
-  //   console.log({errorGroups});
-  //   return errorGroups;
-  // }
 
   backStatus = () => {
     if (this.state.back) {
@@ -103,18 +62,6 @@ class Back extends Component {
       return 'clear';
     }
   }
-
-  // registerOnRemoteValidation = (callback) => {
-  //   const callbacks = this.state.callbacks.slice();
-  //   callbacks.push(callback);
-  //   this.setState({ callbacks });
-  //   return () => {
-  //     const i = this.state.callbacks.indexOf(callback);
-  //     const callbacks = this.state.callbacks.slice().splice(i, 1);
-  //     this.setState({ callbacks })
-  //   };
-  // }
-  // executeOnRemoteValidation = () => this.state.callbacks.map(c => c());
 
   verificationImage = (status) => {
     const backStatus = status || this.backStatus();
@@ -170,6 +117,7 @@ class App extends Component {
       : App.defaults.set;
 
     const selectedGroup = start.action === 'load' ? 'LOADJSON' : Object.keys(this.sets[selectedSet].schema.groups)[0];
+    const disableLoadJSON = start.action === 'new';
 
     this.state = { 
       editorTheme: "default",
@@ -184,6 +132,8 @@ class App extends Component {
       selectedSet, 
       selectedGroup, 
       formData: undefined, 
+
+      disableLoadJSON
     };
   }
   
@@ -260,6 +210,8 @@ class App extends Component {
     const index = groupKeys.indexOf(this.state.selectedGroup);
     if (index + 1 < groupKeys.length) {
       this.setState({selectedGroup: groupKeys[index + 1]}, () => window.scrollTo(0, 0));
+    } else if (index + 1 === groupKeys.length) {
+      this.setState({selectedGroup: "MAKEJSON"}, () => window.scrollTo(0, 0));
     }
   };
 
@@ -295,7 +247,7 @@ class App extends Component {
     //Replace default formData with user formData
     set.formData = this.state.formData || set.formData;
 
-    const invalidTopProperties = stripToTopProperty(R.pathOr([], ['context','response','errors'], this));
+    // const invalidTopProperties = stripToTopProperty(R.pathOr([], ['context','response','errors'], this));
     
     // const setOptions = Object.keys(this.sets).map(set => ({
     //   label: set,
@@ -315,13 +267,12 @@ class App extends Component {
     }));
 
     const navOptions = [
-      // { label: ' | Sets | >>>' },
-      // ...setOptions,
-      // { label: ' | Groups | >>> ' },
-      { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
       { label: 'Make JSON',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
     ];
+    if (!this.state.disableLoadJSON) {
+      navOptions.unshift({ label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' });
+    }
 
     if (!groupKeys) { navOptions.unshift({ label: 'Group information not found in schema.' }); }
 
@@ -370,7 +321,7 @@ class App extends Component {
           <div className="container-fluid">
             <div className="navbar-header">
               
-              <a className="navbar-brand" href="#">
+              <a className="navbar-brand" href="https://www.earthcube.org/geocodes">
                 <img src={geocodes_png} />
               </a>
               <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false" style={{marginTop: '2rem'}}>
