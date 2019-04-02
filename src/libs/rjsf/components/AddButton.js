@@ -4,7 +4,7 @@ import IconButton from "./IconButton";
 export default function AddButton({ className, onClick, disabled }) {
   return (
     <div className="row">
-      <p className={`col-xs-1 col-xs-offset-11 text-right ${className}`}> {/* ISTI */}
+      <p className={`col-xs-2 col-xs-offset-10 text-right ${className}`}> {/* ISTI */}
         <IconButton
           type="info"
           icon="plus"

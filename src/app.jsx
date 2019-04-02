@@ -267,12 +267,11 @@ class App extends Component {
     }));
 
     const navOptions = [
+      { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
       { label: 'Make JSON',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
     ];
-    if (!this.state.disableLoadJSON) {
-      navOptions.unshift({ label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' });
-    }
+    if (this.state.disableLoadJSON) { navOptions.shift(); }
 
     if (!groupKeys) { navOptions.unshift({ label: 'Group information not found in schema.' }); }
 

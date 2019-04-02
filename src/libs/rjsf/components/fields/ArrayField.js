@@ -47,12 +47,12 @@ function DefaultArrayItem(props) {
   };
   return (
     <div key={props.index} className={props.className}>
-      <div className={ ( props.hasToolbar ? "col-xs-11" : "col-xs-12" ) + ' left-hover-border'}>  {/* ISTI */}
+      <div className={ ( props.hasToolbar ? "col-xs-10" : "col-xs-12" ) + ' left-hover-border'}>  {/* ISTI */}
         {props.children}
       </div>
 
       {props.hasToolbar && (
-        <div className="col-xs-1 array-item-toolbox">  {/* ISTI */}
+        <div className="col-xs-2 array-item-toolbox">  {/* ISTI */}
           <div
             className="btn-group"
             style={{
