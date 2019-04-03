@@ -269,7 +269,7 @@ class App extends Component {
     const navOptions = [
       { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
-      { label: 'Make JSON',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
+      { label: 'Save JSON',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
     ];
     if (this.state.disableLoadJSON) { navOptions.shift(); }
 
@@ -524,7 +524,7 @@ class SuperEditorForm extends Component {
     } = this.props;
 
     return (
-      <div className="container-fluid">
+      <div className="container-fluid margin-bottom-lg">
         { !this.props.disableTripleEdit && (
           <TriEditor 
             editor={editorTheme}
@@ -564,6 +564,12 @@ class SuperEditorForm extends Component {
               transformErrors={transformErrors}
               onError={log("errors")}>
               
+              <div>
+                <button type="submit" className="btn btn-info">
+                  Validate and Continue
+                </button>
+              </div>
+
             </Form>
           )}
         </div>

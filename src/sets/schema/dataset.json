@@ -117,6 +117,7 @@
     },
     "includedInDataCatalog": {
       "type": "object",
+      "title": "Data Catalog",
       "required": [
         "@id",
         "url"

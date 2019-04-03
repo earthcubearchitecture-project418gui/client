@@ -21,7 +21,7 @@ export function MakeJSONPage({json, remoteResponse = {}, validationImage, onVali
         </div>
       </div>
       <div className="row margin-y-sm">
-        <div className="col-xs-2">
+        <div className="col-xs-3">
           <button type="button" className="btn btn-info margin-xs" onClick={onValidateClick} > Validate </button>
           <button type="button" className="btn btn-info margin-xs" onClick={onSave}>Save</button>
           <span className="verification-img margin-sm" >
@@ -29,12 +29,12 @@ export function MakeJSONPage({json, remoteResponse = {}, validationImage, onVali
           </span>
    
         </div>
-        <div className="col-xs-8">
+        <div className="col-xs-6">
             <p className="padding-x-lg padding-y-xs"><b>Validate</b> your JSON.
             Go back to any section that appears in red, and fix any issues. Once issues are resolved, come back here to <b>Save</b> your JSON
             </p>
         </div>
-        <div className="col-xs-2"></div>
+        {/* <div className="col-xs-2"></div> */}
       </div>
 
       <div className="row margin-y-sm">
