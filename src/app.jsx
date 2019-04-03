@@ -398,6 +398,7 @@ export class Catagorizor extends Component {
       const groups = group(schema.properties, schema.groups);
       const shell = createShell(schema);
       shell.properties = groups[selectedGroup];
+      shell.required = R.intersection(schema.required, Object.keys(groups[selectedGroup]));
       return shell;
     }
   
