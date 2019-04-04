@@ -32,15 +32,14 @@
   /* margin: 0 auto; */
 }
 
-
 .left-hover-border:hover {
   border: #345a8d solid 2px;
   padding-top: 10px;
   margin-bottom: 20px;
+  /* background: linear-gradient(95deg, #f0f8ff, #f0f8ff 80%,  #345a8d33 99%); */
 }
 
 /*
-
 .left-hover-border:hover:before {
   
   content:''; 
@@ -52,7 +51,6 @@
   top: 0;
 }
 
-
 .left-hover-border:hover:after {
   
     content:''; 
@@ -63,8 +61,7 @@
     right: 0;
     bottom: 0;
 }
- */
-
+*/
 
 .monospace { font-family: 'Courier New', Courier, monospace }
 
@@ -245,22 +242,25 @@ legend {
     border-bottom-width: 0px;
   /* border-bottom: 1px transparent #4e5d6c; */
 }
+.form-group {
+  margin-bottom: 25px;
+}
 
 .form-group > fieldset > legend {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 800;
 }
 
 .has-error .help-block, .has-error .control-label, .has-error .radio, .has-error .checkbox, .has-error .radio-inline, .has-error .checkbox-inline, .has-error.radio label, .has-error.checkbox label, .has-error.radio-inline label, .has-error.checkbox-inline label, .has-error .form-control-feedback {
   /* color: #345a8d; */
-  color: #ff5a8d;  
+  color: #E5310C;  
   font-size: 15px;
 }
 .has-error .form-control {
-  border-color: #ff5a8d;
+  border-color: #E5310C;
 }
 .text-danger, .text-danger:hover {
-  color: #ff5a8d;
+  color: #E5310C;
 }
 .btn-warning {
   color: #345a8d;
@@ -269,11 +269,11 @@ legend {
 }
 .btn-warning:hover, focus, active {
   color: #345a8d;
-  background-color: #E2DEF4;
+  background-color:  #ccd3d9;
   border-color: #f0f8ff;
 }
 .panel-danger > .panel-heading {
-  color: #ff5a8d;
+  color: #E5310C;
   background-color: #fafaff;
   border-color: #f0f8ff;
 font-size:15px;
@@ -285,7 +285,7 @@ font-size:15px;
 }
 .btn-info:hover, .btn-info:focus, .btn-info:active {
   color: #345a8d;
-  background-color: #E2DEF4;
+  background-color:  #ccd3d9;
   border-color: #f0f8ff;
 }
 a:hover, a:focus {

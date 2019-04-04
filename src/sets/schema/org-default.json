@@ -31,10 +31,6 @@
     }
   ],
   "foundingDate": "",
-  "logo": {
-    "@type": "ImageObject",
-    "url": ""
-  },
   "parentOrganization": [
     {
       "@type": "Organization",

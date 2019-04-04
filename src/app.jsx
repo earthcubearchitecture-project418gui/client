@@ -133,6 +133,8 @@ class App extends Component {
       selectedGroup, 
       formData: undefined, 
 
+      // visitedGroups: [],
+
       disableLoadJSON
     };
   }
@@ -142,14 +144,15 @@ class App extends Component {
     this.onThemeSelected(theme, themes[theme]);
   }
 
-  //TODO: check that this is dead code
   componentDidUpdate() { 
-    const { groups, selectedGroup } = this.state;
-    if (!groups) { return; }
-    if ( !this.state.selectedGroup ) {
-      debugger;
-      this.setState({ selectedGroup: groups[0] });
-    }
+    // const { groups, selectedGroup } = this.state;
+    // if (!groups) { return; }
+    // if ( !this.state.selectedGroup ) {
+    //   debugger;
+    //   this.setState({ selectedGroup: groups[0] });
+    // }
+    // const { selectedGroup, visitedGroups = [] } = this.state;
+    // if ( ! visitedGroups.includes(selectedGroup)) { this.setState({visitedGroups: [selectedGroup, ...visitedGroups]}); }
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -189,9 +192,14 @@ class App extends Component {
   setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
   changeSet = selectedSet => {
     if (selectedSet === this.state.selectedSet) { this.setState({ selectedGroup: undefined }); }
-    else { this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined, formData: undefined }); }
+    else { this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined, formData: undefined, visitedGroups: [] }); }
   };
-  changeGroup = selectedGroup => this.setState({selectedGroup});
+  changeGroup = selectedGroup => {
+    // const { selectedGroup: prevSelectedGroup, visitedGroups = [] } = this.state;
+    // if ( ! visitedGroups.includes(prevSelectedGroup)) { visitedGroups.push(prevSelectedGroup) }
+
+    this.setState({selectedGroup /*, visitedGroups */ });
+  };
   onThemeSelected = (theme, { stylesheet, editor }) => {
     this.setState({ theme, editorTheme: editor ? editor : "default" });
     setImmediate(() => {
@@ -305,7 +313,8 @@ class App extends Component {
 
           throughArgs={{ 
             editorTheme, 
-            liveValidate: liveSettings.validate, 
+            liveValidate: liveSettings.validate,
+            // prevVisited: this.state.visitedGroups.includes(selectedGroup), 
             disableForm: liveSettings.disable, 
             disableTripleEdit: liveSettings.disableTripleEdit,
             onSubmit: this.onSubmit
@@ -463,6 +472,7 @@ class SuperEditorForm extends Component {
         ArrayFieldTemplate,
         ObjectFieldTemplate,
         uiSchema,
+        liveValidate: false
       })
     );
   };
@@ -470,7 +480,7 @@ class SuperEditorForm extends Component {
   static getDerivedStateFromProps(props, state) {
     const { schema, form } = state;
     if (form && !deepEquals(props.schema, schema)) {
-      return { ...props, form: false /* , suppressNextPropagation: true  */ };
+      return { ...props, form: false, liveValidate: false /* , suppressNextPropagation: true  */ };
     }
     return null;
   }
@@ -495,7 +505,7 @@ class SuperEditorForm extends Component {
   onFormDataEdited = formData => this.setState({ formData });
 
   onFormDataChange = ({ formData }) => {
-    this.setState({ formData }, () => {
+    this.setState({ formData , liveValidate: this.props.liveValidate }, () => {
       // if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
       // else { this.props.onFormDataChange(this.state.formData); }
 
@@ -513,13 +523,13 @@ class SuperEditorForm extends Component {
       formData,
       fields,
       validate,
+      liveValidate,
       ArrayFieldTemplate,
       ObjectFieldTemplate,
       transformErrors,
     } = this.state;
 
     const { 
-      liveValidate,
       disableForm,
       editorTheme
     } = this.props;
@@ -565,9 +575,12 @@ class SuperEditorForm extends Component {
               transformErrors={transformErrors}
               onError={log("errors")}>
               
-              <div>
-                <button type="submit" className="btn btn-info">
-                  Validate and Continue
+              <div style={{ textAlign: 'center' }}>
+                {/* <button type="button" className="btn btn-info margin-right-xs" onClick={() => this.setState({liveValidate: !!this.props.liveValidate})}>
+                  Validate
+                </button> */}
+                <button type="submit" className="btn btn-info btn-lg">
+                  Validate & Continue
                 </button>
               </div>
 

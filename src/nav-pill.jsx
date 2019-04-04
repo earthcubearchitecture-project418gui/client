@@ -9,9 +9,6 @@ import themes from './themes.js';
 
 export function NavPillSelector({ options }) {
 
-
-  console.log('[NavPillSelector] render()');
-
   const onLabelClick = (label, onClick) => {
     return event => {
       event.preventDefault();

@@ -75,6 +75,7 @@ export class StartPage extends Component {
     // console.log('[verifyInput] instance: ', instance.hasOwnProperty('@type') );
 
     const instanceType = instance['@type'];
+    const checkType = this.props.checkType.toLowerCase();
 
     //No check if not object or missing @type
     if (
@@ -90,15 +91,22 @@ export class StartPage extends Component {
     // console.log('Checking for @type === ', this.props.checkType);
     // console.log('Checking for typeof instanceType ', typeof instanceType);
 
+
     if (
-      (R.is(String, instanceType) && instanceType.toLowerCase() === this.props.checkType) 
+      (R.is(String, instanceType) && instanceType.toLowerCase() === checkType) 
       ||
-      (R.is(Array, instanceType) && !!instanceType.find(v => v.toLowerCase() === this.props.checkType))
+      (R.is(Array, instanceType) && !!instanceType.find(v => v.toLowerCase() === checkType))
     ) {
       this.setState({ loadedData: instance }, onVerified);
     } else {
       console.error('Remote JSON contains invalid @type value : ', instanceType);
-      this.setState({ errorModal: true, errorMessage: `Error : Loaded data contains invalid "@type".`});
+      this.setState({ 
+        errorModal: true, 
+        errorMessage: 
+          `Error : This file contains a @type other than ${checkType}. 
+           Please open an appropiate JSON file. 
+           Current value is : ${JSON.stringify(instanceType, undefined, 2)}
+           `});
     }
   };
   
@@ -186,11 +194,11 @@ function VerifyUserAction(props) {
   return (
     <>
       <h4>Are you Sure?</h4>
-      <p className="bg-warning padding-sm">This will erase all data currently loaded into the editor.</p>
+      <p className="padding-sm">This will erase all data currently loaded into the editor.</p>
 
       <div className="pull-right">
         <button type="button" className="btn-sm btn-default" onClick={onCancel}>Cancel</button>
-        <button type="button" className="btn-sm btn-danger margin-left-xs" onClick={onAccept}>Accept</button>
+        <button type="button" className="btn-sm btn-danger margin-left-xs" onClick={onAccept} style={{ backgroundColor: '#E5310C' }} >Load</button>
       </div>
     </>
   );

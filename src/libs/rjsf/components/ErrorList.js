@@ -5,7 +5,7 @@ export default function ErrorList(props) {
   return (
     <div className="panel panel-danger errors">
       <div className="panel-heading">
-        <h3 className="panel-title">Errors</h3>
+        <h3 className="panel-title">Requirements :</h3>
       </div>
       <ul className="list-group">
         {errors.map((error, i) => {

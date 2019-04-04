@@ -214,10 +214,7 @@
       "type": "object",
       "title": "Logo",
       "description": "Logo refers to the symbol or graphical design adopted by your organization to readily identify it.",
-      "required": [
-        "@type",
-        "url"
-      ],
+     
       "properties": {
         "@type": {
           "type": "string",
