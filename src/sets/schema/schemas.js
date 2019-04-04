@@ -9,8 +9,8 @@ import dataset_ui_schema from './dataset-ui.js';
 import datasetBCODMOexample from './bcodmo-dataset.json';
 import datasetDefault from './dataset-default.json';
 
-import orgSchema from './organizations.json';
-import org_ui_schema from './organizations-ui.json';
+import orgSchema from './organization.json';
+import org_ui_schema from './organization-ui.json';
 import orgBCODMOexample from './bcodmo-org.json';
 import orgDefault from './org-default.json';
 
@@ -61,7 +61,7 @@ export default {
     "uiSchema": dataset_ui_schema,
     // "fields": { geo: OneOfSpliterManager }
   },
-  "organizations": {
+  "organization": {
     "schema": orgSchema,
     "examples": [orgBCODMOexample],
     "formData": orgDefault,

@@ -11,6 +11,11 @@ export default {
   "description": {
     "ui:widget": "textarea"
   },
+  // "citation": {
+  //   "items": {
+  //     "ui:emptyValue": " "
+  //   }
+  // },
   "includedInDataCatalog": {
     "@id": {
       "ui:widget": "hidden"
