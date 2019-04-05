@@ -6,7 +6,7 @@ import { Modal } from './modal.jsx';
 
 const nop = () => {};
 
-export class StartPage extends Component {
+export default class StartPage extends Component {
   constructor(props) {
     super(props);
     this.fileInputRef = React.createRef();

@@ -18,6 +18,35 @@
   border-radius: 10%;
 }
 
+.about {
+  font-size: 18px;
+  font-weight: 500;
+
+}
+
+.about a {
+  color: #345a8d;
+  text-decoration: underline;
+}
+
+.about a:hover {
+  color: #000;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.about a:visited, a:visited:hover {
+  /* color: inherit; */
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.about a:focus {
+  color: #345a8d;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
 .nav.nav-pills {
   padding-top: 1.5rem;
 }
@@ -32,6 +61,11 @@
   /* margin: 0 auto; */
 }
 
+.left-hover-border {
+  border: #FFF0 solid 2px;
+  padding-top: 10px;
+  margin-bottom: 20px;
+}
 .left-hover-border:hover {
   border: #345a8d solid 2px;
   padding-top: 10px;
@@ -243,7 +277,7 @@ legend {
   /* border-bottom: 1px transparent #4e5d6c; */
 }
 .form-group {
-  margin-bottom: 25px;
+  margin-bottom: 18px;
 }
 
 .form-group > fieldset > legend {
@@ -291,7 +325,7 @@ font-size:15px;
 a:hover, a:focus {
   color: #345a8d;
   text-decoration: underline;
-font-size:15px;
+  font-size: inherit;
 }
 
 label, .radio label, .checkbox label, .help-block {

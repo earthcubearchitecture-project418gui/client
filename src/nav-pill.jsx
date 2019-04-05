@@ -7,7 +7,7 @@ import { setImmediate } from 'core-js-pure';
 
 import themes from './themes.js';
 
-export function NavPillSelector({ options }) {
+export default function NavPillSelector({ options }) {
 
   const onLabelClick = (label, onClick) => {
     return event => {

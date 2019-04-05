@@ -4,7 +4,7 @@ import ErrorList from './libs/rjsf/components/ErrorList.js';
 
 import * as R from 'ramda';
 
-export function MakeJSONPage({json, remoteResponse = {}, validationImage, onValidateClick, onSave}) {
+export default function MakeJSONPage({json, remoteResponse = {}, validationImage, onValidateClick, onSave}) {
   json = JSON.stringify(json || {}, undefined, 2);
 
   let errorList;

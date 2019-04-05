@@ -11,9 +11,10 @@ import Form from "./libs/rjsf";
 import { shouldRender, deepEquals } from "./libs/rjsf/utils.js";
 
                                                           // Components
-import { NavPillSelector, ThemeSelector } from './nav-pill.jsx';
-import { StartPage } from './start-page.jsx';
-import { MakeJSONPage } from './make-json-page.jsx';
+import NavPillSelector, { ThemeSelector } from './nav-pill.jsx';
+import StartPage from './start-page.jsx';
+import MakeJSONPage  from './make-json-page.jsx';
+import About from './about.jsx';
 
 import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
@@ -98,6 +99,8 @@ class App extends Component {
     set: "dataset"
   };
 
+  static sets = SchemaSets;
+
   static liveSettingsSchema = {
     type: "object",
     properties: {
@@ -133,8 +136,6 @@ class App extends Component {
       selectedGroup, 
       formData: undefined, 
 
-      // visitedGroups: [],
-
       disableLoadJSON
     };
   }
@@ -142,17 +143,6 @@ class App extends Component {
   componentDidMount() {
     const theme = App.defaults.theme;
     this.onThemeSelected(theme, themes[theme]);
-  }
-
-  componentDidUpdate() { 
-    // const { groups, selectedGroup } = this.state;
-    // if (!groups) { return; }
-    // if ( !this.state.selectedGroup ) {
-    //   debugger;
-    //   this.setState({ selectedGroup: groups[0] });
-    // }
-    // const { selectedGroup, visitedGroups = [] } = this.state;
-    // if ( ! visitedGroups.includes(selectedGroup)) { this.setState({visitedGroups: [selectedGroup, ...visitedGroups]}); }
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -188,18 +178,16 @@ class App extends Component {
     return { validGroups, errorGroups };
   });
 
+  groups = () => App.sets[this.state.selectedSet].schema.groups;
+  groupKeys = () => Object.keys(this.groups());
+
   // For NavPill
   setLiveSettings = ({ formData }) => this.setState({ liveSettings: formData });
   changeSet = selectedSet => {
     if (selectedSet === this.state.selectedSet) { this.setState({ selectedGroup: undefined }); }
-    else { this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined, formData: undefined, visitedGroups: [] }); }
+    else { this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined, formData: undefined }); }
   };
-  changeGroup = selectedGroup => {
-    // const { selectedGroup: prevSelectedGroup, visitedGroups = [] } = this.state;
-    // if ( ! visitedGroups.includes(prevSelectedGroup)) { visitedGroups.push(prevSelectedGroup) }
-
-    this.setState({selectedGroup /*, visitedGroups */ });
-  };
+  changeGroup = selectedGroup => this.setState({selectedGroup });
   onThemeSelected = (theme, { stylesheet, editor }) => {
     this.setState({ theme, editorTheme: editor ? editor : "default" });
     setImmediate(() => {
@@ -284,13 +272,13 @@ class App extends Component {
     if (!groupKeys) { navOptions.unshift({ label: 'Group information not found in schema.' }); }
 
     let main;
-    if (this.state.selectedGroup === "LOADJSON") {
+    if (selectedGroup === "LOADJSON") {
       main = ( <StartPage 
         shouldChallenge={!! this.state.formData}
         checkType={selectedSet}
         onLoadFormData={this.loadExternalFormData} 
       /> );
-    } else if (this.state.selectedGroup === "MAKEJSON") {
+    } else if (selectedGroup === "MAKEJSON") {
       main = (
         <MakeJSONPage 
           // json={this.state.formData} 
@@ -301,12 +289,14 @@ class App extends Component {
           onSave={this.saveFile}
         /> 
       );
+    } else if (selectedGroup === 'ABOUT') {
+      main = ( <About /> );
     } else {
       main = (
         <Catagorizor
           key={ selectedSet }
           disableCatagorization={false}
-          set={{...set, schema: removeIDs(R.clone(set.schema))}}
+          set={{...set, schema: R.clone(set.schema)}}
           selectedGroup={selectedGroup}
           // reportGroups={this.updateGroups}
           onFormDataChange={this.userEditedFormData}
@@ -314,7 +304,6 @@ class App extends Component {
           throughArgs={{ 
             editorTheme, 
             liveValidate: liveSettings.validate,
-            // prevVisited: this.state.visitedGroups.includes(selectedGroup), 
             disableForm: liveSettings.disable, 
             disableTripleEdit: liveSettings.disableTripleEdit,
             onSubmit: this.onSubmit
@@ -329,7 +318,7 @@ class App extends Component {
           <div className="container-fluid">
             <div className="navbar-header">
               
-              <a className="navbar-brand" href="https://www.earthcube.org/geocodes">
+              <a className="navbar-brand" onClick={() => this.changeGroup('ABOUT')}>
                 <img src={geocodes_png} />
               </a>
               <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false" style={{marginTop: '2rem'}}>
