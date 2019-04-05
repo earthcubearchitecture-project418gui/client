@@ -198,7 +198,7 @@ class App extends Component {
   
   // For Catagorizor
   // updateGroups = groups => this.setState({groups});
-  userEditedFormData = formData => this.setState({formData}, () => this.invalidate(this.state.selectedGroup));
+  userEditedFormData = formData => { debugger; this.setState({formData}, () => this.invalidate(this.state.selectedGroup)); };
   onSubmit = () => {
     const set = this.sets[this.state.selectedSet];
     const groupKeys = Object.keys(group(set.schema.properties, set.schema.groups)); 
@@ -219,7 +219,13 @@ class App extends Component {
     var blob = new Blob([JSON.stringify(this.state.formData, undefined, 2)], {type: "text/plain;charset=utf-8"});
     FileSaver.saveAs(blob, "ucar-json-instance.json");
   }
-  fillInMissingIDs = () => fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' });
+  fillInMissingIDs = () => {
+    try {
+      return fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' });
+    } catch (err) {
+      return { "ERROR": "User data is malformed."};
+    }
+  };
   
   // For Back context
   remoteValidation = () => {
@@ -464,12 +470,17 @@ class SuperEditorForm extends Component {
     );
   };
 
+  //TODO performance enhance by passing string of schema, instead of brute force deepEquals
   static getDerivedStateFromProps(props, state) {
-    const { schema, form } = state;
-    if (form && !deepEquals(props.schema, schema)) {
-      return { ...props, form: false, liveValidate: false /* , suppressNextPropagation: true  */ };
+    const { schema, form, errorBox } = state;
+    if ( !deepEquals(props.schema, schema) ) {
+      return { ...props, form: false, liveValidate: false, errorBox: false /* , suppressNextPropagation: true  */ };
     }
     return null;
+  }
+
+  static getDerivedStateFromError(error) {
+    return { form: false, errorBox: true };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -479,7 +490,7 @@ class SuperEditorForm extends Component {
 
   componentDidUpdate() {
     // console.log('[SuperEditorForm compDidUpdate()]');
-    if (this.state.form === false) {
+    if (this.state.form === false && this.state.errorBox === false) {
       // With form cleared, create new instance
       this.setState({ form: true });  
     }
@@ -492,6 +503,7 @@ class SuperEditorForm extends Component {
   onFormDataEdited = formData => this.setState({ formData });
 
   onFormDataChange = ({ formData }) => {
+    if (this.state.errorBox) { return; }
     this.setState({ formData , liveValidate: this.props.liveValidate }, () => {
       // if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
       // else { this.props.onFormDataChange(this.state.formData); }
@@ -572,6 +584,12 @@ class SuperEditorForm extends Component {
               </div>
 
             </Form>
+          )}
+
+          { this.state.errorBox && (
+            <p style={{textAlign: 'center', fontSize: '16px'}}>
+              The JSON data for this group is <emphasize>spectacularly</emphasize> malformed and an error occurred while attempting to render the form.
+            </p>
           )}
         </div>
       </div>
