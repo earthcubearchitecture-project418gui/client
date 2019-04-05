@@ -243,8 +243,6 @@ class App extends Component {
     //Replace default formData with user formData
     set.formData = this.state.formData || set.formData;
 
-    // const invalidTopProperties = stripToTopProperty(R.pathOr([], ['context','response','errors'], this));
-    
     // const setOptions = Object.keys(this.sets).map(set => ({
     //   label: set,
     //   onClick: this.changeSet,

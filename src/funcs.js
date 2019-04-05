@@ -50,15 +50,30 @@ export function morphDataPath(path) { return '/' + path.slice(5).replace(/_/g, '
  * @param {Array.<string>} errors 
  */
 export function stripToTopProperty(errors) {
-  return errors.map(e => {
-    const noSlash = e.dataPath.slice(1);
+  function formatType(err) {
+    const noSlash = err.dataPath.slice(1);
     const i = noSlash.indexOf('/');
     if (i !== -1) {
       return noSlash.slice(0, i);
     } else {
       return noSlash;
     }
-  });
+  }
+
+  function requiredType(err) {
+    if (err.schemaPath === '#/required') {
+      return (!!err.params) && err.params.missingProperty;
+    }
+  }
+
+  const res = errors
+    .map(err => {
+      if (err.keyword === "format") { return formatType(err); }
+      if (err.keyword === "required") { return requiredType(err); }
+    })
+    .filter(v => v !== undefined);
+  console.log('[stripToTopProperty()] : ', res);
+  return res;
 }
 
 export function mapTopPropertyToGroup(prop, groups) {
