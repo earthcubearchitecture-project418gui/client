@@ -296,7 +296,7 @@ class App extends Component {
         <Catagorizor
           key={ selectedSet }
           disableCatagorization={false}
-          set={{...set, schema: R.clone(set.schema)}}
+          set={{...set, schema: removeIDs(R.clone(set.schema))}}
           selectedGroup={selectedGroup}
           // reportGroups={this.updateGroups}
           onFormDataChange={this.userEditedFormData}

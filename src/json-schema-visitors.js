@@ -1,6 +1,8 @@
 /// Modifies json schema instance, adding '@id'
 
-const createVisitor = require('json-schema-visitor');
+import * as R from 'ramda';
+
+import createVisitor from 'json-schema-visitor';
 
 
 // visitor(doc, instance, 
@@ -57,7 +59,7 @@ export function fillInMissingIDs(schema, instance, options) {
   return instance;
 }
 
-/** Removes @id property from all objects */
+/** Removes @id property from all objects, and from required array */
 export function removeIDs(schema, options) {
   
   const visitor = createVisitor({
@@ -69,6 +71,10 @@ export function removeIDs(schema, options) {
 
       if ( schema.properties['@id'] ) {
         delete schema.properties['@id'];
+      }
+
+      if ( schema.required ) { 
+        schema.required = R.reject(v => v === '@id', schema.required);
       }
 
       Object.entries(schema.properties)

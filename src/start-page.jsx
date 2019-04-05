@@ -209,13 +209,13 @@ function ErrorModal(props) {
   return (
     <>
       <div className="bg-danger " style={{color: '#111'}}>
-        <p className=" padding-sm" >
+        <p className="padding-sm" >
           {msg}
         </p>
       </div>
 
       <div className="pull-right">
-        <button type="button" className="btn-sm btn-default" onClick={props.onCancel}>Cancel</button>
+        <button type="button" className="btn-sm btn-default" onClick={props.onCancel}>OK</button>
       </div>
     </>
   );
