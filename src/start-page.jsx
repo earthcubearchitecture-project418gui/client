@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import * as R from 'ramda';
 
 import { Modal } from './modal.jsx';
+import { arrayCoercion } from './json-schema-visitors.js';
 
 const nop = () => {};
 
@@ -25,7 +26,7 @@ export default class StartPage extends Component {
   upload = () => this.props.onLoadFormData(this.state.loadedData);
 
   handleFetchJSON = () => this.challengeUser({modalAccepted: () => this.fetchJSON(this.upload)});
-  fetchJSON = (onVerified) => {
+  fetchJSON = (postVerified) => {
     const self = this;
 
     if (! this.urlInputRef) { return; }
@@ -33,7 +34,7 @@ export default class StartPage extends Component {
 
     fetch(url)
       .then(res => res.json())
-      .then(obj => self.verifyInput(obj, onVerified) )
+      .then(obj => self.verifyInput(obj, postVerified) )
       .catch(err => {
         console.error(err)
         this.setState({ errorModal: true, errorMessage: `Error : Remote data is not valid JSON.`});
@@ -42,10 +43,10 @@ export default class StartPage extends Component {
  
   
   handleLoadFile = () => this.challengeUser({modalAccepted: () => this.handleAcceptedLoadFile(this.upload) });
-  handleAcceptedLoadFile = (onVerified) => {
+  handleAcceptedLoadFile = (postVerified) => {
     const file = this.retrieveSelectedFileName();
     if (!file) { return; }
-    this.loadFile(file, onVerified);
+    this.loadFile(file, postVerified);
   }
 
   retrieveSelectedFileName = () => {
@@ -57,20 +58,26 @@ export default class StartPage extends Component {
     return;
   }
 
-  loadFile = (file, onVerified) => {
+  loadFile = (file, postVerified) => {
     const fr = new FileReader();
     fr.onload = () => {
       try {
         const instance = JSON.parse(fr.result, undefined, 2);
-        this.verifyInput(instance, onVerified);
+        this.verifyInput(instance, postVerified);
       } catch(error) {
+        console.error(error);
         this.setState({ errorModal: true, errorMessage: `Error : Remote data is not valid JSON.`});
       }
     };
     fr.readAsText(file);
   }
 
-  verifyInput = (instance, onVerified = nop) => {
+  verifyInput = (instance, postVerified = nop) => {
+    const onVerified = () => {
+      instance = arrayCoercion(this.props.schema, instance);
+      this.setState({ loadedData: instance }, postVerified);
+    };
+
     // inspect for conflicting dataset
     // console.log('[verifyInput] instance: ', instance.hasOwnProperty('@type') );
 
@@ -84,20 +91,22 @@ export default class StartPage extends Component {
       ( R.is(Object, instance) && !instance.hasOwnProperty('@type'))
     ) { 
       console.log('No @type, bypass check');
-      this.setState({ loadedData: instance }, onVerified);
+      // this.setState({ loadedData: instance }, postVerified);
+      onVerified();
       return; 
     }
 
     // console.log('Checking for @type === ', this.props.checkType);
     // console.log('Checking for typeof instanceType ', typeof instanceType);
 
-
     if (
       (R.is(String, instanceType) && instanceType.toLowerCase() === checkType) 
       ||
       (R.is(Array, instanceType) && !!instanceType.find(v => v.toLowerCase() === checkType))
     ) {
-      this.setState({ loadedData: instance }, onVerified);
+      // this.setState({ loadedData: instance }, postVerified);
+      onVerified();
+
     } else {
       console.error('Remote JSON contains invalid @type value : ', instanceType);
       this.setState({ 

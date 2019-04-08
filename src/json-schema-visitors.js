@@ -4,18 +4,12 @@ import * as R from 'ramda';
 
 import createVisitor from 'json-schema-visitor';
 
-
-// visitor(doc, instance, 
-//   (schema, instance) => {
-//     console.log(schema.type, 'instance:', instance);
-//   }
-// );
-
+const nop = () => {};
 
 export function fillInMissingIDs(schema, instance, options) {
   
   const visitor = createVisitor({
-    object: (schema, instance, callback) => {
+    object: (schema, instance, callback = nop) => {
       if (!instance) { return; }
       callback(schema, instance);
       
@@ -33,26 +27,13 @@ export function fillInMissingIDs(schema, instance, options) {
       Object.entries(schema.properties)
         .forEach(([prop, childSchema]) => visitor(childSchema, instance[prop], callback))
     },
-    array: (schema, arr = [], callback) => {
+    array: (schema, arr, callback = nop) => {
+      if (!arr) { return; }
       callback(schema, arr);
-      arr.forEach(item => visitor(schema.items, item, callback));
-    },
-    // allOf: (schema, instance, callback) => {
-    //   callback(schema, instance);
-    //   schema.allOf.forEach(childSchema => visitor(childSchema, instance[key], callback))
-    // },
-    // anyOf: (schema, instance, callback) => {
-    //   callback(schema, instance);
-    //   schema.anyOf.forEach(childSchema => visitor(childSchema, instance[key], callback))
-    // },
-    // oneOf: (schema, instance, callback) => {
-    //   callback(schema, instance);
-    //   debugger;
-    //   schema.oneOf.forEach(childSchema => visitor(childSchema, instance[key], callback))
-    // },
-    // any: (schema, instance, callback) => {
-    //   callback(schema, instance);
-    // }
+      if (schema.items) { 
+        instance.forEach(v => visitor(schema.items, v, callback))
+      }
+    }
   });
   
   visitor(schema, instance, () => { ; });
@@ -63,7 +44,7 @@ export function fillInMissingIDs(schema, instance, options) {
 export function removeIDs(schema, options) {
   
   const visitor = createVisitor({
-    object: (schema, callback) => {
+    object: (schema, callback = nop) => {
       callback(schema);
       
       // Test if oneOf, ...
@@ -80,29 +61,61 @@ export function removeIDs(schema, options) {
       Object.entries(schema.properties)
         .forEach(([prop, childSchema]) => visitor(childSchema, callback))
     },
-    array: (schema, callback) => {
+    array: (schema, callback = nop) => {
       callback(schema);
       if (schema.items) { visitor(schema.items, callback); }
-    },
-    // allOf: (schema, instance, callback) => {
-    //   callback(schema, instance);
-    //   schema.allOf.forEach(childSchema => visitor(childSchema, instance[key], callback))
-    // },
-    // anyOf: (schema, instance, callback) => {
-    //   callback(schema, instance);
-    //   schema.anyOf.forEach(childSchema => visitor(childSchema, instance[key], callback))
-    // },
-    // oneOf: (schema, instance, callback) => {
-    //   callback(schema, instance);
-    //   debugger;
-    //   schema.oneOf.forEach(childSchema => visitor(childSchema, instance[key], callback))
-    // },
-    // any: (schema, instance, callback) => {
-    //   callback(schema, instance);
-    // }
+    }
   });
   
   visitor(schema, () => { ; });
   return schema;
 }
 
+export function arrayCoercion(schema, instance) {
+  
+  const visitor = createVisitor({
+    object: (schema, instance, callback = nop) => {
+      if (!instance) { return; }
+      callback(schema, instance, 'object');
+
+      if (! schema.properties) { return instance; }
+
+      const result = Object.entries(schema.properties)
+        .map(([prop, childSchema]) => [prop, visitor(childSchema, instance[prop], callback)] )
+        .reduce( (acc, [prop, v]) => {
+          // console.log({acc, prop, v});
+          
+          acc[prop] = v || instance[prop];
+          return acc;
+        }        
+        , {});
+
+      return { ...instance, ...result }; 
+      
+    },
+    array: (schema, instance, callback = nop) => {
+      if (!instance) { return; }
+      callback(schema, instance, 'array');
+
+      if (
+        R.is(Object, instance) && !R.is(Array, instance) //Is object and ...
+        &&
+        R.is(Object, schema.items) //Suppose to be array of object
+      ) {
+        console.log('Coercing');
+        instance = [R.clone(instance)];
+      }
+      if (schema.items) { 
+        if ( ! R.is(Array, instance) ) {
+          console.log('Error, instance not array');
+          return instance; 
+        }
+        instance = instance.map(v => visitor(schema.items, v, callback));
+      }
+      return instance;
+    }
+  });
+  
+  const result = visitor(schema, instance);
+  return result;
+}

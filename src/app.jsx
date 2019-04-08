@@ -18,9 +18,9 @@ import About from './about.jsx';
 
 import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
-import themes from './themes.js';
 import { group, ungroup, createShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
-import { fillInMissingIDs, removeIDs } from './json-schema-visitors.js';
+import { fillInMissingIDs, removeIDs, arrayCoercion } from './json-schema-visitors.js';
+import themes from './themes.js';   
 
 import verified_png from './images/verified.png';       // Images
 import clear_png from './images/clear.png';
@@ -178,6 +178,7 @@ class App extends Component {
     return { validGroups, errorGroups };
   });
 
+  get set() { return App.sets[this.state.selectedSet]; }
   groups = () => App.sets[this.state.selectedSet].schema.groups;
   groupKeys = () => Object.keys(this.groups());
 
@@ -198,7 +199,7 @@ class App extends Component {
   
   // For Catagorizor
   // updateGroups = groups => this.setState({groups});
-  userEditedFormData = formData => { debugger; this.setState({formData}, () => this.invalidate(this.state.selectedGroup)); };
+  userEditedFormData = formData => { this.setState({formData}, () => this.invalidate(this.state.selectedGroup)); };
   onSubmit = () => {
     const set = this.sets[this.state.selectedSet];
     const groupKeys = Object.keys(group(set.schema.properties, set.schema.groups)); 
@@ -212,7 +213,10 @@ class App extends Component {
   };
 
   // For StartPage
-  loadExternalFormData = formData => this.setState({formData});
+  loadExternalFormData = formData => {
+    // formData = arrayCoercion(this.set.schema, formData);
+    this.setState({formData});
+  } 
   
   // For MakeJSONPage
   saveFile = () => {
@@ -280,6 +284,7 @@ class App extends Component {
       main = ( <StartPage 
         shouldChallenge={!! this.state.formData}
         checkType={selectedSet}
+        schema={set.schema}  // change to forwarded annon func
         onLoadFormData={this.loadExternalFormData} 
       /> );
     } else if (selectedGroup === "MAKEJSON") {
@@ -588,7 +593,7 @@ class SuperEditorForm extends Component {
 
           { this.state.errorBox && (
             <p style={{textAlign: 'center', fontSize: '16px'}}>
-              The JSON data for this group is <emphasize>spectacularly</emphasize> malformed and an error occurred while attempting to render the form.
+              The JSON data for this group is malformed and an error occurred while attempting to render the form.
             </p>
           )}
         </div>
