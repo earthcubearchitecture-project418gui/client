@@ -159,21 +159,33 @@ export default class Form extends Component {
     event.preventDefault();
     event.persist();
 
+    //ISTI
+    //Pre process out blank string
+    let formData = this.state.formData;
+    let formDataChanged = false;
+    if (this.props.preValidation) { 
+      [formData, formDataChanged] = this.props.preValidation(formData);
+      //  = deepEquals(formData, this.state.formData);
+      console.log({formDataChanged});
+    }
+
     if (!this.props.noValidate) {
-      const { errors, errorSchema } = this.validate(this.state.formData);
+      const { errors, errorSchema } = this.validate(formData);
       if (Object.keys(errors).length > 0) {
-        setState(this, { errors, errorSchema }, () => {
+        setState(this, { formData, errors, errorSchema }, () => {
           if (this.props.onError) {
             this.props.onError(errors);
           } else {
             console.error("Form validation failed", errors);
           }
+          if (formDataChanged) { this.onChange(formData); }
         });
         return;
       }
     }
 
-    this.setState({ errors: [], errorSchema: {} }, () => {
+    //ISTI
+    this.setState({ formData, errors: [], errorSchema: {} }, () => {
       if (this.props.onSubmit) {
         this.props.onSubmit({ ...this.state, status: "submitted" }, event);
       }

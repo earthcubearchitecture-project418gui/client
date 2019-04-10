@@ -19,7 +19,7 @@ import About from './about.jsx';
 import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
 import { group, ungroup, createShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
-import { fillInMissingIDs, removeIDs, arrayCoercion } from './json-schema-visitors.js';
+import * as JSONvisitors from './json-schema-visitors.js';
 import themes from './themes.js';   
 
 import verified_png from './images/verified.png';       // Images
@@ -136,7 +136,9 @@ class App extends Component {
       selectedGroup, 
       formData: undefined, 
 
-      disableLoadJSON
+      disableLoadJSON,
+
+      attemptedRemoteValidation: false
     };
   }
   
@@ -214,7 +216,6 @@ class App extends Component {
 
   // For StartPage
   loadExternalFormData = formData => {
-    // formData = arrayCoercion(this.set.schema, formData);
     this.setState({formData});
   } 
   
@@ -225,7 +226,7 @@ class App extends Component {
   }
   fillInMissingIDs = () => {
     try {
-      return fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' });
+      return JSONvisitors.fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' });
     } catch (err) {
       return { "ERROR": "User data is malformed."};
     }
@@ -233,8 +234,7 @@ class App extends Component {
   
   // For Back context
   remoteValidation = () => {
-    console.log('[App remoteValidation()]');
-    this.setState({ errorList: undefined, validGroups: undefined, errorGroups: undefined}, () => 
+    this.setState({ attemptedRemoteValidation: true, errorList: undefined, validGroups: undefined, errorGroups: undefined}, () => 
       this.context.validate({
         schema: this.state.selectedSet,
         doc: this.fillInMissingIDs()
@@ -273,7 +273,7 @@ class App extends Component {
     const navOptions = [
       { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
-      { label: 'Save JSON',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
+      { label: 'Generate JSON-LD',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
     ];
     if (this.state.disableLoadJSON) { navOptions.shift(); }
 
@@ -294,7 +294,7 @@ class App extends Component {
           json={this.fillInMissingIDs()}
           remoteResponse={this.context.response}
           validationImage={this.context.validationImage}
-          onValidateClick={this.remoteValidation}
+          onValidate={this.remoteValidation}
           onSave={this.saveFile}
         /> 
       );
@@ -305,14 +305,15 @@ class App extends Component {
         <Catagorizor
           key={ selectedSet }
           disableCatagorization={false}
-          set={{...set, schema: removeIDs(R.clone(set.schema))}}
+          set={{...set, schema: JSONvisitors.removeIDs(R.clone(set.schema))}}
           selectedGroup={selectedGroup}
           // reportGroups={this.updateGroups}
           onFormDataChange={this.userEditedFormData}
 
           throughArgs={{ 
             editorTheme, 
-            liveValidate: liveSettings.validate,
+            liveValidationEnabled: liveSettings.validate,
+            delayLiveValidateUserInput: !this.state.attemptedRemoteValidation,
             disableForm: liveSettings.disable, 
             disableTripleEdit: liveSettings.disableTripleEdit,
             onSubmit: this.onSubmit
@@ -470,7 +471,7 @@ class SuperEditorForm extends Component {
         ArrayFieldTemplate,
         ObjectFieldTemplate,
         uiSchema,
-        liveValidate: false
+        liveValidationEnabled: false
       })
     );
   };
@@ -479,7 +480,7 @@ class SuperEditorForm extends Component {
   static getDerivedStateFromProps(props, state) {
     const { schema, form, errorBox } = state;
     if ( !deepEquals(props.schema, schema) ) {
-      return { ...props, form: false, liveValidate: false, errorBox: false /* , suppressNextPropagation: true  */ };
+      return { ...props, form: false, liveValidationEnabled: false, errorBox: false ,  userEditedFormData: false /* , suppressNextPropagation: true  */ };
     }
     return null;
   }
@@ -509,7 +510,7 @@ class SuperEditorForm extends Component {
 
   onFormDataChange = ({ formData }) => {
     if (this.state.errorBox) { return; }
-    this.setState({ formData , liveValidate: this.props.liveValidate }, () => {
+    this.setState({ formData , userEditedFormData: true }, () => {
       // if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
       // else { this.props.onFormDataChange(this.state.formData); }
 
@@ -527,7 +528,6 @@ class SuperEditorForm extends Component {
       formData,
       fields,
       validate,
-      liveValidate,
       ArrayFieldTemplate,
       ObjectFieldTemplate,
       transformErrors,
@@ -537,6 +537,15 @@ class SuperEditorForm extends Component {
       disableForm,
       editorTheme
     } = this.props;
+
+    let liveValidate = false;
+
+    if (this.props.liveValidationEnabled) {
+      if ( ! this.props.delayLiveValidateUserInput) { liveValidate = true;}
+      else {
+        if ( this.props.delayLiveValidateUserInput && this.state.userEditedFormData ) { liveValidate = true; }
+      }
+    }
 
     return (
       <div className="container-fluid margin-bottom-lg">
@@ -555,22 +564,31 @@ class SuperEditorForm extends Component {
         <div className={ this.props.disableTripleEdit ? "col-sm-12" : "col-sm-5" }>
           {this.state.form && (
             <Form
-              noHtml5Validate={true}
               ArrayFieldTemplate={ArrayFieldTemplate}
               ObjectFieldTemplate={ObjectFieldTemplate}
+              
               liveValidate={liveValidate}
+              noHtml5Validate={true}
+              validate={validate}
               disabled={disableForm}
+              
               schema={schema}
               uiSchema={uiSchema}
+              fields={fields}
               formData={formData}
+              
+              preValidation={ formData => { 
+                let res = JSONvisitors.removeArrayBlanks(schema, R.clone(formData)); 
+                return [res, !R.equals(res, formData)];
+              }}
+    
               onChange={this.onFormDataChange}
               onSubmit={({ formData }, e) => {
                 console.log("submitted formData", formData);
                 console.log("submit event", e);
+                this.onFormDataChange(formData);
                 this.props.onSubmit();
               }}
-              fields={fields}
-              validate={validate}
               // onBlur={(id, value) =>
               //   console.log(`Touched ${id} with value ${value}`)
               // }

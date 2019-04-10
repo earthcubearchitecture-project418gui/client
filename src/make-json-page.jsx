@@ -4,7 +4,7 @@ import ErrorList from './libs/rjsf/components/ErrorList.js';
 
 import * as R from 'ramda';
 
-export default function MakeJSONPage({json, remoteResponse = {}, validationImage, onValidateClick, onSave}) {
+export default function MakeJSONPage({json, remoteResponse = {}, validationImage, onValidate, onSave}) {
   json = JSON.stringify(json || {}, undefined, 2);
 
   let errorList;
@@ -22,7 +22,7 @@ export default function MakeJSONPage({json, remoteResponse = {}, validationImage
       </div>
       <div className="row margin-y-sm">
         <div className="col-xs-3">
-          <button type="button" className="btn btn-info margin-xs" onClick={onValidateClick} > Validate </button>
+          <button type="button" className="btn btn-info margin-xs" onClick={onValidate} > Validate </button>
           <button type="button" className="btn btn-info margin-xs" onClick={onSave}>Save</button>
           <span className="verification-img margin-sm" >
             <img src={validationImage} />
@@ -47,7 +47,7 @@ export default function MakeJSONPage({json, remoteResponse = {}, validationImage
 
       <div className="row margin-top-sm">
         <div className="col-xs-12">
-        <button type="button" className="btn btn-info margin-xs" onClick={onValidateClick} > Validate </button>
+        <button type="button" className="btn btn-info margin-xs" onClick={onValidate} > Validate </button>
           <button type="button" className="btn btn-info margin-xs" onClick={onSave}>Save</button>
         </div>
       </div>
