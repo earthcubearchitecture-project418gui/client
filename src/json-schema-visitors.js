@@ -117,6 +117,6 @@ export function arrayCoercion(schema, instance) {
     any: (schema, instance) => instance
   });
   
-  const result = visitor(schema, instance, (subschema, subinstance) => console.log(JSON.stringify(subinstance).substring(0, 30)));
+  const result = visitor(schema, instance);
   return result;
 }
