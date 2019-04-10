@@ -2,21 +2,14 @@
 import * as R from 'ramda';
 
 import datasetSchema from './dataset.json';
-import datasetSchemaGU from './dataset-gu.js';
-import datasetSchemaGroupMain from './dataset-group-main.js';
-
 import dataset_ui_schema from './dataset-ui.js';
-import datasetBCODMOexample from './bcodmo-dataset.json';
 import datasetDefault from './dataset-default.json';
 
 import orgSchema from './organization.json';
 import org_ui_schema from './organization-ui.json';
-import orgBCODMOexample from './bcodmo-org.json';
 import orgDefault from './org-default.json';
 
-import { GeoComponent, OneOfSpliter, OneOfSpliterManager } from './schema-components/geo-component.jsx';
-
-import { removeIDs } from '../../json-schema-visitors.js';
+import { OneOfSpliterManager } from './schema-components/geo-component.jsx';
 
 /// IMPORTANT FIX 
 // Remove spatialCoverage.geo from schema, brakes react-jsonschema-form
@@ -32,38 +25,18 @@ if (R.hasPath(path, datasetSchemaFixed)) {
   console.error('Geo not found!!!');
 }
 
-// removeIDs(datasetSchemaFixed);
-
-// const orgSchemaFixed = R.clone(orgSchema);
-// removeIDs(orgSchemaFixed);
-
-
 export default {
   "dataset": {
     "schema": datasetSchemaFixed,
-    "examples": [datasetBCODMOexample],
+    // "examples": [datasetBCODMOexample],
     "formData": datasetDefault,
     "uiSchema": dataset_ui_schema,
     "fields": { geo: OneOfSpliterManager },
     "perform_id_removal": true
   },
-  "dataset-ground-up": {
-    "schema": datasetSchemaGU,
-    "examples": [datasetBCODMOexample],
-    "formData": {},
-    "uiSchema": dataset_ui_schema,
-    // "fields": { geo: OneOfSpliterManager }
-  },
-  "dataset-group-main": {
-    "schema": datasetSchemaGroupMain,
-    "examples": [datasetBCODMOexample],
-    "formData": {},
-    "uiSchema": dataset_ui_schema,
-    // "fields": { geo: OneOfSpliterManager }
-  },
   "organization": {
     "schema": orgSchema,
-    "examples": [orgBCODMOexample],
+    // "examples": [orgBCODMOexample],
     "formData": orgDefault,
     "uiSchema": org_ui_schema,
     "fields": { },

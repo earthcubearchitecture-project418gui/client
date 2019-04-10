@@ -27,9 +27,9 @@ export function fillInMissingIDs(schema, instance, options) {
       Object.entries(schema.properties)
         .forEach(([prop, childSchema]) => visitor(childSchema, instance[prop], callback))
     },
-    array: (schema, arr, callback = nop) => {
-      if (!arr) { return; }
-      callback(schema, arr);
+    array: (schema, instance, callback = nop) => {
+      if (!instance) { return; }
+      callback(schema, instance);
       if (schema.items) { 
         instance.forEach(v => visitor(schema.items, v, callback))
       }
@@ -83,7 +83,6 @@ export function arrayCoercion(schema, instance) {
       const result = Object.entries(schema.properties)
         .map(([prop, childSchema]) => [prop, visitor(childSchema, instance[prop], callback)] )
         .reduce( (acc, [prop, v]) => {
-          // console.log({acc, prop, v});
           
           acc[prop] = v || instance[prop];
           return acc;
@@ -100,22 +99,24 @@ export function arrayCoercion(schema, instance) {
       if (
         R.is(Object, instance) && !R.is(Array, instance) //Is object and ...
         &&
-        R.is(Object, schema.items) //Suppose to be array of object
+        R.is(Array, schema.items) && schema.items.length == 1 && schema.items[0].type == 'object' //Suppose to be array of a single type of object
       ) {
-        console.log('Coercing');
+        // console.log('Coercing : ', schema.title);
         instance = [R.clone(instance)];
       }
+
       if (schema.items) { 
         if ( ! R.is(Array, instance) ) {
-          console.log('Error, instance not array');
+          console.log('Error, instance is not array');
           return instance; 
         }
         instance = instance.map(v => visitor(schema.items, v, callback));
       }
       return instance;
-    }
+    },
+    any: (schema, instance) => instance
   });
   
-  const result = visitor(schema, instance);
+  const result = visitor(schema, instance, (subschema, subinstance) => console.log(JSON.stringify(subinstance).substring(0, 30)));
   return result;
 }

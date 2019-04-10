@@ -50,7 +50,7 @@ export function morphDataPath(path) { return '/' + path.slice(5).replace(/_/g, '
  * @param {Array.<string>} errors 
  */
 export function stripToTopProperty(errors) {
-  function formatType(err) {
+  function format(err) {
     const noSlash = err.dataPath.slice(1);
     const i = noSlash.indexOf('/');
     if (i !== -1) {
@@ -60,16 +60,17 @@ export function stripToTopProperty(errors) {
     }
   }
 
-  function requiredType(err) {
+  function required(err) {
     if (err.schemaPath === '#/required') {
-      return (!!err.params) && err.params.missingProperty;
+      return err.params && err.params.missingProperty;
     }
   }
 
   const res = errors
     .map(err => {
-      if (err.keyword === "format") { return formatType(err); }
-      if (err.keyword === "required") { return requiredType(err); }
+      if (err.keyword === "format") { return format(err); }
+      if (err.keyword === "required") { return required(err); }
+      if (err.keyword === "type") { return format(err); }
     })
     .filter(v => v !== undefined);
   console.log('[stripToTopProperty()] : ', res);

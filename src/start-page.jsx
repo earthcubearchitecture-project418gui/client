@@ -92,8 +92,7 @@ export default class StartPage extends Component {
     ) { 
       console.log('No @type, bypass check');
       // this.setState({ loadedData: instance }, postVerified);
-      onVerified();
-      return; 
+      return onVerified();
     }
 
     // console.log('Checking for @type === ', this.props.checkType);
@@ -116,6 +115,7 @@ export default class StartPage extends Component {
            Please open an appropiate JSON file. 
            Current value is : ${JSON.stringify(instanceType, undefined, 2)}
            `});
+      return;
     }
   };
   
