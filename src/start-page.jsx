@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import * as R from 'ramda';
 
-import { Modal } from './modal.jsx';
+import { Modal, ErrorModal, VerifyUserAction } from './modal.jsx';
 import { arrayCoercion } from './json-schema-visitors.js';
 
 const nop = () => {};
@@ -37,7 +37,7 @@ export default class StartPage extends Component {
       .then(obj => self.verifyInput(obj, postVerified) )
       .catch(err => {
         console.error(err)
-        this.setState({ errorModal: true, errorMessage: `Error : Remote data is not valid JSON.`});
+        this.setState({ errorModal: true, errorMessage: `Remote data is not valid JSON.`});
       });
   }
  
@@ -66,7 +66,7 @@ export default class StartPage extends Component {
         this.verifyInput(instance, postVerified);
       } catch(error) {
         console.error(error);
-        this.setState({ errorModal: true, errorMessage: `Error : Remote data is not valid JSON.`});
+        this.setState({ errorModal: true, errorMessage: `Remote data is not valid JSON.`});
       }
     };
     fr.readAsText(file);
@@ -108,14 +108,12 @@ export default class StartPage extends Component {
 
     } else {
       console.error('Remote JSON contains invalid @type value : ', instanceType);
-      this.setState({ 
+      return this.setState({ 
         errorModal: true, 
-        errorMessage: 
-          `Error : This file contains a @type other than ${checkType}. 
-           Please open an appropiate JSON file. 
-           Current value is : ${JSON.stringify(instanceType, undefined, 2)}
-           `});
-      return;
+        errorMessage: `This file type is not a(n) ${checkType} JSON file. 
+           Please open an appropiate JSON file.`,
+        errorMessage2: 'Current value is : ' + JSON.stringify(instanceType, undefined, 2)
+      });
     }
   };
   
@@ -137,15 +135,16 @@ export default class StartPage extends Component {
       <div>
         <Modal show={this.state.challengeModal} >
           <VerifyUserAction 
-            onAccept={() => {console.log('accepted'); this.clearModal(); this.state.modalAccepted();}} 
-            onCancel={() => {console.log('cancelled'); this.clearModal(); } } 
+            onAccept={() => { this.clearModal(); this.state.modalAccepted();}} 
+            onCancel={this.clearModal} 
           />
         </Modal>
 
         <Modal show={this.state.errorModal} >
           <ErrorModal
             message={this.state.errorMessage}
-            onCancel={() => {console.log('cancelled'); this.clearModal(); } } 
+            message2={this.state.errorMessage2}
+            onCancel={this.clearModal} 
           />
         </Modal>
 
@@ -171,7 +170,7 @@ export default class StartPage extends Component {
                       <input type="url" id="inputURL" ref={this.urlInputRef} className="form-control" placeholder="URL" pattern="https://.*" 
                         defaultValue="https://earthcube.isti.com/alexm/bco-dmo-example-FIXED.json" />
                       <span className="input-group-btn">
-                        <button className="btn btn-info" type="button" onClick={this.handleFetchJSON}>Fetch</button>
+                        <button className="btn btn-info" type="button" onClick={this.handleFetchJSON}>Load JSON Button</button>
                       </span>
                     </div>
                   </div>
@@ -197,35 +196,3 @@ export default class StartPage extends Component {
   }
 }
 
-function VerifyUserAction(props) {
-  const {onAccept, onCancel} = props;
-  
-  return (
-    <>
-      <h4>Are you Sure?</h4>
-      <p className="padding-sm">This will erase all data currently loaded into the editor.</p>
-
-      <div className="pull-right">
-        <button type="button" className="btn-sm btn-default" onClick={onCancel}>Cancel</button>
-        <button type="button" className="btn-sm btn-danger margin-left-xs" onClick={onAccept} style={{ backgroundColor: '#E5310C' }} >Load</button>
-      </div>
-    </>
-  );
-}
-
-function ErrorModal(props) {
-  const msg = props.message || 'An error has occurred while loading this file';
-  return (
-    <>
-      <div className="bg-danger " style={{color: '#111'}}>
-        <p className="padding-sm" >
-          {msg}
-        </p>
-      </div>
-
-      <div className="pull-right">
-        <button type="button" className="btn-sm btn-default" onClick={props.onCancel}>OK</button>
-      </div>
-    </>
-  );
-}

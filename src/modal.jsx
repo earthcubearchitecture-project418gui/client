@@ -21,8 +21,44 @@ export const Modal = (props) => (
     >
       { props.children }
     </div>
-
   </>
 );
 
+export const VerifyUserAction = props => {
+  const {onAccept, onCancel} = props;
+  
+  return (
+    <>
+      <h4>Are you Sure?</h4>
+      <p className="padding-sm">This will erase all data currently loaded into the editor.</p>
 
+      <div className="pull-right">
+        <button type="button" className="btn-sm btn-default" onClick={onCancel}>Cancel</button>
+        <button type="button" className="btn-sm btn-danger margin-left-xs" onClick={onAccept} style={{ backgroundColor: '#E5310C' }} >Load</button>
+      </div>
+    </>
+  );
+};
+
+export const ErrorModal = props => {
+  const msg = props.message || 'An error has occurred while loading this file';
+  const msg2 = props.message2;
+  return (
+    <>
+      <h5 style={{ fontWeight: 800 }}>Error</h5>
+      <br />
+      <div  style={{color: '#111'}}>
+        <p className="padding-sm" >
+          {msg}
+        </p>
+        <p className="padding-sm" >
+          {msg2}
+        </p>
+      </div>
+
+      <div className="pull-right">
+        <button type="button" className="btn-sm btn-default" onClick={props.onCancel}>OK</button>
+      </div>
+    </>
+  );
+};

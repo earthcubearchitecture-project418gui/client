@@ -6,7 +6,7 @@ import { setImmediate } from 'core-js-pure';
 
 import * as FileSaver from 'file-saver';
 
-import TriEditor from './tri-editor.jsx';                 // Internal deps
+// import TriEditor from './tri-editor.jsx';                 // Internal deps
 import Form from "./libs/rjsf";
 import { shouldRender, deepEquals } from "./libs/rjsf/utils.js";
 
@@ -15,6 +15,7 @@ import NavPillSelector, { ThemeSelector } from './nav-pill.jsx';
 import StartPage from './start-page.jsx';
 import MakeJSONPage  from './make-json-page.jsx';
 import About from './about.jsx';
+import { Modal, VerifyUserAction } from './modal.jsx';
 
 import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
@@ -139,7 +140,10 @@ class App extends Component {
 
       disableLoadJSON,
 
-      attemptedRemoteValidation: false
+      attemptedRemoteValidation: false,
+
+      challengeModal: false,
+      modalAccepted: undefined,
     };
   }
   
@@ -243,6 +247,14 @@ class App extends Component {
     );
   };
 
+  //For Home button
+  handleHomeClick = () => this.challengeUser({modalAccepted: () =>  window.location.assign('https://earthcube.isti.com/theui/')});
+  challengeUser = state => {
+    if (!this.state.formData) { state.modalAccepted(); return; }
+    this.setState({modalAccepted: this.clearModal(), ...state, challengeModal: true});
+  }
+  clearModal = () => this.setState({challengeModal: false, modalAccepted: undefined});
+
   render() {
     const { 
       selectedSet, selectedGroup, 
@@ -272,10 +284,10 @@ class App extends Component {
     }));
 
     const navOptions = [
-      { label: 'Home', onClick: () => window.location.assign('https://earthcube.isti.com/theui/') },
+      { label: 'Home', onClick: () => this.handleHomeClick() },
       { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
-      { label: 'Generate JSON-LD',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
+      { label: 'Generate JSON-LD', onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
     ];
     if (this.state.disableLoadJSON) { navOptions.shift(); }
 
@@ -326,6 +338,13 @@ class App extends Component {
 
     return (
       <>
+        <Modal show={this.state.challengeModal} >
+          <VerifyUserAction 
+            onAccept={this.state.modalAccepted} 
+            onCancel={this.clearModal} 
+          />
+        </Modal>
+
         <div className="navbar navbar-default navbar-fixed-top container-fluid">
           <div className="container-fluid">
             <div className="navbar-header">
@@ -551,7 +570,7 @@ class SuperEditorForm extends Component {
 
     return (
       <div className="container-fluid margin-bottom-lg">
-        { !this.props.disableTripleEdit && (
+        {/* { !this.props.disableTripleEdit && (
           <TriEditor 
             editor={editorTheme}
             schema={schema}
@@ -562,7 +581,7 @@ class SuperEditorForm extends Component {
             onUISchemaEdited={this.onUISchemaEdited}
             onFormDataEdited={this.onFormDataEdited}
           /> 
-        )}
+        )} */}
         {/* div height to allow image to slightly overlap Form */}
         <div style={{ textAlign: 'right', height: '4.0rem' }}>
           <a href="www.earthcube.com" >
