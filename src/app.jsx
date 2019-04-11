@@ -271,6 +271,7 @@ class App extends Component {
     }));
 
     const navOptions = [
+      { label: 'Home', onClick: () => window.location.assign('https://earthcube.isti.com/theui/') },
       { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
       { label: 'Generate JSON-LD',  onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
@@ -583,10 +584,10 @@ class SuperEditorForm extends Component {
               }}
     
               onChange={this.onFormDataChange}
-              onSubmit={({ formData }, e) => {
+              onSubmit={({ formData, formDataChanged }, e) => {
                 console.log("submitted formData", formData);
                 console.log("submit event", e);
-                this.onFormDataChange(formData);
+                if (formDataChanged) { this.onFormDataChange(formData); }
                 this.props.onSubmit();
               }}
               // onBlur={(id, value) =>

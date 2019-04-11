@@ -187,7 +187,7 @@ export default class Form extends Component {
     //ISTI
     this.setState({ formData, errors: [], errorSchema: {} }, () => {
       if (this.props.onSubmit) {
-        this.props.onSubmit({ ...this.state, status: "submitted" }, event);
+        this.props.onSubmit({ ...this.state, formDataChanged, status: "submitted" }, event);
       }
     });
   };
