@@ -25,6 +25,7 @@ import themes from './themes.js';
 import verified_png from './images/verified.png';       // Images
 import clear_png from './images/clear.png';
 import error_png from './images/error.png';
+import earthcube_png from './images/logo_earthcube_full_horizontal.png';
 
 import geocodes_png from './images/geofinalLight.png';
 
@@ -562,6 +563,12 @@ class SuperEditorForm extends Component {
             onFormDataEdited={this.onFormDataEdited}
           /> 
         )}
+        {/* div height to allow image to slightly overlap Form */}
+        <div style={{ textAlign: 'right', height: '4.0rem' }}>
+          <a href="www.earthcube.com" >
+            <img src={earthcube_png}  style={{ height: '5.25rem' }}/>
+          </a>
+        </div>
         <div className={ this.props.disableTripleEdit ? "col-sm-12" : "col-sm-5" }>
           {this.state.form && (
             <Form
