@@ -137,6 +137,7 @@ export default class StartPage extends Component {
           <VerifyUserAction 
             onAccept={() => { this.clearModal(); this.state.modalAccepted();}} 
             onCancel={this.clearModal} 
+            acceptText="Load"
           />
         </Modal>
 

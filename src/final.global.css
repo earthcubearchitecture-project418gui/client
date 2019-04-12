@@ -328,12 +328,12 @@ font-size:15px;
 .btn-info:hover, .btn-info:focus, .btn-info:active {
   color: #345a8d;
   background-color:  #ccd3d9;
-  border-color: #f0f8ff;
+  /* border-color: #f0f8ff; */
 }
 a:hover, a:focus {
   color: #345a8d;
   text-decoration: underline;
-  font-size: inherit;
+  font-size: inherit; 
 }
 
 label, .radio label, .checkbox label, .help-block {

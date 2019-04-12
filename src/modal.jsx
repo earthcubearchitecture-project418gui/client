@@ -24,17 +24,15 @@ export const Modal = (props) => (
   </>
 );
 
-export const VerifyUserAction = props => {
-  const {onAccept, onCancel} = props;
-  
+export const VerifyUserAction = ({onAccept, onCancel, acceptText = 'Ok', cancelText = 'Cancel'}) => {
   return (
     <>
       <h4>Are you Sure?</h4>
       <p className="padding-sm">This will erase all data currently loaded into the editor.</p>
 
       <div className="pull-right">
-        <button type="button" className="btn-sm btn-default" onClick={onCancel}>Cancel</button>
-        <button type="button" className="btn-sm btn-danger margin-left-xs" onClick={onAccept} style={{ backgroundColor: '#E5310C' }} >Load</button>
+        <button type="button" className="btn-sm btn-info" onClick={onCancel}>{cancelText}</button>
+        <button type="button" className="btn-sm btn-info margin-left-xs" onClick={onAccept}>{acceptText}</button>
       </div>
     </>
   );
