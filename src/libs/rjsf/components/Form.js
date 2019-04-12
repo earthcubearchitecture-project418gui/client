@@ -165,8 +165,6 @@ export default class Form extends Component {
     let formDataChanged = false;
     if (this.props.preValidation) { 
       [formData, formDataChanged] = this.props.preValidation(formData);
-      //  = deepEquals(formData, this.state.formData);
-      console.log({formDataChanged});
     }
 
     if (!this.props.noValidate) {

@@ -85,13 +85,12 @@ class Back extends Component {
       }} >
         <App 
           retrieveStartValues={this.props.retrieveStartValues}
-          errorList={R.path(['back','errors'], this.state)}
-          />
+          errorList={R.pathOr([], ['back','errors'], this.state)}
+        />
       </BackContext.Provider>
     );
   }
 }
-
 
 class App extends Component {
   static contextType = BackContext;
@@ -118,8 +117,7 @@ class App extends Component {
 
     const start = props.retrieveStartValues();
     const selectedSet = (start.set && Object.keys(this.sets).includes(start.set))
-      ? start.set 
-      : App.defaults.set;
+      ? start.set : App.defaults.set;
 
     const selectedGroup = start.action === 'load' ? 'LOADJSON' : Object.keys(this.sets[selectedSet].schema.groups)[0];
     const disableLoadJSON = start.action === 'new';
@@ -152,11 +150,10 @@ class App extends Component {
     this.onThemeSelected(theme, themes[theme]);
   }
 
-  static getDerivedStateFromProps(props, state) {
-    if (!props.errorList) { return { errorList: undefined, validGroups: undefined, errorGroups: undefined }; }
+  static getDerivedStateFromProps({errorList = []}, state) {
+    if (!state.attemptedRemoteValidation) { return { errorList: undefined, validGroups: undefined, errorGroups: undefined }; }
 
-    if (!deepEquals(props.errorList, state.errorList)) {
-      const errorList = props.errorList;
+    if (!deepEquals(errorList, state.errorList)) {
       const errorGroups = [];
       //TODO: SchemaSets -> App.sets
       const groups = SchemaSets[state.selectedSet].schema.groups;
@@ -174,7 +171,7 @@ class App extends Component {
 
       // Now filter for those groups that are valid
       const validGroups = Object.keys(groups).filter(g => !errorGroups.includes(g));
-      return { errorList: props.errorList, validGroups, errorGroups };
+      return { errorList: errorList, validGroups, errorGroups };
     }
     return null;
   }
@@ -274,6 +271,7 @@ class App extends Component {
 
     let groupKeys;
     if (set.schema.groups) { groupKeys = Object.keys(group(set.schema.properties, set.schema.groups)); }
+    else { return (<h5> Error: Group information not found in schema.</h5>); }
 
     // const errorGroups = this.context.errorGroups(set.schema.groups);
     const groupOptions = groupKeys.map(group => ({
@@ -283,15 +281,14 @@ class App extends Component {
       icon: '' + (errorGroups.includes(group) ? '🛑' : '') + (validGroups.includes(group) ? '✅' : '')
     }));
 
-    const navOptions = [
+    let navOptions = [
       { label: 'Home', onClick: () => this.handleHomeClick() },
       { label: 'Load JSON', onClick: () => this.changeGroup('LOADJSON'), active: selectedGroup === 'LOADJSON' },
       ...groupOptions,
       { label: 'Generate JSON-LD', onClick: () => this.changeGroup('MAKEJSON'), active: selectedGroup === 'MAKEJSON' }
     ];
-    if (this.state.disableLoadJSON) { navOptions.shift(); }
+    if (this.state.disableLoadJSON) { navOptions = navOptions.filter(option => option.label !== 'Load JSON'); }
 
-    if (!groupKeys) { navOptions.unshift({ label: 'Group information not found in schema.' }); }
 
     let main;
     if (selectedGroup === "LOADJSON") {
@@ -361,20 +358,16 @@ class App extends Component {
             </div>
             <div className="collapse navbar-collapse" id="navbar-collapse-1">
               <NavPillSelector  options={navOptions} />        
-              {/* <ul className="nav navbar-nav navbar-right">
-                <li><a href="#">Link</a></li>
-                <li className="dropdown">
-                  <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span className="caret"></span></a>
-                  <ul className="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li role="separator" className="divider"></li>
-                    <li><a href="#">Separated link</a></li>
-                  </ul>
-                </li>
-              </ul> */}
             </div>
+
+            {/* <ul className="nav navbar-nav navbar-right hidden-xs" style={{ position: 'absolute', top: '1rem', right: '3rem' }}>
+              <div >
+                <a href="www.earthcube.com" >
+                  <img src={earthcube_png}  style={{ height: '5.25rem' }}/>
+                </a>
+              </div>
+            </ul> */}
+
           </div>
         </div>
 
@@ -583,11 +576,11 @@ class SuperEditorForm extends Component {
           /> 
         )} */}
         {/* div height to allow image to slightly overlap Form */}
-        <div style={{ textAlign: 'right', height: '4.0rem' }}>
+        {/* <div style={{ textAlign: 'right', height: '4.0rem' }}>
           <a href="www.earthcube.com" >
             <img src={earthcube_png}  style={{ height: '5.25rem' }}/>
           </a>
-        </div>
+        </div> */}
         <div className={ this.props.disableTripleEdit ? "col-sm-12" : "col-sm-5" }>
           {this.state.form && (
             <Form
@@ -623,7 +616,7 @@ class SuperEditorForm extends Component {
               //   console.log(`Focused ${id} with value ${value}`)
               // }
               transformErrors={transformErrors}
-              onError={log("errors")}>
+              onError={() => window.scrollTo(0,0)}>
               
               <div style={{ textAlign: 'center' }}>
                 {/* <button type="button" className="btn btn-info margin-right-xs" onClick={() => this.setState({liveValidate: !!this.props.liveValidate})}>

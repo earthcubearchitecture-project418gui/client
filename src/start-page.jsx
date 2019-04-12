@@ -170,7 +170,7 @@ export default class StartPage extends Component {
                       <input type="url" id="inputURL" ref={this.urlInputRef} className="form-control" placeholder="URL" pattern="https://.*" 
                         defaultValue="https://earthcube.isti.com/alexm/bco-dmo-example-FIXED.json" />
                       <span className="input-group-btn">
-                        <button className="btn btn-info" type="button" onClick={this.handleFetchJSON}>Load JSON Button</button>
+                        <button className="btn btn-info" type="button" onClick={this.handleFetchJSON}>Load JSON</button>
                       </span>
                     </div>
                   </div>
