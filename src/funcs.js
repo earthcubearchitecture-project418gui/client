@@ -64,6 +64,9 @@ export function stripToTopProperty(errors) {
     if (err.schemaPath === '#/required') {
       return err.params && err.params.missingProperty;
     }
+    if (err.schemaPath.startsWith('#/properties')) {
+      return format(err);
+    }
   }
 
   const res = errors
