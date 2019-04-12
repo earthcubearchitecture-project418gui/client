@@ -398,7 +398,10 @@
             "const": "Organization",
             "default": "Organization"
           },
-
+          "@id": {
+            "type": "string",
+            "format": "uri"
+          },
           "legalName": {
             "type": "string",
             "title": "Legal Name",
