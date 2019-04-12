@@ -23,7 +23,7 @@ import { group, ungroup, createShell, stripToTopProperty, mapTopPropertyToGroup 
 import * as JSONvisitors from './json-schema-visitors.js';
 import themes from './themes.js';   
 
-import verified_png from './images/verified.png';       // Images
+import verified_png from './images/verified-green.png';       // Images
 import clear_png from './images/clear.png';
 import error_png from './images/error.png';
 import earthcube_png from './images/logo_earthcube_full_horizontal.png';
@@ -360,14 +360,6 @@ class App extends Component {
               <NavPillSelector  options={navOptions} />        
             </div>
 
-            {/* <ul className="nav navbar-nav navbar-right hidden-xs" style={{ position: 'absolute', top: '1rem', right: '3rem' }}>
-              <div >
-                <a href="www.earthcube.com" >
-                  <img src={earthcube_png}  style={{ height: '5.25rem' }}/>
-                </a>
-              </div>
-            </ul> */}
-
           </div>
         </div>
 
@@ -576,11 +568,7 @@ class SuperEditorForm extends Component {
           /> 
         )} */}
         {/* div height to allow image to slightly overlap Form */}
-        {/* <div style={{ textAlign: 'right', height: '4.0rem' }}>
-          <a href="www.earthcube.com" >
-            <img src={earthcube_png}  style={{ height: '5.25rem' }}/>
-          </a>
-        </div> */}
+       
         <div className={ this.props.disableTripleEdit ? "col-sm-12" : "col-sm-5" }>
           {this.state.form && (
             <Form
@@ -635,6 +623,12 @@ class SuperEditorForm extends Component {
               The JSON data for this group is malformed and an error occurred while attempting to render the form.
             </p>
           )}
+
+          <div className="margin-top-lg" style={{ textAlign: 'center' }} >
+            <a href="www.earthcube.com" >
+              <img src={earthcube_png}  style={{ height: '5.25rem' }}/>
+            </a>
+          </div>
         </div>
       </div>
     );

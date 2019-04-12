@@ -7,19 +7,19 @@ import * as R from 'ramda';
 export default function MakeJSONPage({json, remoteResponse = {}, validationImage, onValidate, onSave}) {
   json = JSON.stringify(json || {}, undefined, 2);
 
-  let errorList;
-  if (remoteResponse.valid === false) {
-    const transformed = remoteResponse.errors.map(err => ({ stack: err.message }) );
-    errorList = ( <ErrorList errors={transformed} /> );
-  }
+  // let errorList;
+  // if (remoteResponse.valid === false) {
+  //   const transformed = remoteResponse.errors.map(err => ({ stack: err.message }) );
+  //   errorList = ( <ErrorList errors={transformed} /> );
+  // }
 
   return (
     <div className="container-fluid">
-      <div className="row ">
+      {/* <div className="row ">
         <div className="col-xs-12">
           { errorList }
         </div>
-      </div>
+      </div> */}
       <div className="row margin-y-sm">
         <div className="col-xs-3">
           <button type="button" className="btn btn-info margin-xs" onClick={onValidate} > Validate </button>
