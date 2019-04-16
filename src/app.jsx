@@ -525,18 +525,23 @@ class SuperEditorForm extends Component {
   onFormDataEdited = formData => this.setState({ formData });
 
   onFormDataChange = ({ formData }) => {
-    console.log('[SuperEditForm onFormDataChange()]');
-    if (SuperEditForm_single_supress) { SuperEditForm_single_supress = false; return; }
+    console.log('[SuperEditForm onFormDataChange()]' ,formData);
+    // const backAndForth = obj =>  JSON.parse(JSON.stringify(obj));
+    
+    
     if (this.state.errorBox) { return; }
-    this.setState({ formData , userEditedFormData: true }, () => {
-      // if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
-      // else { this.props.onFormDataChange(this.state.formData); }
 
-      // Potential Performance Hit
-      if (!R.equals(this.state.formData, this.props.formData)) { 
+    // Potential Performance Hit
+    if (!R.equals(formData, this.state.formData)) {
+      if (SuperEditForm_single_supress) { SuperEditForm_single_supress = false; return; }
+
+      this.setState({ formData , userEditedFormData: true }, () => {
+        // if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
+        // else { this.props.onFormDataChange(this.state.formData); }
+  
         this.props.onFormDataChange(this.state.formData); 
-      }
-    });
+      });
+    }
   };
  
   render() {

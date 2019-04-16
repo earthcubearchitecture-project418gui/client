@@ -1,31 +1,11 @@
 {
   "@type": "Dataset",
-  "@id": "",
-  "name": "",
-  "alternateName": "",
-  "url": "",
-  "description": "",
-  "version": "",
-  "isAccessibleForFree": false,
-  "keywords": "",
-  "license": "",
-  "citation": [],
-  "includedInDataCatalog": {
-    "@id": "",
-    "url": ""
-  },
+
   "provider": {
-    "@type": "Organization",
-    "@id": "",
-    "legalName": "",
-    "name": "",
-    "url": ""
+    "@type": "Organization"
   },
   "publisher": {
-    "@type": "Organization",
-    "@id": "",
-    "description": "",
-    "url": "",
-    "name": ""
-  }
+    "@type": "Organization"
+  } 
+ 
 }
