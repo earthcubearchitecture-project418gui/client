@@ -1,14 +1,6 @@
 {
   "@id": "",
-  "legalName": "",
-  "url": "",
-  "description": "",
-  "category": [
-    ""
-  ],
-  "sameAs": [
-    ""
-  ],
+  
   "contactPoint": [
     {
       "@type": "ContactPoint"
@@ -19,13 +11,12 @@
       "@type": "PostalAddress"
     }
   ],
-
  
   "funder": [
     {
       "@type": "Organization",
       "identifier": {
-        "@type": "PropertyValue",
+        "@type": "PropertyValue"
       }
     }
   ]

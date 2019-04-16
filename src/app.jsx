@@ -461,6 +461,9 @@ export class Catagorizor extends Component {
   }
 }
 
+/** For Bugfix JIRA 198/199. Used to suppress toggle of live validation on first render. */
+let SuperEditForm_single_supress = true;
+
 class SuperEditorForm extends Component {
 
   state = { form: false /* , suppressNextPropagation: true  */}
@@ -523,6 +526,7 @@ class SuperEditorForm extends Component {
 
   onFormDataChange = ({ formData }) => {
     console.log('[SuperEditForm onFormDataChange()]');
+    if (SuperEditForm_single_supress) { SuperEditForm_single_supress = false; return; }
     if (this.state.errorBox) { return; }
     this.setState({ formData , userEditedFormData: true }, () => {
       // if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
