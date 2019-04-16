@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import * as R from 'ramda';
 
 import { Modal, ErrorModal, VerifyUserAction } from './modal.jsx';
+import { findScriptJSONLD } from './funcs.js';
 import { arrayCoercion } from './json-schema-visitors.js';
 
 const nop = () => {};
@@ -33,14 +34,22 @@ export default class StartPage extends Component {
     const url = this.urlInputRef.current.value;
 
     fetch(url)
-      .then(res => res.json())
+      .then(res => res.text())
+      .then(text => {
+        try {
+          return JSON.parse(text);
+        } catch (error) {
+          debugger;
+          const json = findScriptJSONLD(text);
+          return JSON.parse(json);
+        }
+      })
       .then(obj => self.verifyInput(obj, postVerified) )
       .catch(err => {
         console.error(err)
-        this.setState({ errorModal: true, errorMessage: `Remote data is not valid JSON.`});
+        this.setState({ errorModal: true, errorMessage: `Remote data is not valid JSON, nor HTML with script[type="application/ld+json"] tag.`});
       });
   }
- 
   
   handleLoadFile = () => this.challengeUser({modalAccepted: () => this.handleAcceptedLoadFile(this.upload) });
   handleAcceptedLoadFile = (postVerified) => {

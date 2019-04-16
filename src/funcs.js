@@ -18,7 +18,7 @@ export function getBCODOM() {
     .catch(err => console.error(err));
 }
 
-function findScriptJSONLD(html) {
+export function findScriptJSONLD(html) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
 
