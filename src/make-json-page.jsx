@@ -4,25 +4,33 @@ import ErrorList from './libs/rjsf/components/ErrorList.js';
 
 import * as R from 'ramda';
 
-export default function MakeJSONPage({json, remoteResponse = {}, validationImage, onValidate, onSave}) {
+export default function MakeJSONPage({json, id_insertion_passed, validationImage, onValidate, onSave}) {
+
   json = JSON.stringify(json || {}, undefined, 2);
 
-  // let errorList;
-  // if (remoteResponse.valid === false) {
-  //   const transformed = remoteResponse.errors.map(err => ({ stack: err.message }) );
-  //   errorList = ( <ErrorList errors={transformed} /> );
-  // }
+  let errorList;
+  if (!id_insertion_passed) {
+    errorList = (
+      <div className="row ">
+        <div className="col-xs-offset-1 col-xs-10">
+          <div className="panel panel-danger errors">
+            <div className="panel-heading">
+              <h4 className="panel-title">ID INSERTION FAILED. Validation by server is prohibited.</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container-fluid">
-      {/* <div className="row ">
-        <div className="col-xs-12">
-          { errorList }
-        </div>
-      </div> */}
+      
+      { errorList }
+      
       <div className="row margin-y-sm">
         <div className="col-xs-3">
-          <button type="button" className="btn btn-info margin-xs" onClick={onValidate} > Validate </button>
+          <button type="button" className="btn btn-info margin-xs" onClick={onValidate} disabled={!id_insertion_passed}> Validate </button>
           <button type="button" className="btn btn-info margin-xs" onClick={onSave}>Save</button>
           <span className="verification-img margin-sm" >
             <img src={validationImage} />
@@ -47,7 +55,7 @@ export default function MakeJSONPage({json, remoteResponse = {}, validationImage
 
       <div className="row margin-top-sm">
         <div className="col-xs-12">
-        <button type="button" className="btn btn-info margin-xs" onClick={onValidate} > Validate </button>
+        <button type="button" className="btn btn-info margin-xs" onClick={onValidate} disabled={!id_insertion_passed}> Validate </button>
           <button type="button" className="btn btn-info margin-xs" onClick={onSave}>Save</button>
         </div>
       </div>

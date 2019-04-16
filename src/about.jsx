@@ -9,7 +9,7 @@ const About = () => (
           <hr />
 
           <p> 
-            <a href="https://www.earthcube.org/geocodes">Geoscience Cyber for Open Discovery in the Earth Sciences (GeoCODES)</a>, 
+            <a href="https://www.earthcube.org/geocodes">Geoscience Cyberinfrastructure for Open Discovery in the Earth Sciences (GeoCODES)</a>, 
             the evolution of the P418 Pilot Project, is a production-ready package of intuitive
             web-based tools, REST APIs, and Python, R, and MATLAB notebook integration for a variety of services.
           </p>

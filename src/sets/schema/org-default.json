@@ -1,7 +1,6 @@
 {
   "@id": "",
   "legalName": "",
-  "name": "",
   "url": "",
   "description": "",
   "category": [
@@ -12,71 +11,23 @@
   ],
   "contactPoint": [
     {
-      "@type": "ContactPoint",
-      "@id": "",
-      "name": "",
-      "email": "",
-      "url": "",
-      "contactType": ""
+      "@type": "ContactPoint"
     }
   ],
   "address": [
     {
-      "@type": "PostalAddress",
-      "streetAddress": "",
-      "addressLocality": "",
-      "addressRegion": "",
-      "postalCode": "",
-      "addressCountry": ""
+      "@type": "PostalAddress"
     }
   ],
-  "parentOrganization": [
-    {
-      "@type": "Organization",
-      "@id": "",
-      "legalName": "",
-      "name": "",
-      "url": "",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "",
-        "addressLocality": "",
-        "addressRegion": "",
-        "postalCode": "",
-        "addressCountry": ""
-      }
-    }
-  ],
-  "memberOf": [
-    {
-      "@type": "ProgramMembership",
-      "programName": "",
-      "hostingOrganization": {
-        "@type": "Organization",
-        "name": "",
-        "url": ""
-      }
-    }
-  ],
+
+ 
   "funder": [
     {
       "@type": "Organization",
-      "legalName": "",
-      "name": "",
-      "url": "",
       "identifier": {
         "@type": "PropertyValue",
-        "value": "",
-        "url": ""
       }
     }
-  ],
-  "publishingPrinciples": [
-    {
-      "@type": "DigitalDocument",
-      "name": "",
-      "url": "",
-      "fileFormat": "text/html"
-    }
   ]
+
 }

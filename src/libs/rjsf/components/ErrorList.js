@@ -26,7 +26,7 @@ export default function ErrorList(props) {
     <div className="panel panel-danger errors">
       <div className="panel-heading">
        
-        <h4 className="panel-title">Some fields in this step contain validation errors. Please see the highlighted properties below.</h4>
+        <h4 className="panel-title">Some fields in this step contain validation errors. Please see the highlighted properties below and fix the errors to continue.</h4>
       </div>
       
     </div>

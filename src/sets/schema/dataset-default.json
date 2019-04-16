@@ -9,20 +9,11 @@
   "isAccessibleForFree": false,
   "keywords": "",
   "license": "",
-  "citation": [
-    ""
-  ],
+  "citation": [],
   "includedInDataCatalog": {
     "@id": "",
     "url": ""
   },
-  "distribution": [
-    {
-      "@type": "DataDownload",
-      "contentUrl": "",
-      "encodingFormat": "text/html"
-    }
-  ],
   "provider": {
     "@type": "Organization",
     "@id": "",
@@ -36,46 +27,5 @@
     "description": "",
     "url": "",
     "name": ""
-  },
-  "creator": [
-    {
-      "@type": "Role",
-      "@id": "",
-      "roleName": "",
-      "url": "",
-      "creator": {
-        "@type": "Person",
-        "@id": "",
-        "name": "",
-        "givenName": "",
-        "familyName": "",
-        "url": "",
-        "identifier": {
-          "@type": "PropertyValue",
-          "url": "",
-          "value": ""
-        }
-      }
-    }
-  ],
-  "spatialCoverage": [
-    {
-      "@type": "Place",
-      "name": "",
-      "geo": {}
-    }
-  ],
-  "variableMeasured": [
-    {
-      "@type": "PropertyValue",
-      "@id": "",
-      "description": "",
-      "url": "",
-      "name": "",
-      "unitText": ""
-    }
-  ],
-  "measurementTechnique": [
-    ""
-  ]
+  }
 }

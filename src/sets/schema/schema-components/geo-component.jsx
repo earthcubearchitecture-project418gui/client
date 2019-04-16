@@ -209,7 +209,7 @@ class Shape extends React.Component {
         <div className="container-fluid">
           <div className="row">
             <div className="col-xs-8 col-xs-offset-2 ">
-              <pre>Notes: No space <i>between</i> a coordinate pair. </pre>
+              <pre>Notes: No space <i>between</i> latitude and longitude. </pre>
               <pre>Example Box : 40.9719474,-109.0713774  36.9924303,-102.0463517 </pre>
               <pre>Example Polygon : 25.7617,-80.1918 32.3078,-64.7505 18.4655,-66.1057 </pre>
             </div>

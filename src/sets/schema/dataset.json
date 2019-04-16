@@ -310,8 +310,7 @@
         "type": "object",
         "required": [
           "@type",
-          "@id",
-          "creator"
+          "@id"
         ],
         "properties": {
           "@type": {
@@ -384,11 +383,7 @@
                 "type": "object",
                 "title": "ORCID",
                 "description": "ORCID is a standardized method often used by the scientific community to identify an individual. For example, if two individuals with the same name authored a paper, ORCID uniquely identifies the two authors.",
-                "required": [
-                  "@type",
-                  "url",
-                  "value"
-                ],
+            
                 "properties": {
                   "@type": {
                     "type": "string",

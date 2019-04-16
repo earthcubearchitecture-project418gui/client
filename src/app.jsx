@@ -223,14 +223,14 @@ class App extends Component {
   
   // For MakeJSONPage
   saveFile = () => {
-    var blob = new Blob([JSON.stringify(this.state.formData, undefined, 2)], {type: "text/plain;charset=utf-8"});
-    FileSaver.saveAs(blob, "ucar-json-instance.json");
+    var blob = new Blob([JSON.stringify(this.fillInMissingIDs(), undefined, 2)], {type: "text/plain;charset=utf-8"});
+    FileSaver.saveAs(blob, "geocodes-" + this.state.selectedSet + ".json");
   }
   fillInMissingIDs = () => {
     try {
       return JSONvisitors.fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' });
     } catch (err) {
-      return { "ERROR": "User data is malformed."};
+      return null;
     }
   };
   
@@ -299,10 +299,11 @@ class App extends Component {
         onLoadFormData={this.loadExternalFormData} 
       /> );
     } else if (selectedGroup === "MAKEJSON") {
+      const json = this.fillInMissingIDs();
       main = (
         <MakeJSONPage 
-          // json={this.state.formData} 
-          json={this.fillInMissingIDs()}
+          id_insertion_passed={!!json}
+          json={json || R.clone(this.state.formData)}
           remoteResponse={this.context.response}
           validationImage={this.context.validationImage}
           onValidate={this.remoteValidation}
@@ -365,6 +366,12 @@ class App extends Component {
 
         <div className="main">
           { main }
+        </div>
+
+        <div className="margin-y-lg" style={{ textAlign: 'center' }} >
+          <a href="http://www.earthcube.org" >
+            <img src={earthcube_png}  style={{ height: '5.25rem' }}/>
+          </a>
         </div>
       </>
     );
@@ -515,6 +522,7 @@ class SuperEditorForm extends Component {
   onFormDataEdited = formData => this.setState({ formData });
 
   onFormDataChange = ({ formData }) => {
+    console.log('[SuperEditForm onFormDataChange()]');
     if (this.state.errorBox) { return; }
     this.setState({ formData , userEditedFormData: true }, () => {
       // if (this.state.suppressNextPropagation) { this.setState({suppressNextPropagation: false}); }
@@ -624,11 +632,7 @@ class SuperEditorForm extends Component {
             </p>
           )}
 
-          <div className="margin-top-lg" style={{ textAlign: 'center' }} >
-            <a href="www.earthcube.com" >
-              <img src={earthcube_png}  style={{ height: '5.25rem' }}/>
-            </a>
-          </div>
+         
         </div>
       </div>
     );

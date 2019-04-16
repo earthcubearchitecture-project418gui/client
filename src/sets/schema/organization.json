@@ -103,6 +103,7 @@
       "type": "array",
       "title": "Contact",
       "description": "Provide information about the organization's contact(s), which may be an individual and/or a department within the organization.",
+      "minItems": 1,
       "items": {
         "type": "object",
         "required": [
@@ -154,6 +155,7 @@
       "type": "array",
       "title": "Address",
       "description": "Enter this organization's postal address(es).",
+      "minItems": 1,
       "items": {
         "type": "object",
         "required": [
