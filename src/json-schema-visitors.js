@@ -100,10 +100,16 @@ export function arrayCoercion(schema, instance) {
         if (
           R.is(Object, instance) && !R.is(Array, instance) //Is object and ...
           &&
-          R.is(Array, schema.items) && schema.items.length == 1 && schema.items[0].type == 'object' //Suppose to be array of a single type of object
+          R.is(Object, schema.items) && schema.items.type == 'object' //Suppose to be array of a single type of object
         ) {
           // console.log('Coercing : ', schema.title);
           instance = [R.clone(instance)];
+        } else if (
+          R.is(String, instance) 
+          &&
+          R.is(Object, schema.items) && schema.items.type == 'string' //Suppose to be array of a single type of object
+        ) {
+          instance = [instance];
         }
 
         if ( ! R.is(Array, instance) ) {
@@ -119,7 +125,7 @@ export function arrayCoercion(schema, instance) {
     any: (schema, instance) => instance
   });
   
-  const result = visitor(schema, instance);
+  const result = visitor(schema, instance, (...out) => { console.log(...out) });
   return result;
 }
 

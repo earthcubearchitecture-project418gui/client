@@ -3,11 +3,11 @@ import * as R from 'ramda';
 
 import datasetSchema from './dataset.json';
 import dataset_ui_schema from './dataset-ui.js';
-import datasetDefault from './dataset-default.json';
+import datasetDefault from './dataset-default.js';
 
 import orgSchema from './organization.json';
 import org_ui_schema from './organization-ui.json';
-import orgDefault from './org-default.json';
+import orgDefault from './org-default.js';
 
 import { OneOfSpliterManager } from './schema-components/geo-component.jsx';
 
