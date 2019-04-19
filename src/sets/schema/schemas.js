@@ -28,18 +28,18 @@ if (R.hasPath(path, datasetSchemaFixed)) {
 export default {
   "dataset": {
     "schema": datasetSchemaFixed,
-    // "examples": [datasetBCODMOexample],
     "formData": datasetDefault,
     "uiSchema": dataset_ui_schema,
     "fields": { geo: OneOfSpliterManager },
+    "exampleURL": `https://earthcube.isti.com/alexm/bco-dmo-dataset.json`,
     "perform_id_removal": true
   },
   "organization": {
     "schema": orgSchema,
-    // "examples": [orgBCODMOexample],
     "formData": orgDefault,
     "uiSchema": org_ui_schema,
     "fields": { },
+    "exampleURL": `https://earthcube.isti.com/alexm/bco-dmo-org.json`,
     "perform_id_removal": true
   }
 };

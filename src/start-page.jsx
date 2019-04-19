@@ -6,8 +6,6 @@ import { Modal, ErrorModal, VerifyUserAction } from './modal.jsx';
 import { findScriptJSONLD } from './funcs.js';
 import { arrayCoercion, fillInMissingURLs } from './json-schema-visitors.js';
 
-const nop = () => {};
-
 export default class StartPage extends Component {
   constructor(props) {
     super(props);
@@ -26,14 +24,12 @@ export default class StartPage extends Component {
     };
   }
 
-  upload = () => this.props.onLoadFormData(this.state.loadedData);
-
   handleFetchJSON = () => {
     const value = this.urlInputRef.current.value;
     if (value.startsWith('http') && !value.startsWith('https')) { return this.forceUpdate(); }
-    this.challengeUser({modalAccepted: () => this.fetchJSON(this.upload)});
+    this.challengeUser({modalAccepted: () => this.fetchJSON()});
   };
-  fetchJSON = (postVerified) => {
+  fetchJSON = () => {
     const self = this;
 
     if (! this.urlInputRef) { return; }
@@ -49,20 +45,23 @@ export default class StartPage extends Component {
           return JSON.parse(json);
         }
       })
-      .then(obj => self.verifyInput(obj, postVerified) )
+      .then(obj => {
+        const instance = self.verifyInput(obj);
+        if (!instance) { throw new Error(); }
+        this.props.onLoadFormData(instance, url);
+      })
       .catch(err => {
-        console.error(err)
+        console.error(err);
         this.setState({ errorModal: true, errorMessage: `Remote data is not valid JSON, nor HTML with script[type="application/ld+json"] tag.`});
       });
   }
   
-  handleLoadFile = () => this.challengeUser({modalAccepted: () => this.handleAcceptedLoadFile(this.upload) });
-  handleAcceptedLoadFile = (postVerified) => {
+  handleLoadFile = () => this.challengeUser({modalAccepted: () => this.handleAcceptedLoadFile() });
+  handleAcceptedLoadFile = () => {
     const file = this.retrieveSelectedFileName();
     if (!file) { return; }
-    this.loadFile(file, postVerified);
-  }
-
+    this.loadFile(file);
+  };
   retrieveSelectedFileName = () => {
     let files = this.fileInputRef.current.files;
     if (files.length !== 0) {
@@ -70,27 +69,29 @@ export default class StartPage extends Component {
       return currentFile;
     }
     return;
-  }
-
-  loadFile = (file, postVerified) => {
+  };
+  loadFile = (file) => {
     const fr = new FileReader();
     fr.onload = () => {
       try {
-        const instance = JSON.parse(fr.result, undefined, 2);
-        this.verifyInput(instance, postVerified);
+        let instance = JSON.parse(fr.result, undefined, 2);
+        instance = this.verifyInput(instance);
+        if (!instance) { throw new Error(); }
+        this.props.onLoadFormData(instance, file.name);
       } catch(error) {
         console.error(error);
         this.setState({ json_error_modal: true, errorMessage: `Remote data is not valid JSON.`});
       }
     };
     fr.readAsText(file);
-  }
+  };
 
-  verifyInput = (instance, postVerified = nop) => {
-    const onVerified = () => {
+  verifyInput = (instance) => {
+    const postVerified = () => {
       instance = arrayCoercion(this.props.schema, instance);
       instance = fillInMissingURLs(this.props.schema, instance);
-      this.setState({ loadedData: instance }, postVerified);
+      this.setState({ loadedData: instance });
+      return instance;
     };
 
     const instanceType = instance['@type'];
@@ -103,7 +104,7 @@ export default class StartPage extends Component {
       ( R.is(Object, instance) && !instance.hasOwnProperty('@type'))
     ) { 
       console.log('No @type, bypass check');
-      return onVerified();
+      return postVerified();
     }
 
     if (
@@ -111,7 +112,7 @@ export default class StartPage extends Component {
       ||
       (R.is(Array, instanceType) && !!instanceType.find(v => v.toLowerCase() === checkType))
     ) {
-      return onVerified();
+      return postVerified();
     } else {
       console.error('Remote JSON contains invalid @type value : ', instanceType);
       return this.setState({ 
@@ -173,6 +174,19 @@ export default class StartPage extends Component {
           <div className="row">
             <div className="col-xs-11">
               <form className="form-horizontal">
+                
+                { this.props.loadedFrom ? 
+                  <div className="form-group">
+                    <label className="col-sm-2 control-label "> Loaded From: </label>
+                    <div className="col-sm-10">
+                      {/* <label className="btn btn-info"> 
+                        Browse <input type="file" id="file-input" ref={this.fileInputRef} className="form-control hidden" onChange={this.handleLoadFile} />
+                      </label> */}
+                      <span className="padding-left-xs" style={{verticalAlign: '-webkit-baseline-middle'}}> { this.props.loadedFrom } </span>
+                    </div>
+                  </div>
+                : undefined }
+
                 <div className="form-group">
                   <label className="col-sm-2 control-label "> File: </label>
                   <div className="col-sm-10">
@@ -188,7 +202,7 @@ export default class StartPage extends Component {
                   <div className="col-sm-10">
                     <div className="input-group">
                       <input type="url" id="inputURL" ref={this.urlInputRef} className="form-control" placeholder="URL" pattern="https://.*" 
-                        defaultValue="https://earthcube.isti.com/alexm/bco-dmo-example-FIXED.json" />
+                        defaultValue={this.props.exampleURL} />
                       <span className="input-group-btn">
                         <button className="btn btn-info" type="button" onClick={this.handleFetchJSON}>Load JSON</button>
                       </span>

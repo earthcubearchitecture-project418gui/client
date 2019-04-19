@@ -217,9 +217,7 @@ class App extends Component {
   };
 
   // For StartPage
-  loadExternalFormData = formData => {
-    this.setState({formData});
-  } 
+  loadExternalFormData = (formData, loadedFrom) => this.setState({formData, loadedFrom}); 
   
   // For MakeJSONPage
   saveFile = () => {
@@ -294,11 +292,12 @@ class App extends Component {
     ];
     if (this.state.disableLoadJSON) { navOptions = navOptions.filter(option => option.label !== 'Load JSON'); }
 
-
     let main;
     if (selectedGroup === "LOADJSON") {
       main = ( <StartPage 
         shouldChallenge={!! this.state.formData}
+        loadedFrom={this.state.loadedFrom}
+        exampleURL={set.exampleURL}
         checkType={selectedSet}
         schema={set.schema}  // change to forwarded annon func
         onLoadFormData={this.loadExternalFormData} 
@@ -500,7 +499,7 @@ class SuperEditorForm extends Component {
 
   //TODO performance enhance by passing string of schema, instead of brute force deepEquals
   static getDerivedStateFromProps(props, state) {
-    const { schema, form, errorBox } = state;
+    const { schema } = state;
     if ( !deepEquals(props.schema, schema) ) {
       return { ...props, form: false, liveValidationEnabled: false, errorBox: false ,  userEditedFormData: false /* , suppressNextPropagation: true  */ };
     }
@@ -677,50 +676,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("app")
   ); 
 
-  // let sticky;
-  // setTimeout(() => {
-  //   sticky = document.querySelector('#navbar').offsetTop;
-  // }, 500);
-
-  // window.addEventListener('scroll', scroll);
-
-
-  // function scroll(e) {
-  //   const nav = document.querySelector('#navbar');
-  //   const buffer = document.querySelector('#nav-buffer');
-
-  //   if (!nav) { return; }
-
-  //   if (window.pageYOffset  >= sticky){
-  //     nav.classList.add('navbar-fixed-top');
-  //     buffer.classList.remove('hidden');
-  //   } else if (window.pageYOffset <= sticky) {
-  //     nav.classList.remove('navbar-fixed-top');
-  //     buffer.classList.add('hidden');
-  //   }
-  // }
-
-  // const raf = window.requestAnimationFrame;
-  // let lastScrollTop = window.scrollY;
-  // raf(loop);
-  // function loop() {
-  //   let scrollTop = window.scrollY;
-  //   if (lastScrollTop === scrollTop) {
-  //       raf(loop);
-  //       return;
-  //   } else {
-  //       lastScrollTop = scrollTop;
-
-  //       // fire scroll function if scrolls vertically
-  //       scroll();
-  //       raf(loop);
-  //   }
-  // }
-
-  // setTimeout(() => {
-  //   document.querySelector('#file-input').click();
-  // }, 1000);
-  
 });
 
 
