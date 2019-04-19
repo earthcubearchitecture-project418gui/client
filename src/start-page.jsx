@@ -4,7 +4,7 @@ import * as R from 'ramda';
 
 import { Modal, ErrorModal, VerifyUserAction } from './modal.jsx';
 import { findScriptJSONLD } from './funcs.js';
-import { arrayCoercion } from './json-schema-visitors.js';
+import { arrayCoercion, fillInMissingURLs } from './json-schema-visitors.js';
 
 const nop = () => {};
 
@@ -84,11 +84,9 @@ export default class StartPage extends Component {
   verifyInput = (instance, postVerified = nop) => {
     const onVerified = () => {
       instance = arrayCoercion(this.props.schema, instance);
+      instance = fillInMissingURLs(this.props.schema, instance);
       this.setState({ loadedData: instance }, postVerified);
     };
-
-    // inspect for conflicting dataset
-    // console.log('[verifyInput] instance: ', instance.hasOwnProperty('@type') );
 
     const instanceType = instance['@type'];
     const checkType = this.props.checkType.toLowerCase();
@@ -100,21 +98,15 @@ export default class StartPage extends Component {
       ( R.is(Object, instance) && !instance.hasOwnProperty('@type'))
     ) { 
       console.log('No @type, bypass check');
-      // this.setState({ loadedData: instance }, postVerified);
       return onVerified();
     }
-
-    // console.log('Checking for @type === ', this.props.checkType);
-    // console.log('Checking for typeof instanceType ', typeof instanceType);
 
     if (
       (R.is(String, instanceType) && instanceType.toLowerCase() === checkType) 
       ||
       (R.is(Array, instanceType) && !!instanceType.find(v => v.toLowerCase() === checkType))
     ) {
-      // this.setState({ loadedData: instance }, postVerified);
-      onVerified();
-
+      return onVerified();
     } else {
       console.error('Remote JSON contains invalid @type value : ', instanceType);
       return this.setState({ 

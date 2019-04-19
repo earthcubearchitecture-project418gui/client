@@ -5,8 +5,9 @@ import * as R from 'ramda';
 import createVisitor from 'json-schema-visitor';
 
 const nop = () => {};
+const logAll = (...items) => console.log(...items);
 
-export function fillInMissingIDs(schema, instance, options) {
+export function fillInMissingIDs(schema, instance, options = {}) {
   
   const visitor = createVisitor({
     object: (schema, instance, callback = nop) => {
@@ -37,6 +38,41 @@ export function fillInMissingIDs(schema, instance, options) {
   });
   
   visitor(schema, instance, () => { ; });
+  return instance;
+}
+
+
+export function fillInMissingURLs(schema, instance, options = {}) {
+  
+  const visitor = createVisitor({
+    object: (schema, instance, callback = nop) => {
+      if (!instance) { return; }
+      callback(schema, instance);
+      
+      // Test if oneOf, ...
+      if (! schema.properties) { return; }
+
+      if ( schema.properties.url && schema.properties['@id']  ) {
+        // console.log('hit:', schema.type, schema.title);
+        if ( !instance.url || instance.url === '' ) {
+          const transferValue = instance['@id'] || options['@id'];
+          instance.url = transferValue; 
+        }
+      }
+
+      Object.entries(schema.properties)
+        .forEach(([prop, childSchema]) => visitor(childSchema, instance[prop], callback))
+    },
+    array: (schema, instance, callback = nop) => {
+      if (!instance) { return; }
+      callback(schema, instance);
+      if (schema.items) { 
+        instance.forEach(v => visitor(schema.items, v, callback))
+      }
+    }
+  });
+  
+  visitor(schema, instance, logAll);
   return instance;
 }
 
@@ -125,7 +161,7 @@ export function arrayCoercion(schema, instance) {
     any: (schema, instance) => instance
   });
   
-  const result = visitor(schema, instance, (...out) => { console.log(...out) });
+  const result = visitor(schema, instance);
   return result;
 }
 

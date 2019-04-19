@@ -1,5 +1,5 @@
-import React, { Component } from "react";                 // External deps
-import { render } from "react-dom";
+import React, { Component } from 'react';                 // External deps
+import { render } from 'react-dom';
 
 import * as R from 'ramda';
 import { setImmediate } from 'core-js-pure';
@@ -19,7 +19,7 @@ import { Modal, VerifyUserAction } from './modal.jsx';
 
 import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
-import { group, ungroup, createShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
+import { group, ungroup, createSchemaShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
 import * as JSONvisitors from './json-schema-visitors.js';
 import themes from './themes.js';   
 
@@ -223,9 +223,14 @@ class App extends Component {
   
   // For MakeJSONPage
   saveFile = () => {
-    var blob = new Blob([JSON.stringify(this.fillInMissingIDs(), undefined, 2)], {type: "text/plain;charset=utf-8"});
+    var blob = new Blob([JSON.stringify(this.onInstanceOut(), undefined, 2)], {type: "text/plain;charset=utf-8"});
     FileSaver.saveAs(blob, "geocodes-" + this.state.selectedSet + ".json");
-  }
+  };
+  instanceOut = () => {
+    let instance = this.fillInMissingIDs();
+    if (!instance) { return null; }
+    return R.mergeAll( [instance, R.pick(['@context'], this.set.schema)] );
+  };
   fillInMissingIDs = () => {
     try {
       return JSONvisitors.fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' });
@@ -299,7 +304,7 @@ class App extends Component {
         onLoadFormData={this.loadExternalFormData} 
       /> );
     } else if (selectedGroup === "MAKEJSON") {
-      const json = this.fillInMissingIDs();
+      const json = this.instanceOut();
       main = (
         <MakeJSONPage 
           id_insertion_passed={!!json}
@@ -373,6 +378,7 @@ class App extends Component {
             <img src={earthcube_png}  style={{ height: '5.25rem' }}/>
           </a>
         </div>
+
       </>
     );
   }
@@ -417,10 +423,10 @@ export class Catagorizor extends Component {
     const subSchema = (schema, selectedGroup) => {
       // const { schema } = this.props;
       const groups = group(schema.properties, schema.groups);
-      const shell = createShell(schema);
-      shell.properties = groups[selectedGroup];
-      shell.required = R.intersection(schema.required, Object.keys(groups[selectedGroup]));
-      return shell;
+      const sub = createSchemaShell(schema);
+      sub.properties = groups[selectedGroup];
+      sub.required = R.intersection(schema.required, Object.keys(groups[selectedGroup]));
+      return sub;
     }
   
     const subFormData = (schema, selectedGroup, formData) => {
@@ -502,7 +508,8 @@ class SuperEditorForm extends Component {
   }
 
   static getDerivedStateFromError(error) {
-    return { form: false, errorBox: true };
+    console.error('Supereditform ', error);
+    return { form: true, errorBox: true, formData: {} };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -529,7 +536,7 @@ class SuperEditorForm extends Component {
     // const backAndForth = obj =>  JSON.parse(JSON.stringify(obj));
     
     
-    if (this.state.errorBox) { return; }
+    // if (this.state.errorBox) { return; }
 
     // Potential Performance Hit
     if (!R.equals(formData, this.state.formData)) {
@@ -585,7 +592,13 @@ class SuperEditorForm extends Component {
           /> 
         )} */}
         {/* div height to allow image to slightly overlap Form */}
-       
+
+        { this.state.errorBox && (
+            <p className="col-xs-offset-1 col-xs-10 padding-y-xs bg-warning" style={{textAlign: 'center', fontSize: '16px'}}>
+              The JSON data for this group is malformed and an error occurred while attempting to render the form. The data will be overwritten with your new input here.
+            </p>
+        )}
+
         <div className={ this.props.disableTripleEdit ? "col-sm-12" : "col-sm-5" }>
           {this.state.form && (
             <Form
@@ -635,13 +648,6 @@ class SuperEditorForm extends Component {
             </Form>
           )}
 
-          { this.state.errorBox && (
-            <p style={{textAlign: 'center', fontSize: '16px'}}>
-              The JSON data for this group is malformed and an error occurred while attempting to render the form.
-            </p>
-          )}
-
-         
         </div>
       </div>
     );
