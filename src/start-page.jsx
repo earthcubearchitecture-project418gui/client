@@ -14,19 +14,25 @@ export default class StartPage extends Component {
     this.fileInputRef = React.createRef();
     this.urlInputRef = React.createRef();
     this.state = { 
+      loadedFrom: undefined,
       loadedData: undefined, 
-      challengeModal: false,
       modalAccepted: undefined,
+      errorMessage: '',
       
+      challengeModal: false,
       errorModal: false,
-      errorMessage: ''
+      json_error_modal: false, 
     
     };
   }
 
   upload = () => this.props.onLoadFormData(this.state.loadedData);
 
-  handleFetchJSON = () => this.challengeUser({modalAccepted: () => this.fetchJSON(this.upload)});
+  handleFetchJSON = () => {
+    const value = this.urlInputRef.current.value;
+    if (value.startsWith('http') && !value.startsWith('https')) { return this.forceUpdate(); }
+    this.challengeUser({modalAccepted: () => this.fetchJSON(this.upload)});
+  };
   fetchJSON = (postVerified) => {
     const self = this;
 
@@ -39,7 +45,6 @@ export default class StartPage extends Component {
         try {
           return JSON.parse(text);
         } catch (error) {
-          debugger;
           const json = findScriptJSONLD(text);
           return JSON.parse(json);
         }
@@ -75,7 +80,7 @@ export default class StartPage extends Component {
         this.verifyInput(instance, postVerified);
       } catch(error) {
         console.error(error);
-        this.setState({ errorModal: true, errorMessage: `Remote data is not valid JSON.`});
+        this.setState({ json_error_modal: true, errorMessage: `Remote data is not valid JSON.`});
       }
     };
     fr.readAsText(file);
@@ -125,12 +130,18 @@ export default class StartPage extends Component {
     }
     this.setState({modalAccepted: this.clearModal, ...state, challengeModal: true});
   }
-  clearModal = () => this.setState({challengeModal: false, errorModal: false});
+  clearModal = () => this.setState({challengeModal: false, errorModal: false, json_error_modal: false});
 
   render() {
     const files = R.path(['fileInputRef','current','files'], this);
     let fileName;
     if (files && files.length > 0) { fileName = files[0].name; }
+
+    let url_msg;
+    if (this.urlInputRef.current) {
+      const value = this.urlInputRef.current.value;
+      if (value.startsWith('http') && !value.startsWith('https')) { url_msg = 'Warning: http:// will not work in secure environment.' }
+    }
 
     return (
       <div>
@@ -146,6 +157,13 @@ export default class StartPage extends Component {
           <ErrorModal
             message={this.state.errorMessage}
             message2={this.state.errorMessage2}
+            onCancel={this.clearModal} 
+          />
+        </Modal>
+
+        <Modal show={this.state.json_error_modal} >
+          <JSONErrorModal
+            message={this.state.errorMessage}
             onCancel={this.clearModal} 
           />
         </Modal>
@@ -175,6 +193,9 @@ export default class StartPage extends Component {
                         <button className="btn btn-info" type="button" onClick={this.handleFetchJSON}>Load JSON</button>
                       </span>
                     </div>
+                    <div>
+                      {url_msg}
+                    </div>
                   </div>
                 </div>
               
@@ -198,3 +219,26 @@ export default class StartPage extends Component {
   }
 }
 
+function JSONErrorModal(props)  {
+  const msg = props.message || 'An error has occurred while loading this file';
+  return (
+    <>
+      <h5 style={{ fontWeight: 800 }}>Error</h5>
+      <br />
+      <div  style={{color: '#111'}}>
+        <p className="padding-sm" >
+          {msg}
+        </p>
+
+        <p className="padding-sm" >
+          There are many web and desktop tools to assist in correcting JSON.
+          <a href="https://jsonlint.com/" style={{fontWeight: 800}}> https://jsonlint.com </a>
+        </p>
+      </div>
+
+      <div className="pull-right">
+        <button type="button" className="btn-sm btn-default" onClick={props.onCancel}>OK</button>
+      </div>
+    </>
+  );
+};

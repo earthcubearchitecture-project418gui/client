@@ -72,7 +72,7 @@ export function fillInMissingURLs(schema, instance, options = {}) {
     }
   });
   
-  visitor(schema, instance, logAll);
+  visitor(schema, instance);
   return instance;
 }
 
