@@ -1,0 +1,381 @@
+/**
+ * Custom Web Fonts
+ */
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:700,400,300);
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  /* 1 */
+}
+
+html {
+	background: url(images/earthrise7515.jpg) no-repeat center center fixed;
+	background-size: cover;
+	font-size: 10px;
+	-webkit-text-size-adjust:100%;
+}
+
+/* megahack for giving parent divs height when child elements floated */
+.clearfix {
+  clear: both;
+}
+
+.clearfix:after {
+  clear: both; 
+  content: "";
+  display: table; 
+}
+
+p,h1,h2,h3,h4,h5,ul,ol,dl,img,hr,td,tr,line-height,section,header,footer,label,br,img,input,form {
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	border: none;
+	outline: none;
+}
+
+p {
+	display: block;
+	margin-block-start: 0em;
+	margin-block-end: 0em;
+	margin-inline-start: 0em;
+	margin-inline-end: 0em;
+}
+
+a {
+	cursor: pointer;
+	outline: none;
+	text-decoration: none;
+}
+
+a:link {
+	color: #1C2E7B;
+}
+
+a:hover, a:focus {
+  color: #F20421;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+}
+
+.darkearth {
+	background: url(images/earthrise90.jpg) no-repeat center center fixed;
+	background-size: cover;
+}
+
+img {
+  max-width: 100%;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 10%;
+  padding: 0;
+}
+
+.boxcontainer {
+  max-width: 1440px;
+  margin: 10% 15% 0 15%;
+  padding: 0;
+}
+
+/**
+ * Header Styles
+ */
+.header {
+  overflow: hidden;
+  background-color: transparent;
+  margin: 0 40px;
+  max-width: 1440px;
+}
+
+.logo {
+  float: left;
+  margin: 30px 0;
+  color: #1C2E7B;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 3.6em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tagline {
+  color: #1C2E7B;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  font-size: .5em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.logolight {
+float: left;
+  margin: 30px 0;
+  color: #79C9ED;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 3.6em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.taglinelight {
+  color: #79C9ED;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  font-size: .5em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.header__nav {
+  float: right;
+  width: 50%;
+  height: 1.5em;
+  margin: 1em 0;
+}
+
+.sub-header {
+  background-color: transparent;
+}
+
+/* menubox styles */
+
+.leftbox {
+	float: left;
+	width: 48%;
+	height: auto;
+	margin-right: 1%;
+	background-color: rgba(121, 201, 237, 0.35);
+}
+.rightbox {
+	float: right;
+	width: 48%;
+	height: auto;
+	margin-left: 1%;
+	background-color: rgba(121, 201, 237, 0.35);
+}
+.subleftbox {
+	float: left;
+	width: 49.5%;
+	height: 45em;
+	padding: 1em 1.5em;
+	background-color: rgba(232, 247, 252, 0.4);
+}
+.subrightbox {
+	float: right;
+	width: 49.5%;
+	height: 45em;
+	padding: 1em;
+	background-color: rgba(232, 247, 252, 0.4);
+}
+.subleftbox:hover,  .subrightbox:hover {
+	background-color: rgba(232, 247, 252, 0.8);
+	cursor: pointer;
+}
+.subleftbox .pickone:hover, .subrightbox .pickone:hover {	
+	color:#F20421;
+}
+
+/* text styles*/
+
+h2 {
+  color: #FFF;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 3.6em;
+  }
+
+.pickone {
+	color: #1C2E7B;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 3em;
+  line-height: 100%;
+ 	padding: .85em 0;
+}
+
+.neworedit {
+	margin: .85em 0;
+	text-align: center;
+}
+
+.boxcopy {
+	color: #1C2E7B;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.8em;
+  line-height: 125%;
+}
+
+/**
+ * Breadcrumb Styles
+ */
+ 
+ /*a {
+  color: #F20421;
+  transition: color 0.3s ease-in-out;
+  text-decoration: none;
+}*/
+
+ ul#js-breadcrumb {
+ 	padding-left: 0px;
+ }
+.breadcrumb {
+  font-size: 1.8em;
+}
+.breadcrumb ul{
+	-webkit-inline-start: 0px;
+  	padding-inline-start: 0px;
+  	list-style: none;
+}
+.breadcrumb > li {
+  display: inline-block;
+  padding: 0.5em 0;
+}
+.breadcrumb > li:after {
+  content: ">";
+  display: inline-block;
+  margin: 0 0.5em 0 0.25em;
+  color: #1C2E7B;
+  font-weight: 300;
+}
+.breadcrumb > li:last-child:after {
+	  content: "";
+}
+.breadcrumb > li > a {
+  color: #1C2E7B;
+}
+@media only screen and (min-width: 40em) {
+  .breadcrumb {
+    font-size: 1.8em;
+  }
+}
+
+.breadcrumb:after {
+  display: none;
+}
+@media (hover) {
+  .breadcrumb:after {
+    content: 'hover';
+  }
+}
+
+.breadcrumb > li:hover > a {
+  color: #F20421;
+}
+
+.breadcrumb li {
+  position: relative;
+}
+.breadcrumb li ul {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  left: -9999px;
+  z-index: 2;
+  background-color: #EEFAFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-radius: .25em;
+}
+.breadcrumb li ul a {
+  display: block;
+  white-space: nowrap;
+  padding: 0.5em 1em;
+  border-bottom: 1px solid #C9E9FF;
+  color: #1C2E7B;
+  list-style: none;
+}
+
+.breadcrumb li:hover ul li a:hover {
+  color: #F20421;
+}
+
+.cutsthemustard .breadcrumb__toggle:after {
+  content: "";
+  display: inline-block;
+  vertical-align: middle;
+  width: 0;
+  height: 0;
+  margin-left: 0.3333333333em;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #e9e4c9;
+  transition: border-color 0.3s ease-in-out;
+}
+.breadcrumb li:hover .cutsthemustard .breadcrumb__toggle:after {
+  border-top-color: white;
+}
+
+@media (hover) {
+  .breadcrumb li:hover ul,
+  .breadcrumb li:focus ul {
+    left: 0;
+  }
+}
+.breadcrumb li.is-toggled ul {
+  left: 0;
+}
+
+
+/* media queries */
+
+@media only screen and (max-width: 1220px) {
+	.boxcontainer {
+  		margin: 10% 10% 0 10%;
+	}
+	.pickone {
+		font-size: 2.8em;
+	}
+}
+
+@media only screen and (max-width: 1080px) {
+	.leftbox {
+		width: 49%;
+	}
+	.rightbox {
+		width: 49%;
+	}
+	.boxcopy {
+		font-size: 1.6em;
+	}
+}
+
+@media only screen and (max-width: 1000px) {
+	.pickone {
+		font-size: 2.6em;
+	}
+	.neworedit {
+		margin: .75em 0;
+	}
+}
+
+@media only screen and (max-width: 900px) {
+	.boxcontainer {
+  		margin: 8% 8% 0 8%;
+	}
+	.pickone {
+		font-size: 2.4em;
+	}
+	.neworedit {
+		margin: .66em 0;
+	}
+}
+
+@media only screen and (max-width: 850px) {
+	.boxcontainer {
+  		margin: 8% 7% 0 7%;
+	}
+}

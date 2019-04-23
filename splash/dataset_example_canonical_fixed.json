@@ -1,0 +1,199 @@
+{
+	"@context": {
+		"@vocab": "http://schema.org/",
+		"re3data": "http://example.org/re3data/0.1/",
+		"earthcollab": "https://library.ucar.edu/earthcollab/schema#",
+		"geolink": "http://schema.geolink.org/1.0/base/main#",
+		"geolink-vocab": "http://schema.geolink.org/1.0/voc/local#",
+		"vivo": "http://vivoweb.org/ontology/core#",
+		"dcat": "http://www.w3.org/ns/dcat#",
+		"dbpedia": "http://dbpedia.org/resource/",
+		"geo-upper": "http://www.geoscienceontology.org/geo-upper#"
+	},
+	"@type": "Dataset",
+	"@id": "http://opencoredata.org/id/dataset/00cd2c07-ff21-4ceb-8595-c6572eda55e9",
+	"additionalType": [
+		"http://schema.geolink.org/1.0/base/main#Dataset",
+		"http://vivoweb.org/ontology/core#Dataset"
+	],
+	"name": "LNWB Ch07 Water Management - Agricultural water use - data",
+	"alternateName": "NE15_AlexanderB",
+	"url": "http://opencoredata.org/id/dataset/00cd2c07-ff21-4ceb-8595-c6572eda55e9",
+	"description": "Overview: Agricultural water use includes the irrigation of croplands and the water needs of dairy farms.",
+	"version": "v1.2.5",
+	"isAccessibleForFree": true,
+	"keywords": "ocean acidification, OA, Dissolved Organic Carbon, DOC, bacterioplankton respiration, pCO2, carbon dioxide",
+	"license": "http://creativecommons.org/licenses/by/4.0/",
+	"citation": ["Fake Citation Here"],
+	"includedInDataCatalog": {
+		"@id": "https://www.hydroshare.org",
+		"url": "http:\/\/www.bco-dmo.org\/datasets"
+	},
+	"distribution": [
+		{
+			"@type": "DataDownload",
+			"contentUrl": "https://www.hydroshare.org/hsapi/resource/8f361f21f9884c4b883a7b9d723155bc/",
+			"encodingFormat": "application/zip"
+		},
+		{
+			"@type": "DataDownload",
+			"contentUrl": "https://www.hydroshare.org/hsapi/resource/jjadfs89e4jjzx74jdjd784j",
+			"encodingFormat": "text/csv"
+		}
+	],
+	"provider": {
+		"@id": "https://www.hydroshare.org",
+		"@type": "Organization",
+		"additionalType": "http://schema.geolink.org/1.0/base/main#Organization",
+		"legalName": "Biological and Chemical Data Management Office",
+		"name": "BCO-DMO",
+		"url": "https://www.hydroshare.org"
+	},
+	"publisher": {
+		"@id": "https://csdco.umn.edu/",
+		"@type": "Organization",
+		"description": "Continental Scientific Drilling Coordination Office",
+		"name": "CSDCO",
+		"url": "https://csdco.umn.edu/"
+	},
+	"creator": [
+		{
+			"@id": "http://lod.bco-dmo.org/id/person-role/472036",
+			"@type": "Role",
+			"additionalType": "http://schema.geolink.org/1.0/base/main#Participant",
+			"roleName": "Principal Investigator",
+			"url": "http://lod.bco-dmo.org/id/person-role/472036",
+			"creator": {
+				"@id": "https://www.bco-dmo.org/person/51317",
+				"@type": "Person",
+				"additionalType": "http://schema.geolink.org/1.0/base/main#Person",
+				"name": "Dr. Uta Passow",
+				"givenName": "Uta",
+				"familyName": "Passow",
+				"url": "https://www.bco-dmo.org/person/51317",
+				"identifier": {
+					"@type": "PropertyValue",
+					"additionalType": [
+						"http://schema.geolink.org/1.0/base/main#Identifier",
+						"http://purl.org/spar/datacite/Identifier"
+					],
+					"propertyID": "http://purl.org/spar/datacite/orcid",
+					"url": "https://orcid.org/0000-0003-2591-5293",
+					"value": "0000-0003-2591-5293"
+				}
+			}
+		},
+		{
+			"@id": "http://lod.bco-dmo.org/id/person-role/472036",
+			"@type": "Role",
+			"additionalType": "http://schema.geolink.org/1.0/base/main#Participant",
+			"roleName": "Author",
+			"url": "http://lod.bco-dmo.org/id/person-role/472036",
+			"creator": {
+				"@id": "https://www.bco-dmo.org/person/51317",
+				"@type": "Person",
+				"additionalType": "http://schema.geolink.org/1.0/base/main#Person",
+				"name": "Eric Lingerfelt",
+				"givenName": "Eric",
+				"familyName": "Lingerfelt",
+				"url": "https://www.bco-dmo.org/person/51317",
+				"identifier": {
+					"@type": "PropertyValue",
+					"additionalType": [
+						"http://schema.geolink.org/1.0/base/main#Identifier",
+						"http://purl.org/spar/datacite/Identifier"
+					],
+					"propertyID": "http://purl.org/spar/datacite/orcid",
+					"url": "https://orcid.org/0000-0003-2591-5293",
+					"value": "0000-0003-2591-5293"
+				}
+			}
+		}
+	],
+	"spatialCoverage": [
+		{
+			"@type": "Place",
+			"name": "And now a word from our sponsor",
+			"geo": [{
+				"@type": "GeoCoordinates",
+				"latitude": 40.03509535715194,
+				"longitude": -105.24363760086527
+			}]
+		},
+		{
+			"@type": "Place",
+			"name": "Fauna Lingerfeldt sightings",
+			"geo": [{
+				"@type": "GeoShape",
+				"box": "40.027658595465056,-105.29682689638565,39.9874239672697,-105.2250743410458",
+				"polygon": "40.02792148888426,-105.33459139919609,40.027658595465056,-105.29682689638565,40.063140042367024,-105.2721083127279,40.020560090177206,-105.21786475414564,40.01267199586745,-105.16602439119676,39.9874239672697,-105.2250743410458,39.96295603760275,-105.20653540330251,39.97058676202195,-105.33390477187224,40.00767573121949,-105.31021612920026"
+			}]
+		}
+	],
+	"variableMeasured": [
+		{
+			"@type": "PropertyValue",
+			"@id": "https://www.bco-dmo.org/dataset-parameter/665789",
+			"description": "Number identifying the cruise.",
+			"name": "target_pCO2",
+			"unitText": "parts per million (ppm)",
+			"url": "https://www.bco-dmo.org/dataset-parameter/665789"
+		},
+		{
+			"@id": "https://www.bco-dmo.org/dataset-parameter/665785",
+			"@type": "PropertyValue",
+			"additionalType": "https://library.ucar.edu/earthcollab/schema#Parameter",
+			"description": "Experiment identifier",
+			"unitText": "unitless",
+			"url": "https://www.bco-dmo.org/dataset-parameter/665785",
+			"name": "experiment"
+		},
+		{
+			"@id": "https://www.bco-dmo.org/dataset-parameter/665786",
+			"@type": "PropertyValue",
+			"additionalType": "https://library.ucar.edu/earthcollab/schema#Parameter",
+			"description": "Site the water for the experiment came from",
+			"unitText": "unitless",
+			"url": "https://www.bco-dmo.org/dataset-parameter/665786",
+			"name": "site"
+		},
+		{
+			"@id": "https://www.bco-dmo.org/dataset-parameter/665787",
+			"@type": "PropertyValue",
+			"additionalType": "https://library.ucar.edu/earthcollab/schema#Parameter",
+			"description": "Latitude where water samples were collected; north is positive.",
+			"unitText": "decimal degrees",
+			"url": "https://www.bco-dmo.org/dataset-parameter/665787",
+			"name": "latitude"
+		},
+		{
+			"@id": "https://www.bco-dmo.org/dataset-parameter/665788",
+			"@type": "PropertyValue",
+			"additionalType": "https://library.ucar.edu/earthcollab/schema#Parameter",
+			"description": "Longitude where water samples were collected; west is negative.",
+			"unitText": "decimal degrees",
+			"url": "https://www.bco-dmo.org/dataset-parameter/665788",
+			"name": "longitude"
+		},
+		{
+			"@id": "https://www.bco-dmo.org/dataset-parameter/665789",
+			"@type": "PropertyValue",
+			"additionalType": "https://library.ucar.edu/earthcollab/schema#Parameter",
+			"description": "Bottle identifier",
+			"unitText": "unitless",
+			"url": "https://www.bco-dmo.org/dataset-parameter/665789",
+			"name": "bottle_number"
+		},
+		{
+			"@id": "https://www.bco-dmo.org/dataset-parameter/665790",
+			"@type": "PropertyValue",
+			"additionalType": "https://library.ucar.edu/earthcollab/schema#Parameter",
+			"description": "Dissolved organic carbon additions.",
+			"unitText": "unitless",
+			"url": "https://www.bco-dmo.org/dataset-parameter/665790",
+			"name": "doc_addition"
+		}
+	]
+	,
+	"measurementTechnique": ["Shimadzu TOC-V Analyzer"]
+}

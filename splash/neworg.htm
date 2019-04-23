@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>JSON-LD Tool | New Organization</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />	
+<meta name="robots" content="noindex, nofollow" />
+	
+<script src="jquery-3.3.1.js"></script>
+<script src="jquery-ui.js"></script>
+<script src="jquery-confirm.min.js"></script>
+<script src="extern.js"></script>
+<script src="prettyprint.js"></script>
+<script src="jquery.scrollTo.min.js"></script>
+<link rel="stylesheet" type="text/css" href="jquery-ui.css"/>
+<link rel="stylesheet" type="text/css" href="jquery-confirm.min.css"/>
+<link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+  integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+  crossorigin=""/>
+<link rel="stylesheet" type="text/css" href="main.css"/>
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+  integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+  crossorigin=""></script>
+<script>
+'use strict';
+
+// The JSON Object that defines the default values of certain types.
+var typesInstantiator = {
+  'string': '',
+  'number': 0,
+  'integer': 0,
+  'null': null,
+  'boolean': false, // Always stay positive?
+  'object': { }
+};
+
+/**
+ * Checks whether a variable is a primitive.
+ * @param obj - an object.
+ * @returns {boolean}
+ */
+function isPrimitive(obj) {
+  var type = obj.type;
+
+  return typesInstantiator[type] !== undefined;
+}
+
+/**
+ * Checks whether a property is on required array.
+ * @param property - the property to check.
+ * @param requiredArray - the required array
+ * @returns {boolean}
+ */
+function isPropertyRequired(property, requiredArray) {
+  var found = false;
+  requiredArray = requiredArray || [];
+  requiredArray.forEach(function(requiredProperty) {
+      if (requiredProperty === property) {
+        found = true;
+      }
+  });
+  return found;
+}
+
+
+function shouldVisit(property, obj, options) {
+    return (!options.requiredPropertiesOnly) || (options.requiredPropertiesOnly && isPropertyRequired(property, obj.required));
+}
+
+/**
+ * Instantiate a primitive.
+ * @param val - The object that represents the primitive.
+ * @returns {*}
+ */
+function instantiatePrimitive(val) {
+  var type = val.type;
+
+  // Support for default values in the JSON Schema.
+  if (val.hasOwnProperty('default')) {
+    return val.default;
+  }
+
+  return typesInstantiator[type];
+}
+
+/**
+ * Checks whether a variable is an enum.
+ * @param obj - an object.
+ * @returns {boolean}
+ */
+function isEnum(obj) {
+  return Object.prototype.toString.call(obj.enum) === '[object Array]';
+}
+
+/**
+ * Checks whether a variable is an array.
+ * @param obj - an object.
+ * @returns {boolean}
+ */
+function isArray(obj) {
+  return Array.isArray(obj);
+}
+
+/**
+ * Extracts the type of the object.
+ * If the type is an array, set type to first in list of types.
+ * If obj.type is not overridden, it will fail the isPrimitive check.
+ * Which internally also checks obj.type.
+ * @param obj - An object.
+*/
+function getObjectType(obj) {
+  // Check if type is array of types.
+  if (isArray(obj.type)) {
+    obj.type = obj.type[0];
+  }
+
+  return obj.type;
+}
+
+/**
+ * Instantiate an enum.
+ * @param val - The object that represents the primitive.
+ * @returns {*}
+ */
+function instantiateEnum(val) {
+  // Support for default values in the JSON Schema.
+  if (val.default) {
+      return val.default;
+  }
+  if (!val.enum.length) {
+      return undefined;
+  }
+  return val.enum[0];
+}
+
+/**
+ * Finds a definition in a schema.
+ * Useful for finding references.
+ *
+ * @param schema    The full schema object.
+ * @param ref       The reference to find.
+ * @return {*}      The object representing the ref.
+ */
+function findDefinition(schema, ref) {
+  var propertyPath = ref.split('/').slice(1); // Ignore the #/uri at the beginning.
+  var currentProperty = propertyPath.splice(0, 1)[0];
+
+  var currentValue = schema;
+
+  while (currentProperty) {
+    currentValue = currentValue[currentProperty];
+    currentProperty = propertyPath.splice(0, 1)[0];
+  }
+
+  return currentValue;
+}
+
+/**
+ * The main function.
+ * Calls sub-objects recursively, depth first, using the sub-function 'visit'.
+ * @param schema - The schema to instantiate.
+ * @returns {*}
+ */
+function instantiate(schema, options) {
+  options = options || {};
+//alert("here we are in instantiate");
+  /**
+   * Visits each sub-object using recursion.
+   * If it reaches a primitive, instantiate it.
+   * @param obj - The object that represents the schema.
+   * @param name - The name of the current object.
+   * @param data - The instance data that represents the current object.
+   */
+  function visit(obj, name, data) {
+    if (!obj) {
+      return;
+    }
+
+    var i;
+    var type = getObjectType(obj);
+
+    // We want non-primitives objects (primitive === object w/o properties).
+    if (type === 'object' && obj.properties) {
+      data[name] = data[name] || { };
+
+      // Visit each property.
+      for (var property in obj.properties) {
+        if (obj.properties.hasOwnProperty(property)) {
+          if (shouldVisit(property, obj, options)) {
+            visit(obj.properties[property], property, data[name]);
+          }
+        }
+      }
+    } else if (obj.allOf) {
+      for (i = 0; i < obj.allOf.length; i++) {
+        visit(obj.allOf[i], name, data);
+      }
+    } else if (obj.$ref) {
+      obj = findDefinition(schema, obj.$ref);
+      visit(obj, name, data);
+    } else if (type === 'array') {
+      data[name] = [];
+      var len = options.defaultOnArray ? 1 : 0;
+      if (obj.minItems || obj.minItems > 0) {
+        len = obj.minItems;
+      }
+
+      // Instantiate 'len' items.
+      for (i = 0; i < len; i++) {
+        visit(obj.items, i, data[name]);
+      }
+    } else if (isEnum(obj)) {
+      data[name] = instantiateEnum(obj);
+    } else if (isPrimitive(obj)) {
+      data[name] = instantiatePrimitive(obj);
+    }
+  }
+
+  var data = {};
+  visit(schema, 'kek', data);
+  return data['kek'];
+}
+
+// If we're using Node.js, export the module.
+if (typeof module !== 'undefined') {
+  module.exports = {
+    instantiate: instantiate
+  };
+}
+</script>
+</head>
+
+<header class="surroundHead">
+                <h1 class="logo"><a href="index.htm"><img src="images/geofinal.png" /></a></h1><p class="tagline wrapme">Geoscience Cyberinfrastructure for Open Discovery in the Earth Sciences</p>
+</header>
+
+<body>
+
+<section id="breadcrumbs" class="surroundNav clearfix">
+		
+		<ul id="L1" class="clearfix L1nav">
+                        <li id="EnterData" class="breadcrumb_L1">Organizations</li>             
+        </ul>
+        
+		<p class="subnavrule"></p>
+		
+       	<ul id="L2EnterData" class="clearfix L2nav">	
+                        <li class="breadcrumb_L2 yet2Bdone">startover</li>
+                        <li class="breadcrumb_del"><i class="fa fa-angle-right"></i></li>
+                        <li class="breadcrumb_L2 yet2Bdone">setup</li>
+                        <li class="breadcrumb_del"><i class="fa fa-angle-right"></i></li>
+ 		</ul>
+                        
+        <p class="subnavbottomrule"></p>                
+</section>
+
+<section id="MainInfo" class="surroundDiv clearfix" style="display:none">
+
+			<img id="" class="arrowleft" src="images/leftarrow.png" style="cursor: pointer"/>
+			<img id="" class="arrowright"  src="images/rightarrow.png" style="cursor:pointer"/>
+
+			<form id="InitSetup" name="#" class="clearfix" action="URL where data should be sent" method="post">
+				<h2 class="formHead">Initial Setup</h2>
+				<h3 class="formSubHead"><legend>Start with:</legend></h3>
+				<div class="wholeColumn">
+				<fieldset>
+					<div class="clearfix">
+    						<div class="init"><label for="orgurl" class="radiolabel">URL</label><input class="radiourl" type="text" id="findurl" name="find_url"><input type="button" class="contentbutton choosebutton" value="Choose" onclick="document.getElementById('selectedFile').click();" /></div>
+							<div class="init"><label for="file" class="radiolabel">File</label><input type="button" id="OpenFile" class="contentbutton  choosebutton" value="Browse..." onclick="document.getElementById('selectedFile').click();" /></div>
+							<div class="init"><label for="file" class="radiolabel">Blank form</label><input type="button" class="contentbutton  choosebutton" value="Create file" onclick="document.getElementById('selectedFile').click();" /></div>
+     				</div>
+     			</fieldset>	
+				</div><!--wholecolumn-->
+			</form>
+			
+			<form id="AddCat" name="#" class="clearfix" action="URL where data should be sent" method="post">
+				<h2 class="formHead">Add Categories</h2>
+				<div class="instructions">
+					<p>Select additional categories to include in your JSON-LD and click Next. If you are starting with a file, mandatory data categories are checked by default, based on your file, and cannot be unchecked.</p>
+				</div>
+				<h3 class="formSubHead"><legend>Mandatory Categories</legend></h3>
+				<div class="wholeColumn">
+				<fieldset>
+					<div class="clearfix">
+    						<div><input name="mandatory" type="checkbox" id="maininfo" value="maininfo" checked disabled><label for="maininfo" class="checkboxlabel disable">Main information</label></div>
+							<div><input name="mandatory" type="checkbox" id="contactinfo" value="contactinfo" checked disabled><label for="contactinfo" class="checkboxlabel disable">Contact information</label></div>
+							<div><input name="mandatory" type="checkbox" id="additinfo" value="additinfo" checked disabled><label for="additinfo" class="checkboxlabel disable">Additional information</label></div>
+     				</div>
+     			</fieldset>	
+				</div><!--wholecolumn-->
+				<h3 class="formSubHead"><legend>Additional Categories</legend></h3>
+				<div class="wholeColumn">
+				<fieldset>
+					<div class="clearfix">
+    						<div class="catspace"><input name="add" type="checkbox" id="all" value="all"><label for="all" class="checkboxlabel">Select all</label></div>
+							<div class="catspace"><input name="add" type="checkbox" id="parentorgs" value="parentorgs"><label for="parentorgs" class="checkboxlabel">Parent organizations</label></div>
+							<div class="catspace"><input name="add" type="checkbox" id="associations" value="associations"><label for="associations" class="checkboxlabel">Associations</label></div>
+							<div class="catspace"><input name="add" type="checkbox" id="funding" value="funding"><label for="funding" class="checkboxlabel">Funding agencies</label></div>
+     						<div class="catspace"><input name="add" type="checkbox" id="publish" value="publish"><label for="publish" class="checkboxlabel">Publishing principles</label></div>
+     				</div>
+     			</fieldset>	
+				</div><!--wholecolumn-->
+			</form>
+			
+			<form id="makeJSON" name="#" class="clearfix" action="URL where data should be sent" method="post">
+				<h2 class="formHead">Make JSON-LD</h2>
+				<h3 class="formSubHead"><legend>Your JSON-LD Output:</legend></h3>
+				<div class="wholeColumn">
+				<fieldset>
+					<div class="buttondiv">
+						<input id="Raw" type="button" class="contentbutton" value="Raw"/>
+						<input id="Pretty" type="button" class="contentbutton" value="Pretty"/>
+					</div>
+					<div class="clearfix JSONstring">Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Nullam id dolor id nibh ultricies vehicula ut id elit. Donec id elit non mi porta gravida at eget metus. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</div>
+     			</fieldset>	
+     			
+				</div><!--wholecolumn-->
+			</form>
+			
+</section><!--MainInfo-->
+
+<section id="buttons" class="surroundDiv clearfix">
+	<p class="subnavrule"></p>
+		<input id="SaveFile" type="button" class="contentbutton" value="Save local file"/>
+<!--		<input id="OpenFile" type="button" class="contentbutton" value="Open local file"/> -->
+		<input id="OrgData" type="button" class="contentbutton" value="Org/Data"/>
+		<input id="Validate" type="button" class="contentbutton" value="Validate"/>
+</section>
+
+</body>
+			<div id="TEXTINPUT" style="display:none">
+				<input type="text" id="X1" name="org_street">
+				<label for="X1">Street</label>
+				<p class="errorCopy seeError">Please enter a valid response.</p>
+			</div>
+
+<!-- *********************************************************************************** -->
+				<div id="NEW_OBJECT" style="display:none" class="siblingBox clearfix">
+				<h3 class="formSubHead" ><legend style="display:none">OBJECT NAME</legend></h3>
+				<div class="leftColumn">
+				<fieldset></fieldset>	
+				</div><!--leftcolumn-->
+				
+				<div class="rightColumn">
+				<fieldset></fieldset>
+				</div><!--rightcolumn-->
+				</div><!--siblingBox-->
+<!-- *********************************************************************************** -->
+<!-- premade spatial coverage HTML we merge the two arrays contents to build the JSON -->
+<!-- *********************************************************************************** -->
+<form id="SPATIAL" style="display:none" class="clearfix">
+	<h2 class="formHead">Spatial Coverage</h2>
+	<div class="instructions">
+		<p>Enter information describing the geographical area where this dataset was collected. This area may be either a single point or a box/polygon enclosing the data.</p>
+	</div>
+<!-- Here is where instances of #MULTIGEN get inserted -->
+<div class="geocoordinate multigen clearfix" tinst=0 style="display:none">	
+	<div class="wholeColumn clearfix">
+		<h3 class="multigenSubHead"><legend>GeoCoordinate</legend></h3>
+		<p class="staytogether"><i title="Remove this GeoCoordinate" class="delinst fa fa-minus-square-o fa-3x"></i><i title="Add another GeoCoordinate" class="addinst fa fa-plus-square-o fa-3x"></i></p>
+	</div>
+	<div class="instructions">
+		<p>Enter an individual geographical coordinate: name, latitude, longitude, (optional) elevation<br>OR<br>Click on the map to define a coordinate location.</p>
+	</div>
+	<div class="theColumns clearfix" at_type="GeoCoordinate">
+	<div class="leftColumn">
+		<fieldset>
+<!--
+		<div id="type" style="display: block;" fullpath="spatialGeoCoordinate" data-html="true" title="constant identifying this object type.
+JSON::@type">
+				<input type="text" value="GeoCoordinate" readonly>
+				<label for="X1">@type</label>
+			</div>
+-->
+		<div id="name" style="display: block;" fullpath="spatialGeoCoordinate" data-html="true" title="Enter the name of the geographical area where the dataset was collected.
+Example: Falling Water Falls [3PP40] vertebrate fauna dataset
+JSON::name">
+				<input type="text" class="GeoName">
+				<label for="X1">Name of Place</label>
+			</div>
+					<div>
+    					<input type="text" class="GeoLat">
+    					<label for="neworgurl">Latitude</label>
+  					</div>
+					<div>
+    					<input type="text" class="GeoLon">
+    					<label for="neworgurl">Longitude</label>
+  					</div>
+					<div>
+    					<input type="text" class="GeoElev">
+    					<label for="neworgurl">Elevation (optional)</label>
+  					</div>
+			</fieldset>	
+	</div><!--leftcolumn-->
+
+	<div class="rightColumn">
+		<fieldset>
+		<div class="mapGeoCoord" style="height:455px"></div>
+		</fieldset>
+	</div><!--rightcolumn-->
+	</div><!-- end theColmns -->
+</div><!-- end multigen instance -->
+
+<div class="geoshape multigen clearfix" tinst=0 style="display:none">	
+	<div class="wholeColumn clearfix">
+		<h3 class="multigenSubHead"><legend>GeoShape</legend></h3>
+		<p class="staytogether"><i title="Remove this GeoShape" class="delinst fa fa-minus-square-o fa-3x"></i><i title="Add another GeoShape" class="addinst fa fa-plus-square-o fa-3x"></i></p>
+	</div>
+	<div class="instructions">
+		<p>In "Box" field enter two opposing corners coordinates of the box that bounds the collected data<br>AND/OR<br>In Polygon field enter a comma-delimited closed list of coordinates (last coordinate must match first)</p>
+	</div>
+	<div class="theColumns clearfix" at_type="GeoShape">
+	<div class="leftColumn">
+		<fieldset>
+<!--
+				<div id="type" style="display: block;" fullpath="spatialGeoCoordinate" data-html="true" title="constant identifying this object type.
+JSON::@type">
+				<input type="text" value="GeoShape" readonly>
+				<label for="X1">@type</label>
+			</div>
+-->
+		<div id="name" style="display: block;" fullpath="spatialGeoCoordinate" data-html="true" title="Enter the name of the geographical area where the dataset was collected.
+Example: Falling Water Falls [3PP40] vertebrate fauna dataset
+JSON::name">
+				<input type="text" class="GeoName">
+				<label for="X1">Name of Place</label>
+			</div>
+			<div>
+				<input type="text" class="GeoBox" title="Lat,Lon of opposite corners of box that encloses the dataset.
+Example:
+39.73371170373402,
+-105.00527300620882,
+39.736871660106125,
+-105.00287034299636">
+				<label for="neworgurl">Box</label>
+			</div>
+			<div>
+				<textarea class="GeoPoly" rows="5" cols="60" title="List of lat/lon pairs traversing the polygon vertices.
+Example:
+39.782514, -104.994279,
+39.783676, -104.994283,
+39.783697, -104.992647,
+39.78251, -104.992636,
+39.782514, -104.994279"></textarea>
+				<label for="neworgurl">Polygon Coordinates</label>
+			</div>
+</fieldset>	
+	</div><!--leftcolumn-->
+
+	<div class="rightColumn">
+		<fieldset>
+		<div class="mapGeoShape" style="height:455px"></div>
+		</fieldset>
+	</div><!--rightcolumn-->
+	</div><!-- end theColmns -->
+</div><!-- end multigen instance -->
+
+</form><!-- end of Spatial category form -->
+<!-- *********************************************************************************** -->
+
+<div id="NEWSECT" class="uiSect" style="display:none">
+	<h3 class="formSubHead"><legend>?SECTION_LABEL?</legend></h3>
+	<div class="theColumns clearfix">
+		<div class="leftColumn">
+			<fieldset></fieldset>	
+		</div><!--leftcolumn-->
+	
+		<div class="rightColumn">
+			<fieldset></fieldset>
+		</div><!--rightcolumn-->
+	</div><!--theColumns-->
+</div>
+
+<div id="COMMENT" class="uiSect clearfix" style="display:none">
+	<h3 class="formSubHead"><legend>?SECTION_LABEL?</legend></h3>
+</div>
+
+	<div id="CHECKBOX" class="CheckBoxSpace" style="display:none">
+		<input type="checkbox" id="X1" name="org_street">
+		<label class="checkboxlabel" for="X1">Street</label>
+		<p class="errorCopy seeError">Please enter a valid response.</p>
+	</div>
+
+    <div id="MIMEPICKER" style="display:none">
+    <select name="mpck" id="mpck">
+      <option disabled selected>Select file type</option>
+     </select>
+	<label for="X1">Street</label>
+    </div>
+
+<form id="CATEGORY_NAME" style="display:none" class="clearfix">
+	<h2 class="formHead">Headline for Parent</h2>
+	<div class="instructions">
+		<p></p>
+	</div>
+<!-- Here is where instances of #MULTIGEN get inserted -->
+</form><!-- end of entire category form -->
+			
+<div id="MULTIGEN" class="multigen clearfix" style="display:none">	
+	<div class="wholeColumn clearfix">
+		<h3 class="multigenSubHead"><legend>Parent Category</legend></h3>
+		<p class="staytogether"><i title="delinst" class="delinst fa fa-minus-square-o fa-3x"></i><i title="addinst" class="addinst fa fa-plus-square-o fa-3x"></i></p>
+	</div>
+	<div class="instructions">
+		<p></p>
+	</div>
+	<div class="theColumns clearfix">
+	<div class="leftColumn">
+		<fieldset></fieldset>	
+	</div><!--leftcolumn-->
+
+	<div class="rightColumn">
+		<fieldset>
+		</fieldset>
+	</div><!--rightcolumn-->
+	</div><!-- end theColmns -->
+</div><!-- end multigen instance -->
+
+</html>

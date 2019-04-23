@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" class="darkearth">
+<head>
+	<meta charset="utf-8" />
+	<title>JSON-LD Tool</title>
+	
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />	
+<meta name="robots" content="noindex, nofollow">
+
+<script src="jquery-3.3.1.js"></script>
+<script src="jquery-ui.js"></script>
+<script src="jquery-confirm.min.js"></script>
+<script src="extern.js"></script>
+<link rel="stylesheet" type="text/css" href="main.css"/>
+<link rel="stylesheet" type="text/css" href="jquery-ui.css"/>
+<link rel="stylesheet" type="text/css" href="jquery-confirm.min.css"/>
+<link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<header class="surroundHead">
+                <h1 class="logolight"><img src="images/geofinalLight.png" /></h1><p class="taglinelight wrapme">Geoscience Cyberinfrastructure for Open Discovery in the Earth Sciences</p>
+    
+</header>
+
+<body class="clearfix">
+	
+    <div class="boxcontainer clearfix">
+    <div class="intro">
+    	<h2 class="teaser">Want to share your data with the scientific community? We&rsquo;ve made it easy!</h2>
+    	<p class="introcopy">Simply enter your data in our wizard-based tool to quickly convert it to a distributable and searchable format. The result is easy-to-share data and better search results.<br /><a id="LearnMore" href="#">Learn more&hellip;</a></p>
+    </div>
+        <div class="leftbox"> 
+        	<h2 class="neworedit">new</h2>  
+        		<a href="/alexm/react-ui-2/?action=new&set=organization"><div class="subleftbox">
+        			<p class="pickone">organization</p>
+        			<p class="boxruleline"></p>
+        			<p class="boxcopy">Click here to create a new organization JSON-LD.</p>
+        		</div></a>
+        		<a href="/alexm/react-ui-2/?action=new&set=dataset"><div class="subrightbox">
+        			<p class="pickone">dataset</p>
+        			<p class="boxruleline"></p>
+        			<p class="boxcopy">Click here to create a new dataset JSON-LD.</p>
+        		</div></a> 
+        </div>
+        <div class="rightbox">
+        	<h2 class="neworedit">edit</h2> 
+        		<a href="/alexm/react-ui-2/?action=load&set=organization"><div class="subleftbox">
+        			<p class="pickone">organization</p>
+        			<p class="boxruleline"></p>
+        			<p class="boxcopy">Already have an organization JSON-LD?
+        			<br/>
+        			<p class="boxcopy">Click here to edit.</p>
+        		</div></a> 
+        		<a href="/alexm/react-ui-2/?action=load&set=dataset"><div class="subrightbox">
+        			<p class="pickone">dataset</p>
+        			<p class="boxruleline"></p>
+       				<p class="boxcopy">Already have a dataset JSON-LD?
+        			<br/>
+        			<p class="boxcopy">Click here to edit.</p>
+        		</div></a>     
+        </div>
+	</div>
+</body>
+</html>
