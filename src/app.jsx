@@ -332,30 +332,32 @@ class App extends Component {
 }
 
 // Convert to function (higher order function ? )
-export class Catagorizor extends Component {
+// export class Catagorizor extends Component {
 
-  isEnabled = () => {
-    const { set, selectedGroup, disableCatagorization } = this.props;
-    return  !disableCatagorization && selectedGroup && set.schema.groups; 
-  }
+function Catagorizor(props) {
+  // render() {
 
-  transformedFormData = () => group(this.props.set.formData, this.props.set.schema.groups);
-  restoreInstance = transformed => ungroup(transformed, this.props.set.schema.groups);
-
-  onFormDataChange = formData => {
-    if (this.isEnabled()) {
-      let next = this.transformedFormData();
-      next[this.props.selectedGroup] = formData;
-      this.props.onFormDataChange(this.restoreInstance(next));
-    } else {
-      this.props.onFormDataChange(formData);
+    const isEnabled = () => {
+      const { set, selectedGroup, disableCatagorization } = props;
+      return  !disableCatagorization && selectedGroup && set.schema.groups; 
     }
-  };
+  
+    const transformedFormData = () => group(props.set.formData, props.set.schema.groups);
+    const restoreInstance = transformed => ungroup(transformed, props.set.schema.groups);
+  
+    const onFormDataChange = formData => {
+      if (isEnabled()) {
+        let next = transformedFormData();
+        next[props.selectedGroup] = formData;
+        props.onFormDataChange(restoreInstance(next));
+      } else {
+        props.onFormDataChange(formData);
+      }
+    };
 
-  render() {
-
+    
     const subSchema = (schema, selectedGroup) => {
-      // const { schema } = this.props;
+      // const { schema } = props;
       const groups = group(schema.properties, schema.groups);
       const sub = createSchemaShell(schema);
       sub.properties = groups[selectedGroup];
@@ -375,10 +377,10 @@ export class Catagorizor extends Component {
       return R.pick(selectedGroupKeys, uiSchema);
     };
 
-    let { set, selectedGroup } = this.props;
+    let { set, selectedGroup } = props;
     let { schema, uiSchema, formData, fields } = set;
 
-    if (this.isEnabled()) {
+    if (isEnabled()) {
       schema = subSchema(set.schema, selectedGroup);
       formData = subFormData(set.schema, selectedGroup, set.formData);
       uiSchema = ui_sub_schema(set.schema, selectedGroup, set.uiSchema);
@@ -394,11 +396,11 @@ export class Catagorizor extends Component {
         uiSchema={uiSchema}
         formData={formData}
         fields={fields}
-        onFormDataChange={this.onFormDataChange}
-        {...this.props.throughArgs}
+        onFormDataChange={onFormDataChange}
+        {...props.throughArgs}
       />
     );
-  }
+  // }
 }
 
 /** For Bugfix JIRA 198/199. Used to suppress toggle of live validation on first render. */
