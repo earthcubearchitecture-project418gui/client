@@ -5,7 +5,7 @@ import Form from "./libs/rjsf";
 
 // import { setImmediate } from 'core-js-pure';
 
-import themes from './themes.js';
+// import themes from './themes.js';
 
 export default function NavPillSelector({ options }) {
 
@@ -37,17 +37,17 @@ export default function NavPillSelector({ options }) {
   );
 }
 
-export function ThemeSelector({ theme, select }) {
-  const themeSchema = {
-    type: "string",
-    enum: Object.keys(themes),
-  };
-  return (
-    <Form
-      schema={themeSchema}
-      formData={theme}
-      onChange={({ formData }) => select(formData, themes[formData])}>
-      <div />
-    </Form>
-  );
-}
+// export function ThemeSelector({ theme, select }) {
+//   const themeSchema = {
+//     type: "string",
+//     enum: Object.keys(themes),
+//   };
+//   return (
+//     <Form
+//       schema={themeSchema}
+//       formData={theme}
+//       onChange={({ formData }) => select(formData, themes[formData])}>
+//       <div />
+//     </Form>
+//   );
+// }

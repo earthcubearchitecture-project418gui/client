@@ -21,7 +21,7 @@ import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
 import { group, ungroup, createSchemaShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
 import * as JSONvisitors from './json-schema-visitors.js';
-import themes from './themes.js';   
+// import themes from './themes.js';   
 
 import verified_png from './images/verified-green.png';       // Images
 import clear_png from './images/clear.png';
@@ -30,8 +30,8 @@ import earthcube_png from './images/logo_earthcube_full_horizontal.png';
 
 import geocodes_png from './images/geofinalLight.png';
 
-import 'codemirror/lib/codemirror.css'                    // CSS
-import "codemirror/mode/javascript/javascript";
+// import 'codemirror/lib/codemirror.css'                    // CSS
+// import "codemirror/mode/javascript/javascript";
 
 const log = type => console.log.bind(console, type);
 
@@ -96,7 +96,7 @@ class App extends Component {
   static contextType = BackContext;
 
   static defaults = {
-    theme: "superhero",
+    // theme: "superhero",
     set: "dataset"
   };
 
@@ -145,10 +145,10 @@ class App extends Component {
     };
   }
   
-  componentDidMount() {
-    const theme = App.defaults.theme;
-    this.onThemeSelected(theme, themes[theme]);
-  }
+  // componentDidMount() {
+  //   const theme = App.defaults.theme;
+  //   this.onThemeSelected(theme, themes[theme]);
+  // }
 
   static getDerivedStateFromProps({errorList = []}, state) {
     if (!state.attemptedRemoteValidation) { return { errorList: undefined, validGroups: undefined, errorGroups: undefined }; }
@@ -193,14 +193,14 @@ class App extends Component {
     else { this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined, formData: undefined }); }
   };
   changeGroup = selectedGroup => this.setState({selectedGroup });
-  onThemeSelected = (theme, { stylesheet, editor }) => {
-    this.setState({ theme, editorTheme: editor ? editor : "default" });
-    setTimeout(() => {
-      // Side effect!
-      document.getElementById("theme").setAttribute("href", stylesheet);
-    },
-    1);
-  };
+  // onThemeSelected = (theme, { stylesheet, editor }) => {
+  //   this.setState({ theme, editorTheme: editor ? editor : "default" });
+  //   setTimeout(() => {
+  //     // Side effect!
+  //     document.getElementById("theme").setAttribute("href", stylesheet);
+  //   },
+  //   1);
+  // };
   
   // For Catagorizor
   // updateGroups = groups => this.setState({groups});
