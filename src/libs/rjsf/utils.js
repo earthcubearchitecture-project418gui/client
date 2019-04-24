@@ -1,11 +1,6 @@
 import React from "react";
 import validateFormData from "./validate";
 
-// import { setImmediate } from 'core-js-pure';
-// import fill from 'core-js/stable/array/fill';  
-
-// console.log({fill});  //KEEP HERE
-// console.log(Array.prototype.fill);
 
 export const ADDITIONAL_PROPERTY_FLAG = "__additional_property";
 
@@ -794,7 +789,7 @@ export function setState(instance, state, callback) {
   } else {
     instance.setState(state);
     // setImmediate(callback);
-    setTimeout(callback, 1);
+    setTimeout(callback, 0);
   }
 }
 

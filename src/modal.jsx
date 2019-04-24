@@ -24,6 +24,8 @@ export const Modal = (props) => (
   </>
 );
 
+// Standard Modals
+
 export const VerifyUserAction = ({onAccept, onCancel, acceptText = 'Ok', cancelText = 'Cancel'}) => {
   return (
     <>
@@ -51,6 +53,31 @@ export const ErrorModal = props => {
         </p>
         <p className="padding-sm" >
           {msg2}
+        </p>
+      </div>
+
+      <div className="pull-right">
+        <button type="button" className="btn-sm btn-default" onClick={props.onCancel}>OK</button>
+      </div>
+    </>
+  );
+};
+
+
+export function JSONErrorModal(props)  {
+  const msg = props.message || 'An error has occurred while loading this file';
+  return (
+    <>
+      <h5 style={{ fontWeight: 800 }}>Error</h5>
+      <br />
+      <div  style={{color: '#111'}}>
+        <p className="padding-sm" >
+          {msg}
+        </p>
+
+        <p className="padding-sm" >
+          There are many web and desktop tools to assist in correcting JSON.
+          <a href="https://jsonlint.com/" style={{fontWeight: 800}}> https://jsonlint.com </a>
         </p>
       </div>
 

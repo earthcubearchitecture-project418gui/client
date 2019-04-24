@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import * as R from 'ramda';
 
-import { Modal, ErrorModal, VerifyUserAction } from './modal.jsx';
+import { Modal, ErrorModal, VerifyUserAction, JSONErrorModal } from './modal.jsx';
 import { findScriptJSONLD } from './funcs.js';
 import { arrayCoercion, fillInMissingURLs } from './json-schema-visitors.js';
 
@@ -20,7 +20,6 @@ export default class StartPage extends Component {
       challengeModal: false,
       errorModal: false,
       json_error_modal: false, 
-    
     };
   }
 
@@ -175,7 +174,7 @@ export default class StartPage extends Component {
             <div className="col-xs-11">
               <form className="form-horizontal">
                 
-                { this.props.loadedFrom ? 
+                { this.props.loadedFrom && 
                   <div className="form-group">
                     <label className="col-sm-2 control-label "> Loaded From: </label>
                     <div className="col-sm-10">
@@ -185,7 +184,7 @@ export default class StartPage extends Component {
                       <span className="padding-left-xs" style={{verticalAlign: '-webkit-baseline-middle'}}> { this.props.loadedFrom } </span>
                     </div>
                   </div>
-                : undefined }
+                }
 
                 <div className="form-group">
                   <label className="col-sm-2 control-label "> File: </label>
@@ -232,27 +231,3 @@ export default class StartPage extends Component {
     );
   }
 }
-
-function JSONErrorModal(props)  {
-  const msg = props.message || 'An error has occurred while loading this file';
-  return (
-    <>
-      <h5 style={{ fontWeight: 800 }}>Error</h5>
-      <br />
-      <div  style={{color: '#111'}}>
-        <p className="padding-sm" >
-          {msg}
-        </p>
-
-        <p className="padding-sm" >
-          There are many web and desktop tools to assist in correcting JSON.
-          <a href="https://jsonlint.com/" style={{fontWeight: 800}}> https://jsonlint.com </a>
-        </p>
-      </div>
-
-      <div className="pull-right">
-        <button type="button" className="btn-sm btn-default" onClick={props.onCancel}>OK</button>
-      </div>
-    </>
-  );
-};

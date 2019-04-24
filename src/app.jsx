@@ -2,16 +2,14 @@ import React, { Component } from 'react';                 // External deps
 import { render } from 'react-dom';
 
 import * as R from 'ramda';
-// import { setImmediate } from 'core-js-pure';
 
 import * as FileSaver from 'file-saver';
 
-// import TriEditor from './tri-editor.jsx';                 // Internal deps
 import Form from "./libs/rjsf";
 import { shouldRender, deepEquals } from "./libs/rjsf/utils.js";
 
                                                           // Components
-import NavPillSelector, { ThemeSelector } from './nav-pill.jsx';
+import NavPillSelector from './nav-pill.jsx';
 import StartPage from './start-page.jsx';
 import MakeJSONPage  from './make-json-page.jsx';
 import About from './about.jsx';
@@ -21,7 +19,6 @@ import BackContext from './back-context.js';              // Local .js
 import { sets as SchemaSets } from "./sets/sets.js";
 import { group, ungroup, createSchemaShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
 import * as JSONvisitors from './json-schema-visitors.js';
-// import themes from './themes.js';   
 
 import verified_png from './images/verified-green.png';       // Images
 import clear_png from './images/clear.png';
@@ -29,9 +26,6 @@ import error_png from './images/error.png';
 import earthcube_png from './images/logo_earthcube_full_horizontal.png';
 
 import geocodes_png from './images/geofinalLight.png';
-
-// import 'codemirror/lib/codemirror.css'                    // CSS
-// import "codemirror/mode/javascript/javascript";
 
 const log = type => console.log.bind(console, type);
 
@@ -95,42 +89,21 @@ class Back extends Component {
 class App extends Component {
   static contextType = BackContext;
 
-  static defaults = {
-    // theme: "superhero",
-    set: "dataset"
-  };
-
   static sets = SchemaSets;
+  static defaultSet = "dataset"
 
-  static liveSettingsSchema = {
-    type: "object",
-    properties: {
-      validate: { type: "boolean", title: "Live validation" },
-      disable: { type: "boolean", title: "Disable whole form" },
-      disableTripleEdit: { type: "boolean", title: "Disable Tri-Edit" }
-    },
-  };
-  
   constructor(props) {
     super(props);
-    this.sets = SchemaSets; // TODO: change to App.sets
 
     const start = props.retrieveStartValues();
     const selectedSet = (start.set && Object.keys(this.sets).includes(start.set))
-      ? start.set : App.defaults.set;
+      ? start.set : App.defaultSet;
 
-    const selectedGroup = start.action === 'load' ? 'LOADJSON' : Object.keys(this.sets[selectedSet].schema.groups)[0];
+    const selectedGroup = start.action === 'load' ? 'LOADJSON' : Object.keys(App.sets[selectedSet].schema.groups)[0];
     const disableLoadJSON = start.action === 'new';
 
     this.state = { 
-      editorTheme: "default",
-      theme: App.defaults.theme,
-
-      liveSettings: {
-        validate: true,
-        disable: false,
-        disableTripleEdit: true
-      },
+      liveValidate: true,
 
       selectedSet, 
       selectedGroup, 
@@ -144,19 +117,13 @@ class App extends Component {
       modalAccepted: undefined,
     };
   }
-  
-  // componentDidMount() {
-  //   const theme = App.defaults.theme;
-  //   this.onThemeSelected(theme, themes[theme]);
-  // }
 
   static getDerivedStateFromProps({errorList = []}, state) {
     if (!state.attemptedRemoteValidation) { return { errorList: undefined, validGroups: undefined, errorGroups: undefined }; }
 
     if (!deepEquals(errorList, state.errorList)) {
       const errorGroups = [];
-      //TODO: SchemaSets -> App.sets
-      const groups = SchemaSets[state.selectedSet].schema.groups;
+      const groups = App.sets[state.selectedSet].schema.groups;
 
       const invalidTopProperties = stripToTopProperty(errorList);
 
@@ -183,7 +150,7 @@ class App extends Component {
   });
 
   get set() { return App.sets[this.state.selectedSet]; }
-  groups = () => App.sets[this.state.selectedSet].schema.groups;
+  groups = () => this.set.schema.groups;
   groupKeys = () => Object.keys(this.groups());
 
   // For NavPill
@@ -193,22 +160,12 @@ class App extends Component {
     else { this.setState({ selectedSet: selectedSet, selectedGroup: undefined, groups: undefined, formData: undefined }); }
   };
   changeGroup = selectedGroup => this.setState({selectedGroup });
-  // onThemeSelected = (theme, { stylesheet, editor }) => {
-  //   this.setState({ theme, editorTheme: editor ? editor : "default" });
-  //   setTimeout(() => {
-  //     // Side effect!
-  //     document.getElementById("theme").setAttribute("href", stylesheet);
-  //   },
-  //   1);
-  // };
   
   // For Catagorizor
   // updateGroups = groups => this.setState({groups});
   userEditedFormData = formData => { this.setState({formData}, () => this.invalidate(this.state.selectedGroup)); };
   onSubmit = () => {
-    const set = this.sets[this.state.selectedSet];
-    const groupKeys = Object.keys(group(set.schema.properties, set.schema.groups)); 
-    // const groups  = Object.keys(this.state.groups);
+    const groupKeys = Object.keys(group(this.set.schema.properties, this.set.schema.groups)); 
     const index = groupKeys.indexOf(this.state.selectedGroup);
     if (index + 1 < groupKeys.length) {
       this.setState({selectedGroup: groupKeys[index + 1]}, () => window.scrollTo(0, 0));
@@ -232,7 +189,7 @@ class App extends Component {
   };
   fillInMissingIDs = () => {
     try {
-      return JSONvisitors.fillInMissingIDs(this.sets[this.state.selectedSet].schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' });
+      return JSONvisitors.fillInMissingIDs(this.set.schema, R.clone(this.state.formData || {}), { 'url' : 'http://example.org' });
     } catch (err) {
       return null;
     }
@@ -259,25 +216,18 @@ class App extends Component {
   render() {
     const { 
       selectedSet, selectedGroup, 
-      theme, editorTheme, liveSettings,
+      liveValidate,
       validGroups = [], errorGroups = []
     } = this.state;
     
-    const set = { ...this.sets[this.state.selectedSet] };
+    const set = R.clone(this.set);
     //Replace default formData with user formData
     set.formData = this.state.formData || set.formData;
-
-    // const setOptions = Object.keys(this.sets).map(set => ({
-    //   label: set,
-    //   onClick: this.changeSet,
-    //   active: selectedSet === set
-    // }));
 
     let groupKeys;
     if (set.schema.groups) { groupKeys = Object.keys(group(set.schema.properties, set.schema.groups)); }
     else { return (<h5> Error: Group information not found in schema.</h5>); }
 
-    // const errorGroups = this.context.errorGroups(set.schema.groups);
     const groupOptions = groupKeys.map(group => ({
       label: group,
       onClick: this.changeGroup,
@@ -328,11 +278,8 @@ class App extends Component {
           onFormDataChange={this.userEditedFormData}
 
           throughArgs={{ 
-            editorTheme, 
-            liveValidationEnabled: liveSettings.validate,
+            liveValidationEnabled: liveValidate,
             delayLiveValidateUserInput: !this.state.attemptedRemoteValidation,
-            disableForm: liveSettings.disable, 
-            disableTripleEdit: liveSettings.disableTripleEdit,
             onSubmit: this.onSubmit
           }}
         />
@@ -384,21 +331,8 @@ class App extends Component {
   }
 }
 
-
+// Convert to function (higher order function ? )
 export class Catagorizor extends Component {
-  // static contextType = BackContext;
- 
-  state = { previousReportedGroups: null };
-
-  // componentDidMount() {
-  //   const { set: { schema }, reportGroups } = this.props;
-
-  //   if (!this.props.set.schema.groups) { console.log('[Catagorizer] no schema.groups'); return; }
-
-  //   const groupKeys = Object.keys(group(schema.properties, schema.groups));
-  //   reportGroups(groupKeys);
-  //   console.log('Reported groups');
-  // }
 
   isEnabled = () => {
     const { set, selectedGroup, disableCatagorization } = this.props;
@@ -526,20 +460,13 @@ class SuperEditorForm extends Component {
   }
 
   onSchemaEdited = schema => this.setState({ schema });
-
   onUISchemaEdited = uiSchema => this.setState({ uiSchema });
-
   onFormDataEdited = formData => this.setState({ formData });
-
   onFormDataChange = ({ formData }) => {
     console.log('[SuperEditForm onFormDataChange()]' ,formData);
-    // const backAndForth = obj =>  JSON.parse(JSON.stringify(obj));
     
-    
-    // if (this.state.errorBox) { return; }
-
     // Potential Performance Hit
-    if (!R.equals(formData, this.state.formData)) {
+    // if (!R.equals(formData, this.state.formData)) {
       if (SuperEditForm_single_supress) { SuperEditForm_single_supress = false; return; }
 
       this.setState({ formData , userEditedFormData: true }, () => {
@@ -548,7 +475,7 @@ class SuperEditorForm extends Component {
   
         this.props.onFormDataChange(this.state.formData); 
       });
-    }
+    // 
   };
  
   render() {
@@ -563,11 +490,6 @@ class SuperEditorForm extends Component {
       transformErrors,
     } = this.state;
 
-    const { 
-      disableForm,
-      editorTheme
-    } = this.props;
-
     let liveValidate = false;
 
     if (this.props.liveValidationEnabled) {
@@ -579,27 +501,14 @@ class SuperEditorForm extends Component {
 
     return (
       <div className="container-fluid margin-bottom-lg">
-        {/* { !this.props.disableTripleEdit && (
-          <TriEditor 
-            editor={editorTheme}
-            schema={schema}
-            uiSchema={uiSchema}
-            formData={formData}
-
-            onSchemaEdited={this.onSchemaEdited}
-            onUISchemaEdited={this.onUISchemaEdited}
-            onFormDataEdited={this.onFormDataEdited}
-          /> 
-        )} */}
-        {/* div height to allow image to slightly overlap Form */}
-
+      
         { this.state.errorBox && (
             <p className="col-xs-offset-1 col-xs-10 padding-y-xs bg-warning" style={{textAlign: 'center', fontSize: '16px'}}>
               The JSON data for this group is malformed and an error occurred while attempting to render the form. The data will be overwritten with your new input here.
             </p>
         )}
 
-        <div className={ this.props.disableTripleEdit ? "col-sm-12" : "col-sm-5" }>
+        <div className="col-sm-12" >
           {this.state.form && (
             <Form
               ArrayFieldTemplate={ArrayFieldTemplate}
@@ -608,7 +517,6 @@ class SuperEditorForm extends Component {
               liveValidate={liveValidate}
               noHtml5Validate={true}
               validate={validate}
-              disabled={disableForm}
               
               schema={schema}
               uiSchema={uiSchema}
@@ -637,9 +545,6 @@ class SuperEditorForm extends Component {
               onError={() => window.scrollTo(0,0)}>
               
               <div style={{ textAlign: 'center' }}>
-                {/* <button type="button" className="btn btn-info margin-right-xs" onClick={() => this.setState({liveValidate: !!this.props.liveValidate})}>
-                  Validate
-                </button> */}
                 <button type="submit" className="btn btn-info btn-lg">
                   Validate & Continue
                 </button>
