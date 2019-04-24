@@ -3,13 +3,10 @@ import PropTypes from 'prop-types';
 
 import * as R from 'ramda';
 import {
-  Circle,
-  CircleMarker,
   FeatureGroup,
   Map,
   Marker,
   Polygon,
-  Polyline,
   Popup,
   Rectangle,
   TileLayer,
@@ -20,14 +17,14 @@ import L from 'leaflet';
 
 // delete L.Icon.Default.prototype._getIconUrl;
 
-import BackContext from '../../../back-context.js';
+// import BackContext from '../../../back-context.js';
 
-import { morphDataPath } from '../../../funcs.js';
+import { morphDataPath } from '../../funcs.js';
 
-import * as validator from '../../../validators.js';
+import * as validator from '../../validators.js';
 
 class LatLon extends React.Component {
-  static contextType = BackContext;
+  // static contextType = BackContext;
 
   constructor(props) {
     super(props);
@@ -117,7 +114,7 @@ class LatLon extends React.Component {
 }
 
 class Shape extends React.Component {
-  static contextType = BackContext;
+  // static contextType = BackContext;
 
   constructor(props) {
     super(props);

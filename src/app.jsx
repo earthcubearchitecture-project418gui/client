@@ -16,7 +16,7 @@ import About from './about.jsx';
 import { Modal, VerifyUserAction } from './modal.jsx';
 
 import BackContext from './back-context.js';              // Local .js
-import { sets as SchemaSets } from "./sets/sets.js";
+import SchemaSets  from "./sets/sets.js";
 import { group, ungroup, createSchemaShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
 import * as JSONvisitors from './json-schema-visitors.js';
 

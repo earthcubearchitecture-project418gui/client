@@ -1,52 +1,44 @@
-// import arrays from "./samples/arrays";
-// import anyOf from "./samples/anyOf";
-// import oneOf from "./samples/oneOf";
-// import nested from "./samples/nested";
-// import numbers from "./samples/numbers";
-// import simple from "./samples/simple";
-// import widgets from "./samples/widgets";
-// import ordering from "./samples/ordering";
-// import references from "./samples/references";
-// import custom from "./samples/custom";
-// import errors from "./samples/errors";
-// import large from "./samples/large";
-// import date from "./samples/date";
-// import validation from "./samples/validation";
-// import files from "./samples/files";
-// import single from "./samples/single";
-// import customArray from "./samples/customArray";
-// import customObject from "./samples/customObject";
-// import alternatives from "./samples/alternatives";
-// import propertyDependencies from "./samples/propertyDependencies";
-// import schemaDependencies from "./samples/schemaDependencies";
-// import additionalProperties from "./samples/additionalProperties";
+import * as R from 'ramda';
 
-// import datasetSchema from './schema/dataset.json';
-import schemas from './schema/schemas.js';
+import datasetSchema from './dataset-geocodes/dataset.json';
+import dataset_ui_schema from './dataset-geocodes/dataset-ui.js';
+import datasetDefault from './dataset-geocodes/dataset-default.js';
 
-export const sets = {
-  // simple: simple,
-  // Nested: nested,
-  // arrays: arrays,
-  // Numbers: numbers,
-  // Widgets: widgets,
-  // Ordering: ordering,
-  // References: references,
-  // Custom: custom,
-  // Errors: errors,
-  // Large: large,
-  // "Date & time": date,
-  // Validation: validation,
-  // Files: files,
-  // Single: single,
-  // "Custom Array": customArray,
-  // "Custom Object": customObject,
-  // Alternatives: alternatives,
-  // "Property dependencies": propertyDependencies,
-  // "Schema dependencies": schemaDependencies,
-  // "Additional Properties": additionalProperties,
-  // "Any Of": anyOf,
-  // "One Of": oneOf,
+import orgSchema from './organization-geocodes/organization.json';
+import org_ui_schema from './organization-geocodes/organization-ui.json';
+import orgDefault from './organization-geocodes/org-default.js';
 
-  ...schemas
+import { OneOfSpliterManager } from './schema-components/geo-component.jsx';
+
+/// IMPORTANT FIX 
+// Remove spatialCoverage.geo from schema, brakes react-jsonschema-form
+// Uses custom component for rendering instead
+
+let datasetSchemaFixed = R.clone(datasetSchema);
+const path = ['properties', 'spatialCoverage', 'items', 'properties', 'geo'];
+if (R.hasPath(path, datasetSchemaFixed)) {
+  const geo = R.omit(['oneOf'], R.path(path, datasetSchemaFixed));
+  // console.log('geo changed:', geo);
+  datasetSchemaFixed = R.assocPath(path, geo, datasetSchemaFixed);
+} else {
+  console.error('Geo not found!!!');
+}
+
+export default {
+  "dataset": {
+    "schema": datasetSchemaFixed,
+    "formData": datasetDefault,
+    "uiSchema": dataset_ui_schema,
+    "fields": { geo: OneOfSpliterManager },
+    "exampleURL": `https://earthcube.isti.com/alexm/bco-dmo-dataset.json`,
+    "perform_id_removal": true
+  },
+  "organization": {
+    "schema": orgSchema,
+    "formData": orgDefault,
+    "uiSchema": org_ui_schema,
+    "fields": { },
+    "exampleURL": `https://earthcube.isti.com/alexm/bco-dmo-org.json`,
+    "perform_id_removal": true
+  }
 };
