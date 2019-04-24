@@ -1,7 +1,7 @@
 import AddButton from "../AddButton";
 import IconButton from "../IconButton";
 import React, { Component } from "react";
-import includes from "core-js-pure/stable/array/includes";
+// import includes from "core-js-pure/stable/array/includes";
 import * as types from "../../types";
 
 import UnsupportedField from "./UnsupportedField";
@@ -196,7 +196,9 @@ class ArrayField extends Component {
     if (Array.isArray(itemSchema.type)) {
       // While we don't yet support composite/nullable jsonschema types, it's
       // future-proof to check for requirement against these.
-      return !includes(itemSchema.type, "null");
+      // return !includes(itemSchema.type, "null");
+      debugger;
+      return !itemSchema.type.includes("null");
     }
     // All non-null array item types are inherently required by design
     return itemSchema.type !== "null";

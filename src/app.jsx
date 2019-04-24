@@ -2,7 +2,7 @@ import React, { Component } from 'react';                 // External deps
 import { render } from 'react-dom';
 
 import * as R from 'ramda';
-import { setImmediate } from 'core-js-pure';
+// import { setImmediate } from 'core-js-pure';
 
 import * as FileSaver from 'file-saver';
 
@@ -195,10 +195,11 @@ class App extends Component {
   changeGroup = selectedGroup => this.setState({selectedGroup });
   onThemeSelected = (theme, { stylesheet, editor }) => {
     this.setState({ theme, editorTheme: editor ? editor : "default" });
-    setImmediate(() => {
+    setTimeout(() => {
       // Side effect!
       document.getElementById("theme").setAttribute("href", stylesheet);
-    });
+    },
+    1);
   };
   
   // For Catagorizor

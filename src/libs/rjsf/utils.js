@@ -1,7 +1,7 @@
 import React from "react";
 import validateFormData from "./validate";
 
-import { setImmediate } from 'core-js-pure';
+// import { setImmediate } from 'core-js-pure';
 // import fill from 'core-js/stable/array/fill';  
 
 // console.log({fill});  //KEEP HERE
@@ -793,7 +793,8 @@ export function setState(instance, state, callback) {
     instance.setState(state, callback);
   } else {
     instance.setState(state);
-    setImmediate(callback);
+    // setImmediate(callback);
+    setTimeout(callback, 1);
   }
 }
 

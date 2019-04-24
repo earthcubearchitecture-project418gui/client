@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 
 import Form from "./libs/rjsf";
-import { shouldRender } from "./libs/rjsf/utils.js";
+// import { shouldRender } from "./libs/rjsf/utils.js";
 
-import { setImmediate } from 'core-js-pure';
+// import { setImmediate } from 'core-js-pure';
 
 import themes from './themes.js';
 

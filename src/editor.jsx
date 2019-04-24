@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { UnControlled as CodeMirror } from "react-codemirror2";
 
-import { setImmediate } from 'core-js-pure';
+// import { setImmediate } from 'core-js-pure';
 
 import { shouldRender } from "./libs/rjsf/utils.js";
 
