@@ -60,6 +60,14 @@ export function fillInMissingURLs(schema, instance, options = {}) {
         }
       }
 
+      if ( schema.properties['@type']  ) {
+        if ( !instance['@type'] || instance['@type'] === '' ) {
+          console.log('hit:', schema.type, schema.title);
+          const transferValue = schema.properties['@type'].default || options['@type'];
+          instance['@type'] = transferValue; 
+        }
+      }
+
       Object.entries(schema.properties)
         .forEach(([prop, childSchema]) => visitor(childSchema, instance[prop], callback))
     },
