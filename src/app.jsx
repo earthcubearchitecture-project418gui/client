@@ -185,7 +185,7 @@ class App extends Component {
   outputFormData = () => {
     let instance = this.fillInMissingIDs();
     if (!instance) { return null; }
-    return R.mergeAll( [instance, R.pick(['@context'], this.set.schema)] );
+    return R.mergeAll( [{'@type': this.state.selectedSet}, instance, R.pick(['@context'], this.set.schema)] );
   };
   fillInMissingIDs = () => {
     try {
