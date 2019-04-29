@@ -96,7 +96,7 @@ class App extends Component {
     super(props);
 
     const start = props.retrieveStartValues();
-    const selectedSet = (start.set && Object.keys(this.sets).includes(start.set))
+    const selectedSet = (start.set && Object.keys(App.sets).includes(start.set))
       ? start.set : App.defaultSet;
 
     const selectedGroup = start.action === 'load' ? 'LOADJSON' : Object.keys(App.sets[selectedSet].schema.groups)[0];
@@ -175,14 +175,14 @@ class App extends Component {
   };
 
   // For StartPage
-  loadExternalFormData = (formData, loadedFrom) => this.setState({formData, loadedFrom}); 
+  loadExternalFormData = (formData, loadedFrom) => this.setState({formData, loadedFrom, attemptedRemoteValidation: false}); 
   
   // For MakeJSONPage
   saveFile = () => {
-    var blob = new Blob([JSON.stringify(this.onInstanceOut(), undefined, 2)], {type: "text/plain;charset=utf-8"});
+    var blob = new Blob([JSON.stringify(this.outputFormData(), undefined, 2)], {type: "text/plain;charset=utf-8"});
     FileSaver.saveAs(blob, "geocodes-" + this.state.selectedSet + ".json");
   };
-  instanceOut = () => {
+  outputFormData = () => {
     let instance = this.fillInMissingIDs();
     if (!instance) { return null; }
     return R.mergeAll( [instance, R.pick(['@context'], this.set.schema)] );
@@ -254,7 +254,7 @@ class App extends Component {
         onLoadFormData={this.loadExternalFormData} 
       /> );
     } else if (selectedGroup === "MAKEJSON") {
-      const json = this.instanceOut();
+      const json = this.outputFormData();
       main = (
         <MakeJSONPage 
           id_insertion_passed={!!json}
