@@ -157,7 +157,7 @@
         "required": [
           "@type",
           "contentUrl",
-          "encodingFormat"
+          "fileFormat"
         ],
         "properties": {
           "@type": {
@@ -172,7 +172,7 @@
             "example": "https://www.hydroshare.org/hsapi/resource/jjadfs89e4jjzx74jdjd784j",
             "format": "uri"
           },
-          "encodingFormat": {
+          "fileFormat": {
             "type": "string",
             "title": "File Type",
             "description": "Select the type of file you are making available.",

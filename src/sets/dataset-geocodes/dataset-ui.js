@@ -29,7 +29,7 @@ export default {
       "@type": {
         "ui:widget": "hidden"
       },
-      "encodingFormat": {
+      "fileFormat": {
         "ui:widget": "select"
       }
     }

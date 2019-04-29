@@ -85,6 +85,7 @@ export default class StartPage extends Component {
     fr.readAsText(file);
   };
 
+  // TODO refactor, return boolean, lift postVerified
   verifyInput = (instance) => {
     const postVerified = () => {
       instance = arrayCoercion(this.props.schema, instance);
