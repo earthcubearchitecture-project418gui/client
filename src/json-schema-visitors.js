@@ -205,9 +205,9 @@ export function removeArrayBlanks(schema, instance) {
           &&
           instance.every(v => R.is(String, v))
         ) {
-          console.log('Removing blanks : ', JSON.stringify(instance, undefined, 0) ); 
+          // console.log('Removing blanks : ', JSON.stringify(instance, undefined, 0) ); 
           instance = instance.filter(v => v.trim() !== '')
-          console.log('Removed blanks : ', JSON.stringify(instance, undefined, 0) ); 
+          // console.log('Removed blanks : ', JSON.stringify(instance, undefined, 0) ); 
           return instance;
         }
 

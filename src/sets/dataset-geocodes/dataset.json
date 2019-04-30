@@ -102,6 +102,7 @@
     },
     "isAccessibleForFree": {
       "type": "boolean",
+      "default": false,
       "title": "Accessible for Free",
       "description": "Indicate if the dataset is available for free by selecting this checkbox."
     },

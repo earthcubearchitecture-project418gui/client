@@ -11,6 +11,9 @@ export default {
   "description": {
     "ui:widget": "textarea"
   },
+  "isAccessibleForFree": {
+    "ui:emptyValue": false
+  },
   // "citation": {
   //   "items": {
   //     "ui:emptyValue": " "

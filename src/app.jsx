@@ -185,7 +185,7 @@ class App extends Component {
   outputFormData = () => {
     let instance = this.fillInMissingIDs();
     if (!instance) { return null; }
-    return R.mergeAll( [{'@type': this.state.selectedSet}, instance, R.pick(['@context'], this.set.schema)] );
+    return R.mergeAll( [{'@type': this.state.selectedSet, isAccessibleForFree: false }, instance, R.pick(['@context'], this.set.schema)] );
   };
   fillInMissingIDs = () => {
     try {
@@ -526,14 +526,23 @@ class SuperEditorForm extends Component {
               formData={formData}
               
               preValidation={ formData => { 
+                console.log(formData);
+                // Optional object with required properies hack
+                // https://github.com/mozilla-services/react-jsonschema-form/issues/675
+                if ( formData.publisher && formData.publisher.name === undefined && formData.publisher.url === undefined ) 
+                  { formData.publisher = undefined; }
+                // "User experience" hack
                 let res = JSONvisitors.removeArrayBlanks(schema, R.clone(formData)); 
                 return [res, !R.equals(res, formData)];
               }}
     
               onChange={this.onFormDataChange}
               onSubmit={({ formData, formDataChanged }, e) => {
-                console.log("submitted formData", formData);
-                console.log("submit event", e);
+                // console.log("submitted formData", formData);
+                // console.log("submit event", e);
+                if ( formData.publisher && formData.publisher.name === undefined && formData.publisher.url === undefined ) 
+                { formData.publisher = {}; formDataChanged = true; }
+
                 if (formDataChanged) { this.onFormDataChange(formData); }
                 this.props.onSubmit();
               }}
