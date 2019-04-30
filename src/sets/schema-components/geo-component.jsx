@@ -28,9 +28,17 @@ class LatLon extends React.Component {
 
   constructor(props) {
     super(props);
+
     let { latitude = '', longitude = '' } = props.formData;
-    if (latitude === 0) { latitude = ''; }
-    if (longitude === 0) { longitude = ''; }
+    console.log('before:',{latitude, longitude});
+
+    // if (latitude === 0) { latitude = ''; }
+    // if (longitude === 0) { longitude = ''; }
+    if (typeof latitude == 'string') { latitude = parseFloat(latitude); }
+    if (typeof longitude == 'string') { longitude = parseFloat(longitude); }
+
+    console.log('after:',{latitude, longitude});
+
     this.state = { latitude, longitude };
   } 
 
