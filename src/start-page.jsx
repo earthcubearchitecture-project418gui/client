@@ -6,6 +6,11 @@ import { Modal, ErrorModal, VerifyUserAction, JSONErrorModal } from './modal.jsx
 import { findScriptJSONLD } from './funcs.js';
 import { arrayCoercion, fillInMissingURLs } from './json-schema-visitors.js';
 
+const errorMessages = {
+  noNetwork: "Either network connectivity failed, or due to the server's security policy, this web page can't read the remote web page. Please instead download the web page source yourself, save the JSON LD into a .json file, and open and edit that.",
+  invalid_json_or_html: `Remote data is not valid JSON, nor HTML with script[type="application/ld+json"] tag.`
+}
+
 export default class StartPage extends Component {
   constructor(props) {
     super(props);
@@ -36,22 +41,33 @@ export default class StartPage extends Component {
 
     fetch(url)
       .then(res => res.text())
-      .then(text => {
-        try {
-          return JSON.parse(text);
-        } catch (error) {
-          const json = findScriptJSONLD(text);
-          return JSON.parse(json);
-        }
-      })
-      .then(obj => {
-        const instance = self.verifyInput(obj);
-        if (!instance) { throw new Error(); }
-        this.props.onLoadFormData(instance, url);
-      })
+      .then(text => 
+        new Promise((resolve, reject) => {
+          let obj;
+          try { 
+            obj = JSON.parse(text);
+          } catch (error) { }
+          if (!obj) {
+            try {
+              obj = JSON.parse(findScriptJSONLD(text));
+            } catch (error) { }
+          }
+          if (!obj) { reject('invalid'); }
+          
+          const instance = self.verifyInput(obj);
+          if (!instance) { reject('invalid'); }
+          this.props.onLoadFormData(instance, url);
+
+          return null;
+        })
+        .catch(err => {
+          console.error(err, err.message);
+          this.setState({ errorModal: true, errorMessage: errorMessages.invalid_json_or_html });
+        })
+      )
       .catch(err => {
-        console.error(err);
-        this.setState({ errorModal: true, errorMessage: `Remote data is not valid JSON, nor HTML with script[type="application/ld+json"] tag.`});
+        console.error(err, err.message);
+        this.setState({ errorModal: true, errorMessage: errorMessages.noNetwork });
       });
   }
   

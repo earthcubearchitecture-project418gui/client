@@ -4,9 +4,28 @@ import ErrorList from './libs/rjsf/components/ErrorList.js';
 
 import * as R from 'ramda';
 
-export default function MakeJSONPage({json, id_insertion_passed, validationImage, onValidate, onSave}) {
+const toJSON = obj => JSON.stringify(obj, undefined, 2);
 
-  json = JSON.stringify(json || {}, undefined, 2);
+export default function MakeJSONPage({obj, id_insertion_passed, validationImage, onValidate, onSave}) {
+  
+  let json = toJSON(obj || {});
+  // if (obj['@context']) {
+  //   let context_json = toJSON(obj['@context']);
+  //   let other_json = toJSON(R.omit(['@context'], obj));
+  //   let first_break = other_json.indexOf('\n'); 
+  //   let last_brace = other_json.lastIndexOf('}');
+  //   let last_break = other_json.lastIndexOf('\n', last_brace);
+
+  //   console.log({first_break, last_brace, last_break});
+
+  //   json = '{  \n' +
+  //   `  "@context": ${context_json},` +
+  //   `  ${other_json.substring(first_break, last_break)}` +
+  //   '}';
+
+  // } else {
+  //   json = toJSON(obj || {});
+  // }
 
   let errorList;
   if (!id_insertion_passed) {

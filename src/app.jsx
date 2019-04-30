@@ -17,7 +17,7 @@ import { Modal, VerifyUserAction } from './modal.jsx';
 
 import BackContext from './back-context.js';              // Local .js
 import SchemaSets  from "./sets/sets.js";
-import { group, ungroup, createSchemaShell, stripToTopProperty, mapTopPropertyToGroup } from './funcs.js';
+import { group, ungroup, createSchemaShell, stripToTopProperty, mapTopPropertyToGroup, nameCapitalized } from './funcs.js';
 import * as JSONvisitors from './json-schema-visitors.js';
 
 import verified_png from './images/verified-green.png';       // Images
@@ -185,7 +185,12 @@ class App extends Component {
   outputFormData = () => {
     let instance = this.fillInMissingIDs();
     if (!instance) { return null; }
-    return R.mergeAll( [{'@type': this.state.selectedSet, isAccessibleForFree: false }, instance, R.pick(['@context'], this.set.schema)] );
+
+    const defaultProps = { '@type': nameCapitalized(this.state.selectedSet) };
+    if (this.state.selectedSet == 'dataset') {
+      defaultProps.isAccessibleForFree = false; 
+    }
+    return R.mergeAll( [defaultProps, instance, R.pick(['@context'], this.set.schema)] );
   };
   fillInMissingIDs = () => {
     try {
@@ -254,11 +259,11 @@ class App extends Component {
         onLoadFormData={this.loadExternalFormData} 
       /> );
     } else if (selectedGroup === "MAKEJSON") {
-      const json = this.outputFormData();
+      const obj = this.outputFormData();
       main = (
         <MakeJSONPage 
-          id_insertion_passed={!!json}
-          json={json || R.clone(this.state.formData)}
+          id_insertion_passed={!!obj}
+          obj={obj || R.clone(this.state.formData)}
           remoteResponse={this.context.response}
           validationImage={this.context.validationImage}
           onValidate={this.remoteValidation}
