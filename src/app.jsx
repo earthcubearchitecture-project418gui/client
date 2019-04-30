@@ -189,6 +189,14 @@ class App extends Component {
     const defaultProps = { '@type': nameCapitalized(this.state.selectedSet) };
     if (this.state.selectedSet == 'dataset') {
       defaultProps.isAccessibleForFree = false; 
+
+      // console.log(Object.hasOwnProperty.call(instance, 'isAccessibleForFree'), instance.isAccessibleForFree !== false, instance.isAccessibleForFree !== true);
+      if ( Object.hasOwnProperty.call(instance, 'isAccessibleForFree'), 
+        instance.isAccessibleForFree !== false, 
+        instance.isAccessibleForFree !== true
+      ) {
+        instance.isAccessibleForFree = false;
+      }
     }
     return R.mergeAll( [defaultProps, instance, R.pick(['@context'], this.set.schema)] );
   };
