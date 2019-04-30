@@ -32,7 +32,7 @@ export default {
       "@type": {
         "ui:widget": "hidden"
       },
-      "fileFormat": {
+      "encodingFormat": {
         "ui:widget": "select"
       }
     }

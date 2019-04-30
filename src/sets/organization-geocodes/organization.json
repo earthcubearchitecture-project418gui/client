@@ -495,7 +495,7 @@
             "example": "https://help.hydroshare.org/about-hydroshare/policies/terms-of-use/",
             "format": "uri"
           },
-          "fileFormat": {
+          "encodingFormat": {
             "type": "string",
             "title": "File Type",
             "description": "Provide the file type for this document.",
