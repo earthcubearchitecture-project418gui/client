@@ -14,9 +14,11 @@ import { OneOfSpliterManager } from './schema-components/geo-component.jsx';
 // Remove spatialCoverage.geo from schema, brakes react-jsonschema-form
 // Uses custom component for rendering instead
 
+export let geoOneOf;
 let datasetSchemaFixed = R.clone(datasetSchema);
 const path = ['properties', 'spatialCoverage', 'items', 'properties', 'geo'];
 if (R.hasPath(path, datasetSchemaFixed)) {
+  geoOneOf = R.path(path, datasetSchemaFixed).oneOf;
   const geo = R.omit(['oneOf'], R.path(path, datasetSchemaFixed));
   // console.log('geo changed:', geo);
   datasetSchemaFixed = R.assocPath(path, geo, datasetSchemaFixed);

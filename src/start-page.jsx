@@ -4,7 +4,7 @@ import * as R from 'ramda';
 
 import { Modal, ErrorModal, VerifyUserAction, JSONErrorModal } from './modal.jsx';
 import { findScriptJSONLD } from './funcs.js';
-import { arrayCoercion, fillInMissingURLs } from './json-schema-visitors.js';
+import { arrayCoercion, geoLatLonCoercion, fillInMissingURLs } from './json-schema-visitors.js';
 
 const errorMessages = {
   noNetwork: "Either network connectivity failed, or due to the server's security policy, this web page can't read the remote web page. Please instead download the web page source yourself, save the JSON LD into a .json file, and open and edit that.",
@@ -105,6 +105,7 @@ export default class StartPage extends Component {
   verifyInput = (instance) => {
     const postVerified = () => {
       instance = arrayCoercion(this.props.schema, instance);
+      instance = geoLatLonCoercion(this.props.schema, instance);
       instance = fillInMissingURLs(this.props.schema, instance);
       this.setState({ loadedData: instance });
       return instance;

@@ -1,8 +1,11 @@
 /// Modifies json schema instance, adding '@id'
 
 import * as R from 'ramda';
-
 import createVisitor from 'json-schema-visitor';
+
+//INSTA-HACK
+//import the part of the schema that was chopped off, over to here
+import { geoOneOf } from './sets/sets.js';
 
 const nop = () => {};
 const logAll = (...items) => console.log(...items);
@@ -60,9 +63,10 @@ export function fillInMissingURLs(schema, instance, options = {}) {
         }
       }
 
+      // Refactor to fillInMissingAtType
       if ( schema.properties['@type']  ) {
         if ( !instance['@type'] || instance['@type'] === '' ) {
-          console.log('hit:', schema.type, schema.title);
+          // console.log('hit:', schema.type, schema.title);
           const transferValue = schema.properties['@type'].default || options['@type'];
           instance['@type'] = transferValue; 
         }
@@ -83,6 +87,43 @@ export function fillInMissingURLs(schema, instance, options = {}) {
   visitor(schema, instance);
   return instance;
 }
+
+
+export function geoLatLonCoercion(schema, instance, options = {}) {
+  const visitor = createVisitor({
+    object: (schema, instance, callback = nop) => {
+      if (!instance) { return; }
+      callback(schema, instance);
+
+      if (instance['@type'] == 'GeoCoordinates') {
+
+        if (typeof instance.latitude == 'string') {
+          instance.latitude = parseFloat(instance.latitude);
+        }
+        if (typeof instance.longitude == 'string') {
+          instance.longitude = parseFloat(instance.longitude);
+        }
+      }
+
+      if (! schema.properties) { return; }
+
+      Object.entries(schema.properties)
+        .forEach(([prop, childSchema]) => visitor(childSchema, instance[prop], callback))
+    },
+    array: (schema, instance, callback = nop) => {
+      if (!instance) { return; }
+      callback(schema, instance);
+
+      if (schema.items) { 
+        instance.forEach(v => visitor(schema.items, v, callback))
+      }
+    }
+  });
+  
+  visitor(schema, instance);
+  return instance;
+}
+
 
 /** Removes @id property from all objects, and from the 'required' array */
 export function removeIDs(schema, options) {
