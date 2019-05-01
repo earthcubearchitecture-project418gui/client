@@ -355,14 +355,10 @@ function Catagorizor(props) {
       return  !disableCatagorization && selectedGroup && set.schema.groups; 
     }
   
-    const transformedFormData = () => group(props.set.formData, props.set.schema.groups);
-    const restoreInstance = transformed => ungroup(transformed, props.set.schema.groups);
-  
     const onFormDataChange = formData => {
       if (isEnabled()) {
-        let next = transformedFormData();
-        next[props.selectedGroup] = formData;
-        props.onFormDataChange(restoreInstance(next));
+        const next = R.mergeAll([set.formData, formData])
+        props.onFormDataChange(next);
       } else {
         props.onFormDataChange(formData);
       }
