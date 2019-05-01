@@ -6,7 +6,7 @@ import * as R from 'ramda';
 
 const toJSON = obj => JSON.stringify(obj, undefined, 2);
 
-export default function MakeJSONPage({obj, id_insertion_passed, validationImage, onValidate, onSave}) {
+export default function MakeJSONPage({obj, id_insertion_passed, validationImage, connectionFailure, onValidate, onSave}) {
   
   let json = toJSON(obj || {});
   // if (obj['@context']) {
@@ -27,25 +27,12 @@ export default function MakeJSONPage({obj, id_insertion_passed, validationImage,
   //   json = toJSON(obj || {});
   // }
 
-  let errorList;
-  if (!id_insertion_passed) {
-    errorList = (
-      <div className="row ">
-        <div className="col-xs-offset-1 col-xs-10">
-          <div className="panel panel-danger errors">
-            <div className="panel-heading">
-              <h4 className="panel-title">ID INSERTION FAILED. Validation by server is prohibited.</h4>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container-fluid">
       
-      { errorList }
+      { !id_insertion_passed && <ErrorBox text={'ID INSERTION FAILED. Validation by server is prohibited'} /> }
+
+      { connectionFailure  && <ErrorBox text={'Last attempt to connect failed. Recommend saving current work before attempting again.'} /> }
       
       <div className="row margin-y-sm">
         <div className="col-xs-3">
@@ -79,6 +66,20 @@ export default function MakeJSONPage({obj, id_insertion_passed, validationImage,
         </div>
       </div>
 
+    </div>
+  );
+}
+
+function ErrorBox({text}) {
+  return (
+    <div className="row ">
+      <div className="col-xs-offset-1 col-xs-10">
+        <div className="panel panel-danger errors">
+          <div className="panel-heading">
+            <h4 className="panel-title"> { text } </h4>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

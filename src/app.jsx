@@ -23,29 +23,43 @@ import * as JSONvisitors from './json-schema-visitors.js';
 import verified_png from './images/verified-green.png';       // Images
 import clear_png from './images/clear.png';
 import error_png from './images/error.png';
+import loading_png from './images/loading-spinner.gif';
 import earthcube_png from './images/logo_earthcube_full_horizontal.png';
 
 import geocodes_png from './images/geofinalLight.png';
 
-const log = type => console.log.bind(console, type);
+const BACK = {
+  // Dont use protocol unless you know CORS
+  PROTOCOL: 'https:',
+  HOST: 'earthcube.isti.org',
+  // ENDPOINT: '/validate_standard999'
+};
 
 class Back extends Component {
   constructor(props) {
     super(props);
-    this.state = { back: undefined, callbacks: []};
+    this.state = { back: undefined, connecting: false, connectionFailure: false };
   }
 
   remoteValidation = (body) => {
-    fetch('https://earthcube.isti.com/api/validate_standard', {
-      method: 'post',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    })
-      .then(res => res.json())
-      .then(json => this.setState({ back:json } , () => { console.log(this.state.back); return; } ) )
-      .catch(err => console.error(err));  
+    this.setState({ connecting: true }, () => {
+      const protocol = BACK.PROTOCOL || window.location.protocol;
+      const slashes = protocol + `//`;
+      const host = slashes + ( BACK.HOST || window.location.hostname );
+      const url = host + ( BACK.ENDPOINT || '/api/validate_standard');
+  
+      fetch(url, {
+        method: 'post',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      })
+        .then(res => res.json())
+        .then(json => this.setState({ back:json, connecting: false, connectionFailure: false } , () => { console.log(this.state.back); return; } ) )
+        .catch(err => { console.error(err); this.setState({ back: undefined, connecting: false, connectionFailure: true }); } );  
+
+    });
   }
 
   backStatus = () => {
@@ -56,14 +70,19 @@ class Back extends Component {
         return 'errors';
       }
     } else {
-      return 'clear';
-    }
+      if (this.state.connecting) { 
+        return 'connecting';
+      } else {
+        return 'clear';
+      }
+    } 
   }
 
   verificationImage = (status) => {
     const backStatus = status || this.backStatus();
     if (backStatus === 'pass') { return verified_png; }
     if (backStatus === 'errors') { return error_png; }
+    if (backStatus === 'connecting') { return loading_png; }
     return clear_png;
   }
 
@@ -74,12 +93,12 @@ class Back extends Component {
         validate: this.remoteValidation, 
         invalidate: this.invalidate, 
         status: this.backStatus(), 
+        connectionFailure: this.state.connectionFailure,
         validationImage: this.verificationImage(),
-        // registerOnRemoteValidation: this.registerOnRemoteValidation 
       }} >
         <App 
           retrieveStartValues={this.props.retrieveStartValues}
-          errorList={R.pathOr([], ['back','errors'], this.state)}
+          errorList={R.path(['back','errors'], this.state)}
         />
       </BackContext.Provider>
     );
@@ -118,9 +137,11 @@ class App extends Component {
     };
   }
 
-  static getDerivedStateFromProps({errorList = []}, state) {
-    if (!state.attemptedRemoteValidation) { return { errorList: undefined, validGroups: undefined, errorGroups: undefined }; }
-
+  static getDerivedStateFromProps({ errorList }, state) {
+    if (!state.attemptedRemoteValidation || errorList === undefined) { return { errorList: undefined, validGroups: undefined, errorGroups: undefined }; }
+    
+    errorList = errorList || [];
+    
     if (!deepEquals(errorList, state.errorList)) {
       const errorGroups = [];
       const groups = App.sets[state.selectedSet].schema.groups;
@@ -138,7 +159,7 @@ class App extends Component {
 
       // Now filter for those groups that are valid
       const validGroups = Object.keys(groups).filter(g => !errorGroups.includes(g));
-      return { errorList: errorList, validGroups, errorGroups };
+      return { errorList, validGroups, errorGroups };
     }
     return null;
   }
@@ -274,6 +295,7 @@ class App extends Component {
           obj={obj || R.clone(this.state.formData)}
           remoteResponse={this.context.response}
           validationImage={this.context.validationImage}
+          connectionFailure={this.context.connectionFailure}
           onValidate={this.remoteValidation}
           onSave={this.saveFile}
         /> 
@@ -287,7 +309,6 @@ class App extends Component {
           disableCatagorization={false}
           set={{...set, schema: JSONvisitors.removeIDs(R.clone(set.schema))}}
           selectedGroup={selectedGroup}
-          // reportGroups={this.updateGroups}
           onFormDataChange={this.userEditedFormData}
 
           throughArgs={{ 
