@@ -88,14 +88,16 @@ export default class StartPage extends Component {
   loadFile = (file) => {
     const fr = new FileReader();
     fr.onload = () => {
+      let instance;
       try {
-        let instance = JSON.parse(fr.result, undefined, 2);
-        instance = this.verifyInput(instance);
-        if (!instance) { throw new Error(); }
-        this.props.onLoadFormData(instance, file.name);
+        instance = JSON.parse(fr.result, undefined, 2);
       } catch(error) {
-        console.error(error);
         this.setState({ json_error_modal: true, errorMessage: `Remote data is not valid JSON.`});
+      }
+      instance = this.verifyInput(instance);
+        // if (!instance) { throw new Error(); }
+      if (instance) {
+        this.props.onLoadFormData(instance, file.name);
       }
     };
     fr.readAsText(file);
@@ -132,7 +134,7 @@ export default class StartPage extends Component {
       return postVerified();
     } else {
       console.error('Remote JSON contains invalid @type value : ', instanceType);
-      return this.setState({ 
+      this.setState({ 
         errorModal: true, 
         errorMessage: `This file type is not a(n) ${checkType} JSON file. 
            Please open an appropiate JSON file.`,
