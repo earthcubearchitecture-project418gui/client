@@ -9,23 +9,23 @@ const toJSON = obj => JSON.stringify(obj, undefined, 2);
 export default function MakeJSONPage({obj, id_insertion_passed, validationImage, connectionFailure, onValidate, onSave}) {
   
   let json = toJSON(obj || {});
-  // if (obj['@context']) {
-  //   let context_json = toJSON(obj['@context']);
-  //   let other_json = toJSON(R.omit(['@context'], obj));
-  //   let first_break = other_json.indexOf('\n'); 
-  //   let last_brace = other_json.lastIndexOf('}');
-  //   let last_break = other_json.lastIndexOf('\n', last_brace);
+  if (obj['@context']) {
+    let context_json = toJSON(obj['@context']).split('\n').map((line,i) => !!i ? '  ' + line : line).join('\n');
+    let other_json = toJSON(R.omit(['@context'], obj));
+    let first_break = other_json.indexOf('\n'); 
+    let last_brace = other_json.lastIndexOf('}');
+    let last_break = other_json.lastIndexOf('\n', last_brace);
 
-  //   console.log({first_break, last_brace, last_break});
+    console.log({first_break, last_brace, last_break});
 
-  //   json = '{  \n' +
-  //   `  "@context": ${context_json},` +
-  //   `  ${other_json.substring(first_break, last_break)}` +
-  //   '}';
+    json = '{  \n' +
+    `  "@context": ${context_json},` +
+    `  ${other_json.substring(first_break, last_break)}` +
+    '}';
 
-  // } else {
-  //   json = toJSON(obj || {});
-  // }
+  } else {
+    json = toJSON(obj || {});
+  }
 
   return (
     <div className="container-fluid">

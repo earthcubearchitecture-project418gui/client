@@ -31,8 +31,8 @@ import geocodes_png from './images/geofinalLight.png';
 const BACK = {
   // Dont use protocol unless you know CORS
   PROTOCOL: 'https:',
-  HOST: 'earthcube.isti.org',
-  // ENDPOINT: '/validate_standard999'
+  HOST: 'earthcube.isti.com',
+  // ENDPOINT: '/api/validate_standard'
 };
 
 class Back extends Component {
