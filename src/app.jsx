@@ -240,7 +240,7 @@ class App extends Component {
   };
 
   //For Home button
-  handleHomeClick = () => this.challengeUser({modalAccepted: () =>   window.location.assign('splash/'); });
+  handleHomeClick = () => this.challengeUser({modalAccepted: () =>   window.location.assign('splash/') });
   challengeUser = state => {
     if (!this.state.formData) { state.modalAccepted(); return; }
     this.setState({modalAccepted: this.clearModal(), ...state, challengeModal: true});
