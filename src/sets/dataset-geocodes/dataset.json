@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://earthcube.isti.com/ucar-json-ld.dataset.schema.json",
+  "$id": "https://earthcube.org/webapps/geocodes/registration/ucar-json-ld.dataset.schema.json",
 
   "@context": {
     "@vocab": "http://schema.org/",

@@ -12,7 +12,7 @@
 	"@type": ["Service", "Organization", "WebSite", "WebPage"],
 	"@id": "https://doi.org/10.17616/R37P4C",
 	
-	"legalName": "Biological and Chemical Data Management Office",
+	"legalName": "Biological and Chemical Oceanography Data Management Office",
     "name": "BCO-DMO",
     "url": "https://www.bco-dmo.org",
 	"description": "The BCO-DMO resource catalog offers free and open access to publicly funded research products whose field of study are biological and chemical oceanography.",

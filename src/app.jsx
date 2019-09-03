@@ -31,8 +31,8 @@ import geocodes_png from './images/geofinalLight.png';
 const BACK = {
   // Dont use protocol unless you know CORS
   PROTOCOL: 'https:',
-  HOST: 'earthcube.isti.com',
-  // ENDPOINT: '/api/validate_standard'
+  HOST: 'js-17-39.jetstream-cloud.org',
+  ENDPOINT: '/api/validate_standard'
 };
 
 class Back extends Component {
@@ -43,10 +43,10 @@ class Back extends Component {
 
   remoteValidation = (body) => {
     this.setState({ connecting: true }, () => {
-      const protocol = BACK.PROTOCOL || window.location.protocol;
-      const slashes = protocol + `//`;
-      const host = slashes + ( BACK.HOST || window.location.hostname );
-      const url = host + ( BACK.ENDPOINT || '/api/validate_standard');
+        const protocol = BACK.PROTOCOL || window.location.protocol;
+        const slashes = protocol + `//`;
+        const host = slashes + ( BACK.HOST || window.location.hostname );
+        const url = host + ( BACK.ENDPOINT || '/api/validate_standard');
   
       fetch(url, {
         method: 'post',
@@ -240,7 +240,7 @@ class App extends Component {
   };
 
   //For Home button
-  handleHomeClick = () => this.challengeUser({modalAccepted: () =>   window.location.assign('splash/') });
+  handleHomeClick = () => this.challengeUser({modalAccepted: () =>   window.location.assign('../') });
   challengeUser = state => {
     if (!this.state.formData) { state.modalAccepted(); return; }
     this.setState({modalAccepted: this.clearModal(), ...state, challengeModal: true});

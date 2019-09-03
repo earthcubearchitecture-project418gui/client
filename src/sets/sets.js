@@ -32,7 +32,7 @@ export default {
     "formData": datasetDefault,
     "uiSchema": dataset_ui_schema,
     "fields": { geo: OneOfSpliterManager },
-    "exampleURL": `https://earthcube.isti.com/alexm/bco-dmo-dataset.json`,
+    "exampleURL": `https://www.earthcube.org/webapps/geocodes/registration/examples/bcodmo-dataset.json`,
     "perform_id_removal": true
   },
   "organization": {
@@ -40,7 +40,7 @@ export default {
     "formData": orgDefault,
     "uiSchema": org_ui_schema,
     "fields": { },
-    "exampleURL": `https://earthcube.isti.com/alexm/bco-dmo-org.json`,
+    "exampleURL": `https://www.earthcube.org/webapps/geocodes/registration/examples/bcodmo-org.json`,
     "perform_id_removal": true
   }
 };
