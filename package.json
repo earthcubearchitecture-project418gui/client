@@ -11,7 +11,7 @@
     "build": "parcel build src/index.html --public-url . "
   },
   "dependencies": {
-    "ajv": "^6.7.0",
+    "ajv": "^6.12.3",
     "autoprefixer": "^9.5.0",
     "file-saver": "^2.0.1",
     "json-schema-visitor": "^0.1.1",
